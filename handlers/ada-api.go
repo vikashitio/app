@@ -61,9 +61,9 @@ func GetCardanoBalance(address string) (string, error) {
 	receivedAmountNew := cryptoAmountFormat(receivedAmount)
 	status := ""
 	if receivedFinalResult == true {
-		status = "SUCCESS"
+		status = "Success"
 	} else {
-		status = "FAILED"
+		status = "Declined"
 	}
 
 	fmt.Println("receivedHash =>>> ", receivedHash)

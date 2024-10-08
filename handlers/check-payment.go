@@ -15,11 +15,11 @@ import (
 func FailedView(c *fiber.Ctx) error {
 
 	transID := c.Params("TransID")
-	fmt.Println(transID)
+	//fmt.Println(transID)
 
 	//=============Update Transaction status from Transaction id===============
 	currentTime := time.Now()
-	database.DB.Db.Table("transaction").Where("transaction_id = ?", transID).UpdateColumns(models.FailedStatus{Status: "FAILED", Substatus: 8, Response_timestamp: currentTime})
+	database.DB.Db.Table("transaction").Where("transaction_id = ?", transID).UpdateColumns(models.FailedStatus{Status: "Declined", Substatus: 8, Response_timestamp: currentTime})
 
 	//=============Fetch Transaction details from Transaction id===============
 	transData := models.Transaction_Pay{}
@@ -43,11 +43,20 @@ func FailedView(c *fiber.Ctx) error {
 		fmt.Println("issue sending verification email")
 	}
 
+	// Fetch Webhook Url from client store
+	storeData := models.ClientStore{}
+	database.DB.Db.Table("client_store").Where("client_id = ?", mID).Find(&storeData)
+	webhookURL := storeData.Webhookurl
+	redirectURL := ""
+	if webhookURL != "" {
+		redirectURL = webhookURL + "?referanceID=" + transData.Customerrefid + "&transactionID=" + transData.Transaction_id + "&orderID=" + transData.Order_id + "&hash=" + transData.Response_hash + "&amount=" + fmt.Sprintf("%f", transData.Receivedamount) + "&currency=" + transData.Receivedcurrency + "&status=" + transData.Status
+	}
 	return c.Render("failed", fiber.Map{
-		"Title":     "Failed Payment",
-		"Subtitle":  "Failed Payment",
-		"TransID":   transID,
-		"TransData": transData,
+		"Title":       "Declined Payment",
+		"Subtitle":    "Declined Payment",
+		"TransID":     transID,
+		"TransData":   transData,
+		"RedirectURL": redirectURL,
 	})
 }
 
@@ -59,7 +68,7 @@ func DisputeView(c *fiber.Ctx) error {
 
 	//=============Update Transaction status from Transaction id===============
 	currentTime := time.Now()
-	database.DB.Db.Table("transaction").Where("transaction_id = ?", transID).UpdateColumns(models.FailedStatus{Status: "FAILED", Substatus: 9, Response_timestamp: currentTime})
+	database.DB.Db.Table("transaction").Where("transaction_id = ?", transID).UpdateColumns(models.FailedStatus{Status: "Declined", Substatus: 9, Response_timestamp: currentTime})
 
 	//=============Fetch Transaction details from Transaction id===============
 	transData := models.Transaction_Pay{}
@@ -83,11 +92,22 @@ func DisputeView(c *fiber.Ctx) error {
 		fmt.Println("issue sending verification email")
 	}
 
+	// Fetch Webhook Url from client store
+	storeData := models.ClientStore{}
+	database.DB.Db.Table("client_store").Where("client_id = ?", mID).Find(&storeData)
+	webhookURL := storeData.Webhookurl
+
+	redirectURL := ""
+	if webhookURL != "" {
+		redirectURL = webhookURL + "?referanceID=" + transData.Customerrefid + "&transactionID=" + transData.Transaction_id + "&orderID=" + transData.Order_id + "&hash=" + transData.Response_hash + "&amount=" + fmt.Sprintf("%f", transData.Receivedamount) + "&currency=" + transData.Receivedcurrency + "&status=" + transData.Status
+	}
+
 	return c.Render("dispute", fiber.Map{
-		"Title":     "Dispute Payment",
-		"Subtitle":  "Dispute Payment",
-		"TransID":   transID,
-		"TransData": transData,
+		"Title":       "Dispute Payment",
+		"Subtitle":    "Dispute Payment",
+		"TransID":     transID,
+		"TransData":   transData,
+		"RedirectURL": redirectURL,
 	})
 }
 
@@ -119,11 +139,21 @@ func SuccessView(c *fiber.Ctx) error {
 		fmt.Println("issue sending verification email")
 	}
 
+	// Fetch Webhook Url from client store
+	storeData := models.ClientStore{}
+	database.DB.Db.Table("client_store").Where("client_id = ?", mID).Find(&storeData)
+	webhookURL := storeData.Webhookurl
+
+	redirectURL := ""
+	if webhookURL != "" {
+		redirectURL = webhookURL + "?referanceID=" + transData.Customerrefid + "&transactionID=" + transData.Transaction_id + "&orderID=" + transData.Order_id + "&hash=" + transData.Response_hash + "&amount=" + fmt.Sprintf("%f", transData.Receivedamount) + "&currency=" + transData.Receivedcurrency + "&status=" + transData.Status
+	}
 	return c.Render("success", fiber.Map{
-		"Title":     "Success Payment",
-		"Subtitle":  "Success Payment",
-		"TransID":   transID,
-		"TransData": transData,
+		"Title":       "Success Payment",
+		"Subtitle":    "Success Payment",
+		"TransID":     transID,
+		"TransData":   transData,
+		"RedirectURL": redirectURL,
 	})
 }
 

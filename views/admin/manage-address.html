@@ -29,7 +29,7 @@
               <thead>
                 <tr class="font-weight-bolder">
                   <th scope="col">Coin</th>
-                  <th scope="col">Address</th>
+                  <th scope="col" style="width: 300px;">Address</th>
                   <th scope="col">Status</th>
                   <th scope="col">Lastupdate</th>
                   <th scope="col" class="text-end mx-2">Action</th>
@@ -111,7 +111,7 @@
 
           <div class="col-md-12 my-2">
             <div class="form-floating">
-              <textarea id="token_details" name="token_details" class="form-control w-100" title="Token Details in JSON" required="" style="min-height: 300px !important;">{{if .CoinData.Token_details}}{{.CoinData.Token_details}}{{end}}</textarea>
+              <textarea id="token_details" name="token_details" class="form-control w-100" title="Token Details in JSON" required="" style="min-height: 300px !important;">{{if .CoinData.Token_details}}{{.CoinData.Token_details}}{{else}}{}{{end}}</textarea>
               <label for="token_details">Token Details in JSON</label>
               
             </div>

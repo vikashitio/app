@@ -185,17 +185,17 @@ function statusData(status,tid) {
     var statusHtml="";
     
     if(status==0){
-      statusVal="Process";
-      statusHtml='<span class="bg-warning-600 text-white border-warning-600 px-16 py-2 radius-12 fw-medium text-sm">Process</span>';
+      statusVal="Waiting";
+      statusHtml='<span class="bg-warning-600 text-white border-warning-600 px-16 py-2 radius-12 fw-medium text-sm">Waiting</span>';
     }else if(status==1){
       statusVal="FullPay";
-      statusHtml='<span class="bg-success-600 text-white border-success-600 px-16 py-2 radius-12 fw-medium text-sm">Full Pay</span>';
+      statusHtml='<span class="bg-success-600 text-white border-success-600 px-16 py-2 radius-12 fw-medium text-sm">FullPay</span>';
     }else if(status==2){
       statusVal="OverPay";
-      statusHtml='<span class="bg-success-600 text-white border-success-600 px-16 py-2 radius-12 fw-medium text-sm">Over Pay</span>';
+      statusHtml='<span class="bg-success-600 text-white border-success-600 px-16 py-2 radius-12 fw-medium text-sm">OverPay</span>';
     }else if(status==3){
       statusVal="UnderPay";
-      statusHtml='<span class="bg-success-600 text-white border-success-600 px-16 py-2 radius-12 fw-medium text-sm">Under Pay</span>';
+      statusHtml='<span class="bg-success-600 text-white border-success-600 px-16 py-2 radius-12 fw-medium text-sm">UnderPay</span>';
     }else if(status==8){
       statusVal="Decline";
       statusHtml='<span class="bg-danger-600 text-white border-danger-600 px-16 py-2 radius-12 fw-medium text-sm">Decline</span>';

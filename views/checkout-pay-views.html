@@ -217,6 +217,8 @@
 
  <script>
  
+ const invoiceEmail="{{.InvoiceData.Email}}";
+ const invoiceName="{{.InvoiceData.Name}}";
          // store session
            const get_sender_name = sessionStorage.getItem('sender_name');
            const get_sender_email = sessionStorage.getItem('sender_email');
@@ -224,7 +226,11 @@
                 $('#customername').val(get_sender_name);
                 $('#customeremail').val(get_sender_email);
                 $('.savecontact').trigger("click");
-            } 
+            }else if (invoiceEmail && invoiceName) {
+                $('#customername').val(invoiceEmail);
+                $('#customeremail').val(invoiceName);
+                $('.savecontact').trigger("click");
+            }
 
 
 

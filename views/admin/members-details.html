@@ -308,7 +308,7 @@
               <div class="col-sm-6 my-1" ><strong>Requested Amount :</strong> <span class="text-uppercase">{{.Requestedcurrency}}</span> {{.Requestedamount}} </div>
               <div class="col-sm-6 my-1"><strong>Converted Amount :</strong> <span class="text-uppercase">{{.Convertedcurrency}}</span> {{.Convertedamount}} </div>
               <div class="col-sm-6 my-1"><strong>Received Amount :</strong> <span class="text-uppercase">{{.Receivedcurrency}}</span> {{.Receivedamount}} </div>
-              <div class="col-sm-6 my-1"><strong>Status :</strong> {{if eq .Status "SUCCESS"}}<span class="badge text-bg-success">Success</span>{{else if eq .Status "PROCESS"}}<span class="badge text-bg-warning">Process</span>{{else}}<span class="badge text-bg-danger">Failed</span>{{end}}</div>
+              <div class="col-sm-6 my-1"><strong>Status :</strong> {{if eq .Status "Success"}}<span class="badge text-bg-success">Success</span>{{else if eq .Status "Waiting"}}<span class="badge text-bg-warning">Waiting</span>{{else}}<span class="badge text-bg-danger">Declined</span>{{end}}</div>
               <div class="col-sm-6 my-1"><strong>Txhash :</strong> {{.Response_hash}}</div>
               <div class="col-sm-6 my-1"><strong>Note :</strong> {{.Note}}</div>
               
@@ -383,7 +383,7 @@
               <div class="col-sm-6 my-1" ><strong>Requested Amount :</strong> <span class="text-uppercase">{{.Requestedcurrency}}</span> {{.Requestedamount}} </div>
               <div class="col-sm-6 my-1"><strong>Converted Amount :</strong> <span class="text-uppercase">{{.Convertedcurrency}}</span> {{.Convertedamount}} </div>
               <div class="col-sm-6 my-1"><strong>Received Amount :</strong> <span class="text-uppercase">{{.Receivedcurrency}}</span> {{.Receivedamount}} </div>
-              <div class="col-sm-6 my-1"><strong>Status :</strong> {{if eq .Status "SUCCESS"}}<span class="badge text-bg-success">Success</span>{{else if eq .Status "PROCESS"}}<span class="badge text-bg-warning">Process</span>{{else}}<span class="badge text-bg-danger">Failed</span>{{end}}</div>
+              <div class="col-sm-6 my-1"><strong>Status :</strong> {{if eq .Status "Success"}}<span class="badge text-bg-success">Success</span>{{else if eq .Status "Waiting"}}<span class="badge text-bg-warning">Waiting</span>{{else}}<span class="badge text-bg-danger">Declined</span>{{end}}</div>
               <div class="col-sm-6 my-1"><strong>Txhash :</strong> {{.Response_hash}}</div>
               <div class="col-sm-6 my-1"><strong>Note :</strong> {{.Note}}</div>
               

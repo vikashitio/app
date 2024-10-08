@@ -51,6 +51,7 @@ func InitRoutes(app *fiber.App) {
 	app.Get("/get-network", handlers.GetNetwork)
 	app.Post("/pay-data", handlers.PayDataPost)
 	app.Get("/pay", handlers.PayQRView)
+	app.Post("/storePost", handlers.StorePost)
 
 	app.Get("/success/:TransID", handlers.SuccessView)
 	app.Get("/failed/:TransID", handlers.FailedView)
@@ -59,6 +60,7 @@ func InitRoutes(app *fiber.App) {
 	app.Post("/API/PayLink", handlers.ApiPaymentLink)
 	app.Get("/API/CryptoBalance", handlers.ApiBalanceByCrypto)
 	app.Get("/API/Transaction/:TransID", handlers.ApiTransactionByTransID)
+	app.Get("/API/Reference/:ReferenceID", handlers.ApiTransactionByReferenceID)
 	app.Get("/API/Transaction", handlers.ApiTransactionList)
 
 	// app.Get("/add-crypto-np", handlers.AddCryptoView)

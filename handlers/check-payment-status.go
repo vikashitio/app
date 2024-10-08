@@ -100,7 +100,7 @@ func FetchPaymentStatus(c *fiber.Ctx) error {
 
 	//Start status By Crypto ID
 
-	if status_coinid == "17" { // For USDT Tether TRX/TRC20
+	if status_coinid == "7" { // For USDT Tether TRC20
 
 		// URL of the external site to fetch JSON from
 		url := "https://apilist.tronscanapi.com/api/token_trc20/transfers-with-status?limit=1&start=0&trc20Id=" + tokenData.TokenId + "&address=" + status_address
@@ -166,7 +166,7 @@ func FetchPaymentStatus(c *fiber.Ctx) error {
 		//fetchTimestamp = "2024-08-23 16:00:09"
 		fetchTimestamp = coinAddress.Lastupdate.Format("2006-01-02 15:04:05")
 		responseTimestamp = time.Unix(receivedBlockTimestamp/1000, 0).Format("2006-01-02 15:04:05")
-	} else if status_coinid == "32" { // For ETH Ethereum Mainnet
+	} else if status_coinid == "5" { // For ETH Ethereum Mainnet
 		// URL of the external site to fetch JSON from
 		apiKey := os.Getenv("ETHER_SCAN_API_KEY")
 		url := "https://api.etherscan.io/api?module=account&action=txlist&address=" + status_address + "&startblock=0&endblock=99999999&page=1&offset=1&sort=desc&apikey=" + apiKey
@@ -242,16 +242,16 @@ func FetchPaymentStatus(c *fiber.Ctx) error {
 		//receivedDecimals := responseD.Data[0].Decimals
 		receivedFinalResult = responseD.Status
 		if receivedFinalResult == "1" {
-			receivedFinalResult = "SUCCESS"
+			receivedFinalResult = "Success"
 		} else {
-			receivedFinalResult = "FAILED"
+			receivedFinalResult = "Declined"
 		}
 
 		fetchTimestamp = "2024-09-30 07:00:09"
 		//fetchTimestamp = coinAddress.Lastupdate.Format("2006-01-02 15:04:05")
 		// Format the time to "2006-01-02 15:04:05"
 		responseTimestamp = timestamp.Format("2006-01-02 15:04:05")
-	} else if status_coinid == "28" { // For ADA Cardano Mainnet
+	} else if status_coinid == "1" { // For ADA Cardano Mainnet
 
 		// Construct the API URL
 		url := "https://api.cardanoscan.io/api/v1/transaction/list?address=" + tokenData.TokenId + "&pageNo=1&limit=1&order=desc"
@@ -305,14 +305,215 @@ func FetchPaymentStatus(c *fiber.Ctx) error {
 		receivedAmountNew = cryptoAmountFormat(receivedAmount)
 		receivedFinalResult = ""
 		if receivedFinalStatus {
-			receivedFinalResult = "SUCCESS"
+			receivedFinalResult = "Success"
 		} else {
-			receivedFinalResult = "FAILED"
+			receivedFinalResult = "Declined"
 		}
 
 		//fetchTimestamp = "2024-06-19 16:00:09"
 		fetchTimestamp = coinAddress.Lastupdate.Format("2006-01-02 15:04:05")
-	} else if status_coinid == "12" { // For BTC Mainnet
+	} else if status_coinid == "4" { // For Doge Coin
+
+		// Construct the API URL
+		url := "https://api.blockcypher.com/v1/doge/main/addrs/" + status_address + "?limit=1"
+		//fmt.Print("URL => ", url)
+		// Create a new HTTP request
+		//////////////////////////////////////
+		resp, err := http.Get(url)
+		if err != nil {
+			return c.Status(http.StatusInternalServerError).SendString("Failed to fetch data")
+		}
+		defer resp.Body.Close()
+
+		// Reading the response body
+		body, err = ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return c.Status(http.StatusInternalServerError).SendString("Failed to read response body")
+		}
+		//fmt.Println("body => ", string(body))
+		// Initialize the Response struct
+		var responseD models.DogeAddressData
+
+		// Unmarshal the byte data into the struct
+		err = json.Unmarshal(body, &responseD)
+		if err != nil {
+			//return c.Status(http.StatusInternalServerError).SendString("Failed to parse JSON")
+			fmt.Println("Failed to parse JSON")
+		}
+		//fmt.Println(" Data :", responseD)
+
+		if len(responseD.TxRefs) == 0 {
+			response := StatusResponse{
+				Hashcode:       "",
+				Payment_status: "",
+				Payment_id:     "",
+			}
+			return c.JSON(response)
+		}
+
+		receivedHash = responseD.TxRefs[0].TxHash
+		responseTimestamp = responseD.TxRefs[0].Confirmed.Format("2006-01-02 15:04:05")
+
+		//fmt.Println("responseTimestamp => ", responseTimestamp)
+		//receivedFees = responseD.Data[0].Fees
+		receivedFinalStatus := responseD.TxRefs[0].DoubleSpend
+		receivedFrom = responseD.TxRefs[0].Spent_by
+		receivedTo = responseD.Address
+		receivedAmount := responseD.TxRefs[0].Value
+		//fmt.Println("receivedAmount => ", receivedAmount)
+
+		// Convert int64 to float64
+		AmountInFloat := float64(receivedAmount) / 100000000
+
+		//fmt.Println("AmountInFloat => ", AmountInFloat)
+
+		receivedAmountNew = AmountInFloat
+		receivedFinalResult = ""
+		if receivedFinalStatus {
+			receivedFinalResult = "Declined"
+		} else {
+			receivedFinalResult = "Success"
+		}
+
+		//fmt.Println("receivedFinalResult => ", receivedFinalResult)
+
+		fetchTimestamp = "2024-10-06 16:00:09"
+		//fetchTimestamp = coinAddress.Lastupdate.Format("2006-01-02 15:04:05")
+	} else if status_coinid == "6" { // For Litecoin
+
+		// Construct the API URL
+		url := "https://api.blockcypher.com/v1/ltc/main/addrs/" + status_address + "?limit=1"
+		//fmt.Print("URL => ", url)
+		// Create a new HTTP request
+		//////////////////////////////////////
+		resp, err := http.Get(url)
+		if err != nil {
+			return c.Status(http.StatusInternalServerError).SendString("Failed to fetch data")
+		}
+		defer resp.Body.Close()
+
+		// Reading the response body
+		body, err = ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return c.Status(http.StatusInternalServerError).SendString("Failed to read response body")
+		}
+		//fmt.Println("body => ", string(body))
+		// Initialize the Response struct
+		var responseD models.LiteAddressData
+
+		// Unmarshal the byte data into the struct
+		err = json.Unmarshal(body, &responseD)
+		if err != nil {
+			//return c.Status(http.StatusInternalServerError).SendString("Failed to parse JSON")
+			fmt.Println("Failed to parse JSON")
+		}
+		//fmt.Println(" Data :", responseD)
+
+		if len(responseD.TxRefs) == 0 {
+			response := StatusResponse{
+				Hashcode:       "",
+				Payment_status: "",
+				Payment_id:     "",
+			}
+			return c.JSON(response)
+		}
+
+		receivedHash = responseD.TxRefs[0].TxHash
+		responseTimestamp = responseD.TxRefs[0].Confirmed.Format("2006-01-02 15:04:05")
+
+		//fmt.Println("responseTimestamp => ", responseTimestamp)
+		//receivedFees = responseD.Data[0].Fees
+		receivedFinalStatus := responseD.TxRefs[0].DoubleSpend
+		receivedFrom = responseD.TxRefs[0].Spent_by
+		receivedTo = responseD.Address
+		receivedAmount := responseD.TxRefs[0].Value
+		//fmt.Println("receivedAmount => ", receivedAmount)
+
+		// Convert int64 to float64
+		AmountInFloat := float64(receivedAmount) / 100000000
+
+		//fmt.Println("AmountInFloat => ", AmountInFloat)
+
+		receivedAmountNew = AmountInFloat
+		receivedFinalResult = ""
+		if receivedFinalStatus {
+			receivedFinalResult = "Declined"
+		} else {
+			receivedFinalResult = "Success"
+		}
+
+		//fmt.Println("receivedFinalResult => ", receivedFinalResult)
+
+		fetchTimestamp = "2024-09-30 16:00:09"
+		//fetchTimestamp = coinAddress.Lastupdate.Format("2006-01-02 15:04:05")
+	} else if status_coinid == "3" { // For Dash
+
+		// Construct the API URL
+		url := "https://api.blockcypher.com/v1/dash/main/addrs/" + status_address + "?limit=1"
+		//fmt.Print("URL => ", url)
+		// Create a new HTTP request
+		//////////////////////////////////////
+		resp, err := http.Get(url)
+		if err != nil {
+			return c.Status(http.StatusInternalServerError).SendString("Failed to fetch data")
+		}
+		defer resp.Body.Close()
+
+		// Reading the response body
+		body, err = ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return c.Status(http.StatusInternalServerError).SendString("Failed to read response body")
+		}
+		//fmt.Println("body => ", string(body))
+		// Initialize the Response struct
+		var responseD models.DashAddressData
+
+		// Unmarshal the byte data into the struct
+		err = json.Unmarshal(body, &responseD)
+		if err != nil {
+			//return c.Status(http.StatusInternalServerError).SendString("Failed to parse JSON")
+			fmt.Println("Failed to parse JSON")
+		}
+		//fmt.Println(" Data :", responseD)
+
+		if len(responseD.TxRefs) == 0 {
+			response := StatusResponse{
+				Hashcode:       "",
+				Payment_status: "",
+				Payment_id:     "",
+			}
+			return c.JSON(response)
+		}
+
+		receivedHash = responseD.TxRefs[0].TxHash
+		responseTimestamp = responseD.TxRefs[0].Confirmed.Format("2006-01-02 15:04:05")
+
+		//fmt.Println("responseTimestamp => ", responseTimestamp)
+		//receivedFees = responseD.Data[0].Fees
+		receivedFinalStatus := responseD.TxRefs[0].DoubleSpend
+		receivedFrom = responseD.TxRefs[0].Spent_by
+		receivedTo = responseD.Address
+		receivedAmount := responseD.TxRefs[0].Value
+		//fmt.Println("receivedAmount => ", receivedAmount)
+
+		// Convert int64 to float64
+		AmountInFloat := float64(receivedAmount) / 100000000
+
+		//fmt.Println("AmountInFloat => ", AmountInFloat)
+
+		receivedAmountNew = AmountInFloat
+		receivedFinalResult = ""
+		if receivedFinalStatus {
+			receivedFinalResult = "Declined"
+		} else {
+			receivedFinalResult = "Success"
+		}
+
+		//fmt.Println("receivedFinalResult => ", receivedFinalResult)
+
+		fetchTimestamp = "2024-10-07 16:00:09"
+		//fetchTimestamp = coinAddress.Lastupdate.Format("2006-01-02 15:04:05")
+	} else if status_coinid == "2" { // For BTC Mainnet
 		// URL of the external site to fetch JSON from
 		url := "https://blockchain.info/rawaddr/" + status_address + "?limit=1"
 		//fmt.Println("URL => ", url)
@@ -338,9 +539,7 @@ func FetchPaymentStatus(c *fiber.Ctx) error {
 			//return c.Status(http.StatusInternalServerError).SendString("Failed to parse JSON")
 			fmt.Println("Failed to parse JSON")
 		}
-
 		//fmt.Println("responseD => ", responseD)
-
 		//fmt.Println(" Data :", responseD)
 		if len(responseD.Txs) == 0 {
 			response := StatusResponse{
@@ -351,25 +550,16 @@ func FetchPaymentStatus(c *fiber.Ctx) error {
 			return c.JSON(response)
 		}
 
-		//###################
-
-		// fmt.Println("Hash => ", responseD.Txs[0].Hash)
-		// fmt.Println("Time => ", responseD.Txs[0].Time)
-		// fmt.Println("BlockHeight => ", responseD.Txs[0].BlockHeight)
-		// fmt.Println("DoubleSpend => ", responseD.Txs[0].DoubleSpend)
-		// fmt.Println("From => ", responseD.Txs[0].Inputs[0].PrevOut.Addr)
-		// fmt.Println("To => ", responseD.Txs[0].Out[0].Addr)
-		// fmt.Println("Amount => ", responseD.Txs[0].Out[0].Value)
 		// Check Status
 		BlockHeight := responseD.Txs[0].BlockHeight
 		DoubleSpend := responseD.Txs[0].DoubleSpend
 
 		if !DoubleSpend && BlockHeight > 0 {
-			//fmt.Println("Final Status SUCCESS")
-			receivedFinalResult = "SUCCESS"
+			//fmt.Println("Final Status Success")
+			receivedFinalResult = "Success"
 		} else {
-			//fmt.Println("Final Status FAILED")
-			receivedFinalResult = "FAILED"
+			//fmt.Println("Final Status Declined")
+			receivedFinalResult = "Declined"
 		}
 
 		//  Fetch Received Amount //
@@ -394,9 +584,6 @@ func FetchPaymentStatus(c *fiber.Ctx) error {
 		t := time.Unix(responseD.Txs[0].Time, 0)
 		// Format the time to "2006-01-02 15:04:05"
 		responseTimestamp = t.Format("2006-01-02 15:04:05")
-		// Print the formatted time
-		//fmt.Println("responseTimestamp ", responseTimestamp)
-
 	} else {
 		fmt.Println("Crypto Not Supported ==> ", status_coin)
 	}
@@ -418,8 +605,8 @@ func FetchPaymentStatus(c *fiber.Ctx) error {
 		return c.Status(400).SendString("Error parsing dateTime2: " + err.Error())
 	}
 
-	fmt.Print("fetchTimestamp", fetchTimestamp)
-	fmt.Print("responseTimestamp", responseTimestamp)
+	//fmt.Print("fetchTimestamp", fetchTimestamp)
+	//fmt.Print("responseTimestamp", responseTimestamp)
 
 	duration := dateTime2.Sub(dateTime1)
 
@@ -447,12 +634,12 @@ func FetchPaymentStatus(c *fiber.Ctx) error {
 		} else {
 			//fmt.Println("Payment Failed")
 			receivedSubStatus = 8
-			receivedFinalResult = "FAILED"
+			receivedFinalResult = "Declined"
 		}
 	} else {
 		receivedSubStatus = 9
-		receivedFinalResult = "DISPUTE"
-		fmt.Println("Payment DISPUTE")
+		receivedFinalResult = "Dispute"
+		//fmt.Println("Payment Dispute")
 	}
 
 	//fmt.Println("invoiceAmount => ", invoiceAmount)

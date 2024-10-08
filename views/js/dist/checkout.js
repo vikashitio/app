@@ -138,13 +138,13 @@ $(".process").click(function(){
                 contentType: 'application/x-www-form-urlencoded',
                 success:function(status){
                     //alert(status.payment_status);
-                    if(status.payment_status=="SUCCESS"){
+                    if(status.payment_status=="Success"){
                         url = CommonURL+"/success/"+status.payment_id;
                         $( location ).attr("href", url);
-                    }else if(status.payment_status=="FAILED"){
+                    }else if(status.payment_status=="Declined"){
                             url = CommonURL+"/failed/"+status.payment_id;
                             $( location ).attr("href", url);}
-                    else if(status.payment_status=="DISPUTE"){
+                    else if(status.payment_status=="Dispute"){
                             url = CommonURL+"/dispute/"+status.payment_id;
                             $( location ).attr("href", url);
                     }else{

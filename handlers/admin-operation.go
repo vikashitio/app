@@ -125,11 +125,11 @@ func AdminIndexView(c *fiber.Ctx) error {
 	// Fetch Transaction List
 	transactionList := []models.Transaction_Pay{}
 	var total int64
-	database.DB.Db.Table("transaction").Where("status = ?", "SUCCESS").Order("id desc").Limit(10).Find(&transactionList).Count(&total)
+	database.DB.Db.Table("transaction").Where("status = ?", "Success").Order("id desc").Limit(10).Find(&transactionList).Count(&total)
 
 	//fetch balance
 	assetList := []models.CoinWithBalance{}
-	database.DB.Db.Table("transaction").Select("assetid, SUM(receivedamount)  as balance").Where("status = ?", "SUCCESS").Group("assetid").Having("COUNT(assetid) > ?", 0).Order("assetid ASC").Find(&assetList)
+	database.DB.Db.Table("transaction").Select("assetid, SUM(receivedamount)  as balance").Where("status = ?", "Success").Group("assetid").Having("COUNT(assetid) > ?", 0).Order("assetid ASC").Find(&assetList)
 
 	// Display coin list in List box
 	coinList := []models.CoinList{}
@@ -330,7 +330,7 @@ func AdminMembersDetailsView(c *fiber.Ctx) error {
 	database.DB.Db.Table("client_api").Order("id desc").Where("status = ? AND Client_id=?", 1, MID).Find(&clientAPI)
 
 	assetList := []models.CoinWithBalance{}
-	database.DB.Db.Table("transaction").Select("assetid, SUM(receivedamount)  as balance").Where("client_id = ? AND status = ?", MID, "SUCCESS").Group("assetid").Having("COUNT(assetid) > ?", 0).Order("assetid ASC").Find(&assetList)
+	database.DB.Db.Table("transaction").Select("assetid, SUM(receivedamount)  as balance").Where("client_id = ? AND status = ?", MID, "Success").Group("assetid").Having("COUNT(assetid) > ?", 0).Order("assetid ASC").Find(&assetList)
 
 	// Display coin list in List box
 	coinList := []models.CoinList{}
@@ -338,7 +338,7 @@ func AdminMembersDetailsView(c *fiber.Ctx) error {
 
 	// fetch query for transaction list
 	transactionList := []models.Transaction_Pay{}
-	database.DB.Db.Table("transaction").Order("id desc").Where("status = ? AND client_id = ?", "SUCCESS", MID).Limit(50).Find(&transactionList)
+	database.DB.Db.Table("transaction").Order("id desc").Where("status = ? AND client_id = ?", "Success", MID).Limit(50).Find(&transactionList)
 	// fetch query for transaction list
 	withdrawList := []models.Transaction_Pay{}
 	database.DB.Db.Table("transaction").Order("id desc").Where("transaction_type = ? AND client_id = ?", "WITHDRAW", MID).Limit(50).Find(&withdrawList)

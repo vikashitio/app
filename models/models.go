@@ -511,33 +511,35 @@ type TransGetResponce struct {
 // Struct for transactions
 type Transaction_Pay struct {
 	//gorm.Model
-	Id                 uint      `gorm:"primaryKey"`
-	Transaction_id     string    `json:"transaction_id,omitempty"`
-	Client_id          uint      `json:"client_id,omitempty"`
-	Assetid            int       `json:"assetid,omitempty"`
-	Transaction_type   string    `json:"transaction_type,omitempty"`
-	Requestedamount    float64   `json:"requestedamount,omitempty"`
-	Requestedcurrency  string    `json:"requestedcurrency,omitempty"`
-	Convertedamount    float64   `json:"convertedamount,omitempty"`
-	Convertedcurrency  string    `json:"convertedcurrency,omitempty"`
-	Receivedamount     float64   `json:"receivedamount,omitempty"`
-	Receivedcurrency   string    `json:"receivedcurrency,omitempty"`
-	Status             string    `json:"status,omitempty"`
-	Substatus          int       `json:"substatus,omitempty"`
-	Customerrefid      string    `json:"customerrefid,omitempty"`
-	Note               string    `json:"note,omitempty"`
-	Createdate         string    `json:"createdate,omitempty"`
-	Destinationaddress string    `json:"destinationaddress,omitempty"`
-	Ip                 string    `json:"ip,omitempty"`
-	Approved_by        string    `json:"approved_by,omitempty"`
-	Approver_id        uint      `json:"approver_id,omitempty"`
-	Approver_comment   string    `json:"approver_comment,omitempty"`
-	Approved_date      string    `json:"approved_date,omitempty"`
-	Response_hash      string    `json:"response_hash,omitempty"`
-	Response_from      string    `json:"response_from,omitempty"`
-	Response_to        string    `json:"response_to,omitempty"`
-	Response_timestamp time.Time `json:"response_timestamp,omitempty"`
-	Response_json      string    `json:"response_json,omitempty"`
+	Id                  uint      `gorm:"primaryKey"`
+	Transaction_id      string    `json:"transaction_id,omitempty"`
+	Client_id           uint      `json:"client_id,omitempty"`
+	Assetid             int       `json:"assetid,omitempty"`
+	Transaction_type    string    `json:"transaction_type,omitempty"`
+	Requestedamount     float64   `json:"requestedamount,omitempty"`
+	Requestedcurrency   string    `json:"requestedcurrency,omitempty"`
+	Convertedamount     float64   `json:"convertedamount,omitempty"`
+	Convertedcurrency   string    `json:"convertedcurrency,omitempty"`
+	Receivedamount      float64   `json:"receivedamount,omitempty"`
+	Receivedcurrency    string    `json:"receivedcurrency,omitempty"`
+	Status              string    `json:"status,omitempty"`
+	Substatus           int       `json:"substatus,omitempty"`
+	Customerrefid       string    `json:"customerrefid,omitempty"`
+	Note                string    `json:"note,omitempty"`
+	Createdate          string    `json:"createdate,omitempty"`
+	Destinationaddress  string    `json:"destinationaddress,omitempty"`
+	Ip                  string    `json:"ip,omitempty"`
+	Approved_by         string    `json:"approved_by,omitempty"`
+	Approver_id         uint      `json:"approver_id,omitempty"`
+	Approver_comment    string    `json:"approver_comment,omitempty"`
+	Approved_date       string    `json:"approved_date,omitempty"`
+	Response_hash       string    `json:"response_hash,omitempty"`
+	Response_from       string    `json:"response_from,omitempty"`
+	Response_to         string    `json:"response_to,omitempty"`
+	Response_timestamp  time.Time `json:"response_timestamp,omitempty"`
+	Response_json       string    `json:"response_json,omitempty"`
+	Order_id            string    `json:"order_id,omitempty"`
+	Is_fee_paid_by_user bool      `json:"is_fee_paid_by_user,omitempty"`
 }
 
 // Struct for transactions
@@ -583,19 +585,32 @@ type CoinWithBalance struct {
 // for manage Invoice
 type Invoice_Master struct {
 	//gorm.Model
-	Invoice_id        uint    `gorm:"primaryKey"`
-	Client_id         uint    `json:"client_id,omitempty"`
-	Name              string  `json:"name,omitempty"`
-	Email             string  `json:"email,omitempty"`
-	Description       string  `json:"description,omitempty"`
-	Requestedamount   float64 `json:"requestedamount,omitempty"`
-	Requestedcurrency string  `json:"requestedcurrency,omitempty"`
-	Status            string  `json:"status,omitempty"`
-	Createdate        string  `json:"createdate,omitempty"`
-	Ip                string  `json:"ip,omitempty"`
-	Trackid           string  `json:"trackid,omitempty"`
-	Product_name      string  `json:"product_name,omitempty"`
-	Invoice_type      int     `json:"invoice_type,omitempty"`
+	Invoice_id          uint    `gorm:"primaryKey"`
+	Client_id           uint    `json:"client_id,omitempty"`
+	Name                string  `json:"name,omitempty"`
+	Email               string  `json:"email,omitempty"`
+	Description         string  `json:"description,omitempty"`
+	Requestedamount     float64 `json:"requestedamount,omitempty"`
+	Requestedcurrency   string  `json:"requestedcurrency,omitempty"`
+	Status              string  `json:"status,omitempty"`
+	Createdate          string  `json:"createdate,omitempty"`
+	Ip                  string  `json:"ip,omitempty"`
+	Trackid             string  `json:"trackid,omitempty"`
+	Product_name        string  `json:"product_name,omitempty"`
+	Invoice_type        int     `json:"invoice_type,omitempty"`
+	Order_id            string  `json:"order_id,omitempty"`
+	Is_fee_paid_by_user bool    `json:"is_fee_paid_by_user,omitempty"`
+}
+
+// for manage Invoice
+type Invoice_Data struct {
+	//gorm.Model
+	Invoice_id          uint    `gorm:"primaryKey"`
+	Client_id           uint    `json:"client_id,omitempty"`
+	Requestedamount     float64 `json:"requestedamount,omitempty"`
+	Requestedcurrency   string  `json:"requestedcurrency,omitempty"`
+	Order_id            string  `json:"order_id,omitempty"`
+	Is_fee_paid_by_user bool    `json:"is_fee_paid_by_user,omitempty"`
 }
 
 // for manage support ticket
@@ -647,6 +662,14 @@ type ClientAPI struct {
 	Apikey    string `json:"apikey,omitempty"`
 	Status    int    `json:"status,omitempty"`
 	Timestamp string `json:"timestamp,omitempty"`
+}
+
+// For Display Transaction List
+type ClientStore struct {
+	//gorm.Model
+	ID         uint   `gorm:"primaryKey"`
+	Client_id  uint   `json:"client_id,omitempty"`
+	Webhookurl string `json:"webhookurl,omitempty"`
 }
 
 type CountTransactionByStatus struct {

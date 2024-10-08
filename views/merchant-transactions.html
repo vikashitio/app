@@ -76,7 +76,7 @@
                     <td class="text-uppercase">{{.Requestedcurrency}} {{.Requestedamount}}</td>
                     <td class="text-uppercase">{{.Convertedcurrency}} {{.Convertedamount}}</td>
                     <td class="text-uppercase">{{.Receivedcurrency}} {{.Receivedamount}}</td>
-                    <td>{{if eq .Transaction_type "TRANSFER"}} 
+                    <td>{{if eq .Transaction_type "Collection"}} 
                       <span class="text-success-main bg-success-focus w-32-px h-32-px d-flex align-items-center justify-content-center rounded-circle text-xl">
                        <iconify-icon icon="tabler:arrow-up-right" class="icon" title="{{.Transaction_type}}"></iconify-icon>
                      </span>
@@ -111,16 +111,20 @@
                     </tr>
                 {{end}}
                 <tr>
-                  <td class="text-end fs-6 mx-2" colspan="9"> 
+                  <td class="text-start fs-6 mx-2" colspan="9"> 
+                    <div>
                     
                     
-                    {{ if lt (mul .Page .Limit) .Total }}
-                    <a href="?page={{ add .Page 1 }}&searchKey={{ .SearchKey }}&searchBy={{ .SearchBy }}&status={{ .Status }}&date_1st={{ .Date_1st }}&date_2nd={{ .Date_2nd }}&limit={{ .Limit }}" class="mx-4 float-end"><iconify-icon icon="zondicons:forward" width="32" height="32" title="Next Page"></iconify-icon></a>
-                    {{ end }}
-                     <span class="mt-1 font-monospace mx-4 float-end" > Page {{ .Page }} Total {{ .Total }}  </span>
+                     <span class="mt-1 font-monospace mx-4 float-start" > Page [{{ .Page }}] Total {{ .Total }}  </span>
                       {{ if gt .Page 1 }}
-                    <a href="?page={{ sub .Page 1 }}&searchKey={{ .SearchKey }}&searchBy={{ .SearchBy }}&status={{ .Status }}&date_1st={{ .Date_1st }}&date_2nd={{ .Date_2nd }}&limit={{ .Limit }}" class="mx-4 float-end"><iconify-icon icon="zondicons:backward" width="32" height="32" title="Previous Page"></iconify-icon></a>
+                    &nbsp;<a href="?page={{ sub .Page 1 }}&searchKey={{ .SearchKey }}&searchBy={{ .SearchBy }}&status={{ .Status }}&date_1st={{ .Date_1st }}&date_2nd={{ .Date_2nd }}&limit={{ .Limit }}" class="mx-4 float-start"><iconify-icon icon="zondicons:backward" width="32" height="32" title="Previous Page"></iconify-icon></a>
                      {{ end }}
+                    
+                     {{ if lt (mul .Page .Limit) .Total }}
+                     &nbsp;<a href="?page={{ add .Page 1 }}&searchKey={{ .SearchKey }}&searchBy={{ .SearchBy }}&status={{ .Status }}&date_1st={{ .Date_1st }}&date_2nd={{ .Date_2nd }}&limit={{ .Limit }}" class="mx-4 float-start"><iconify-icon icon="zondicons:forward" width="32" height="32" title="Next Page"></iconify-icon></a>
+                    {{ end }}
+
+                    </div>
 
                      
  

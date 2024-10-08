@@ -133,13 +133,13 @@
                   </li>
                   <li class="d-flex align-items-center gap-2">
                       <span class="w-12-px h-12-px radius-2 bg-yellow"></span>
-                      <span class="text-secondary-light text-sm fw-normal">Process:  
+                      <span class="text-secondary-light text-sm fw-normal">Waiting:  
                           <span class="text-primary-light fw-bold">{{.CountTrans.Total_process}}</span>
                       </span>
                   </li>
                   <li class="d-flex align-items-center gap-2">
                     <span class="w-12-px h-12-px radius-2 bg-danger"></span>
-                    <span class="text-secondary-light text-sm fw-normal">Failed:  
+                    <span class="text-secondary-light text-sm fw-normal">Declined:  
                         <span class="text-primary-light fw-bold">{{.CountTrans.Total_failed}}</span>
                     </span>
                 </li>
@@ -224,7 +224,7 @@
                                       <td class="text-uppercase">{{.Requestedcurrency}} {{.Requestedamount}}</td>
                                       <td class="text-uppercase">{{.Convertedcurrency}} {{.Convertedamount}}</td>
                                       <td class="text-uppercase">{{.Receivedcurrency}} {{.Receivedamount}}</td>
-                                      <td>{{if eq .Transaction_type "TRANSFER"}} 
+                                      <td>{{if eq .Transaction_type "Collection"}} 
                                         <span class="text-success-main bg-success-focus w-32-px h-32-px d-flex align-items-center justify-content-center rounded-circle text-xl">
                                          <iconify-icon icon="tabler:arrow-up-right" class="icon" title="{{.Transaction_type}}"></iconify-icon>
                                        </span>
@@ -284,7 +284,7 @@
     var options = { 
       series: JSON.parse(vvv),
       colors: ['#00cc00', '#dc3545', '#FF9F29'],
-      labels: ['Success', 'Failed', 'Process'] ,
+      labels: ['Success', 'Waiting', 'Decline'] ,
       legend: {
           show: false 
       },

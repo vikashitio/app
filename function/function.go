@@ -275,13 +275,13 @@ func GetStatusByStatusID(StatusID int) string {
 
 	status := "Hi"
 	if StatusID == 1 || StatusID == 2 || StatusID == 3 {
-		status = "SUCCESS"
+		status = "Success"
 	} else if StatusID == 8 || StatusID == 9 {
-		status = "FAILED"
+		status = "Declined"
 	} else if StatusID == 0 {
-		status = "PROCESS"
+		status = "Waiting"
 	} else {
-		status = "PROCESS"
+		status = "Waiting"
 	}
 	return status
 }

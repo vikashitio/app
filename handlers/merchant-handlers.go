@@ -270,12 +270,12 @@ func IndexView(c *fiber.Ctx) error {
 	transactionList := []models.Transaction_Pay{}
 	var total int64
 	// fetch query for transaction list
-	database.DB.Db.Table("transaction").Order("id desc").Where("status = ? AND client_id = ?", "SUCCESS", LoginMerchantID).Limit(10).Find(&transactionList).Count(&total)
+	database.DB.Db.Table("transaction").Order("id desc").Where("status = ? AND client_id = ?", "Success", LoginMerchantID).Limit(10).Find(&transactionList).Count(&total)
 
 	assetList := []models.CoinWithBalance{}
 	var totalWallet int64
 	// fetch query for wallet with balance
-	database.DB.Db.Table("transaction").Select("assetid, SUM(receivedamount)  as balance").Where("client_id = ? AND status = ?", LoginMerchantID, "SUCCESS").Group("assetid").Having("COUNT(assetid) > ?", 0).Order("assetid ASC").Find(&assetList).Count(&totalWallet)
+	database.DB.Db.Table("transaction").Select("assetid, SUM(receivedamount)  as balance").Where("client_id = ? AND status = ?", LoginMerchantID, "Success").Group("assetid").Having("COUNT(assetid) > ?", 0).Order("assetid ASC").Find(&assetList).Count(&totalWallet)
 
 	// Display coin list in List box
 	coinList := []models.CoinList{}
@@ -287,7 +287,7 @@ func IndexView(c *fiber.Ctx) error {
 
 	// For display Currency List on List Box
 	countTrans := models.CountTransactionByStatus{}
-	database.DB.Db.Table("transaction").Select("COUNT(*) AS total_transactions, COUNT(CASE WHEN status = 'SUCCESS' THEN 1 END) AS total_success, COUNT(CASE WHEN status = 'FAILED' THEN 1 END) AS total_failed, COUNT(CASE WHEN status = 'PROCESS' THEN 1 END) AS total_process").Where("client_id = ?", LoginMerchantID).Find(&countTrans)
+	database.DB.Db.Table("transaction").Select("COUNT(*) AS total_transactions, COUNT(CASE WHEN status = 'Success' THEN 1 END) AS total_success, COUNT(CASE WHEN status = 'Declined' THEN 1 END) AS total_failed, COUNT(CASE WHEN status = 'Waiting' THEN 1 END) AS total_process").Where("client_id = ?", LoginMerchantID).Find(&countTrans)
 
 	return c.Render("index", fiber.Map{
 		"Title":           "Dashboard",
@@ -317,7 +317,7 @@ func WithdrawView(c *fiber.Ctx) error {
 	assetList := []models.CoinWithBalance{}
 	var totalWallet int64
 	// fetch query for wallet with balance
-	database.DB.Db.Table("transaction").Select("assetid, SUM(receivedamount)  as balance").Where("client_id = ? AND status = ?", LoginMerchantID, "SUCCESS").Group("assetid").Having("COUNT(assetid) > ?", 0).Order("assetid ASC").Find(&assetList).Count(&totalWallet)
+	database.DB.Db.Table("transaction").Select("assetid, SUM(receivedamount)  as balance").Where("client_id = ? AND status = ?", LoginMerchantID, "Success").Group("assetid").Having("COUNT(assetid) > ?", 0).Order("assetid ASC").Find(&assetList).Count(&totalWallet)
 
 	// Display coin list in List box
 	coinList := []models.CoinList{}
@@ -370,7 +370,7 @@ func WithdrawFormPost(c *fiber.Ctx) error {
 
 	assetList := models.CoinWithBalance{}
 	// fetch query for wallet with balance
-	database.DB.Db.Table("transaction").Select("assetid, SUM(receivedamount)  as balance").Where("client_id = ? AND assetid = ? AND status = ?", LoginMerchantID, assetID, "SUCCESS").Group("assetid").Having("COUNT(assetid) > ?", 0).Find(&assetList)
+	database.DB.Db.Table("transaction").Select("assetid, SUM(receivedamount)  as balance").Where("client_id = ? AND assetid = ? AND status = ?", LoginMerchantID, assetID, "Success").Group("assetid").Having("COUNT(assetid) > ?", 0).Find(&assetList)
 
 	//balance := assetList.Balance
 	balance, err := strconv.ParseFloat(assetList.Balance, 64)
@@ -411,9 +411,9 @@ func WithdrawFormPost(c *fiber.Ctx) error {
 	destinationAddressFee := ""
 	noteWithdraw := "Sending " + Crypto_code + " to Addresses - " + currencyList.Crypto_address
 	noteFee := "Withdraw Fees"
-	status := "PROCESS"
-	transTypeWithdraw := "WITHDRAW"
-	transTypeFees := "FEE"
+	status := "Waiting"
+	transTypeWithdraw := "Withdraw"
+	transTypeFees := "Withdraw Fee"
 	Ip := c.Context().RemoteIP().String()
 	currentTime := time.Now()
 	// Format the current time as a string
@@ -603,10 +603,14 @@ func ApiKeyView(c *fiber.Ctx) error {
 	}
 	LoginMerchantID := s.Get("LoginMerchantID")
 
+	// Fetch Data from client API
 	var total int64
 	clientAPI := []models.ClientAPI{}
 	database.DB.Db.Table("client_api").Order("id desc").Where("status = ? AND Client_id=?", 1, LoginMerchantID.(uint)).Find(&clientAPI).Count(&total)
 
+	// Fetch Data from client store
+	clientStore := models.ClientStore{}
+	database.DB.Db.Table("client_store").Where("Client_id=?", LoginMerchantID.(uint)).Find(&clientStore)
 	// check session
 	Alerts := s.Get("Alert")
 	if Alerts != "" {
@@ -615,10 +619,12 @@ func ApiKeyView(c *fiber.Ctx) error {
 			panic(err)
 		}
 	}
+
 	return c.Render("api-key", fiber.Map{
 		"Title":        "API Key",
 		"Subtitle":     "API Key",
 		"ClientAPI":    clientAPI,
+		"ClientStore":  clientStore,
 		"Count":        total,
 		"MerchantData": merchantData,
 		"Alert":        Alerts,
@@ -931,6 +937,51 @@ func ChangePasswordPost(c *fiber.Ctx) error {
 	}
 
 	return c.Redirect("/profile")
+}
+
+// For Post Merchant Store Details
+func StorePost(c *fiber.Ctx) error {
+
+	// check session
+	s, _ := store.Get(c)
+	merchantData := s.Get("MerchantData")
+	if merchantData == nil {
+		fmt.Println("Session Expired120")
+		return c.Redirect("/login", 301)
+	}
+
+	// Parses the request body
+
+	tableID := c.FormValue("tableID")
+	cid, err := strconv.ParseUint(tableID, 10, 32)
+	if err != nil {
+		fmt.Println("Error 105")
+	}
+	getTableID := uint(cid)
+	webhookurl := c.FormValue("webhookurl")
+	Alerts := ""
+
+	Client_id := s.Get("LoginMerchantID").(uint) //c.FormValue("tableID")
+
+	//////////
+	// if GET ID than work update else insert
+	// for Full path use- filePath & only file name use file.Filename
+	result := database.DB.Db.Table("client_store").Save(&models.ClientStore{ID: getTableID, Client_id: Client_id, Webhookurl: webhookurl})
+
+	//fmt.Println(loginList.Status)
+	Alerts = "Webhook update successfully"
+	if result.Error != nil {
+		//fmt.Println("ERROR in QUERY")
+		Alerts = "Webhook Not Updated"
+	}
+
+	// check session
+	s.Set("Alert", Alerts) // Set a session key
+	if err := s.Save(); err != nil {
+		return err
+	}
+
+	return c.Redirect("/api-key")
 }
 
 // function for display profile update form

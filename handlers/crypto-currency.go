@@ -44,7 +44,7 @@ func GetCryptoCurrencyList(c *fiber.Ctx) error {
 	currencyList := []models.CryptoCurrencyList{}
 
 	var total int64
-	database.DB.Db.Table("crypto_currency").Order("status ASC,crypto_code ASC").Limit(limit).Offset(offset).Find(&currencyList).Count(&total)
+	database.DB.Db.Table("crypto_currency").Order("crypto_network_short ASC,crypto_code ASC").Limit(limit).Offset(offset).Find(&currencyList).Count(&total)
 
 	//fmt.Println(total)
 	// Prepare pagination data

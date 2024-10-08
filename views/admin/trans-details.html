@@ -36,7 +36,7 @@
                     <div class="col-sm-6"><strong>Destination address :</strong> <a class="text-break" href="{{.AddressUrl}}{{.TransData.Destinationaddress}}" target="_blank" title="View Details"><i class="fa-solid fa-square-arrow-up-right"></i> {{.TransData.Destinationaddress}}</a></div>
                     <div class="col-sm-6" ><strong>Requested Amount :</strong> <span class="text-uppercase">{{.TransData.Requestedcurrency}} {{.TransData.Requestedamount}} </span></div>
                     <div class="col-sm-6"><strong>Converted Amount :</strong> <span class="text-uppercase">{{.TransData.Receivedcurrency}} {{.TransData.Convertedamount}}</span> </div>
-                    <div class="col-sm-6 "><strong>Status :</strong> {{if eq .TransData.Status "SUCCESS"}}<span class="badge text-bg-success">Success</span>{{else if eq .TransData.Status "PROCESS"}}<span class="badge text-bg-warning">Process</span>{{else}}<span class="badge text-bg-danger">Failed</span>{{end}}</div>
+                    <div class="col-sm-6 "><strong>Status :</strong> {{if eq .TransData.Status "Success"}}<span class="badge text-bg-success">Success</span>{{else if eq .TransData.Status "Waiting"}}<span class="badge text-bg-warning">Waiting</span>{{else}}<span class="badge text-bg-danger">Failed</span>{{end}}</div>
                     <div class="col-sm-6 "><strong>Received Amount :</strong> <span class="text-uppercase">{{.TransData.Receivedcurrency}} {{.TransData.Receivedamount}} </span></div>
                     <div class="col-sm-6"><strong>Approved By :</strong> {{.TransData.Approved_by}} {{.TransData.Approver_id}}</div>
                     <div class="col-sm-6"><strong>Approved Date :</strong> {{.TransData.Approved_date}}</div>
@@ -49,7 +49,7 @@
            
           
 
- {{if ne .TransData.Status "SUCCESS"}}
+ {{if ne .TransData.Status "Success"}}
       <form method="POST" class="border border-warning p-2 mx-1 my-2 rounded" action="/admin/transApprovalPost" autocomplete="off">
       <input type="hidden" name="tableID" value="{{.TransData.Id}}">
       
@@ -79,7 +79,7 @@
           <div class="col-md-3 my-2">
             <div class="form-floating">
               <select class="form-select" name="status" id="status" title="status" required="">
-                <option value="0">Process</option>
+                <option value="0">Waiting</option>
                 <option value="1">Full Pay</option>
                 <option value="2">Over Pay</option>
                 <option value="3">Under Pay</option>

@@ -40,6 +40,32 @@
           <h6 class="mb-2 fw-bold text-lg mb-0 py-4"><i class="ri-close-circle-line text-danger" ></i> API Key Not Generated yet</h6>
            <div><a href="/get-api" class="btn btn-sm btn-primary my-3"><i class="ri-add-line"></i> Generate API Key </a></div>
           {{end}}
+          
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-24">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="table-responsive">
+            <form method="POST" id="paymentForm" action="/storePost" autocomplete="off">
+              <input type="hidden" name="tableID" value="{{if .ClientStore.ID}}{{.ClientStore.ID}}{{end}}">
+
+              <div class="mb-20">  
+                  <label for="webhookurl" class="fw-semibold mb-8 text-primary-light">Webhook URL</label>
+                  <div class="input-group input-group-lg border input-form-light radius-8">
+                      <input type="text" class="form-control bg-base border-0 radius-8" id="webhookurl" name="webhookurl" placeholder="Webhook URL" value="{{if .ClientStore.Webhookurl}}{{.ClientStore.Webhookurl}}{{end}}" required="">
+                  </div>
+              </div>
+              <div class="mb-2">  
+                <button type="submit" id="submit" class="btn btn-primary text-sm btn-sm px-8 py-12 radius-8"> Submit</button>
+            </div>
+          </form>
+           
+          </div>
         </div>
       </div>
     </div>

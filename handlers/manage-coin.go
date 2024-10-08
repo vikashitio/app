@@ -49,14 +49,19 @@ func GetCoinList(c *fiber.Ctx) error {
 
 	// For Address
 	coinAddress := []models.CoinAddress{}
-	database.DB.Db.Table("coin_address").Order("coin ASC").Find(&coinAddress)
+	database.DB.Db.Table("coin_address").Where("status = ?", 1).Order("coin ASC").Find(&coinAddress)
 
-	fmt.Println(coinAddress)
 	// Prepare pagination data
+	totalPage := total / 10
+	//fmt.Println(totalPage)
 	nextPage := page + 1
 	prevPage := page - 1
 	if page == 1 {
 		prevPage = 0
+	}
+
+	if page >= int(totalPage+1) {
+		nextPage = 0
 	}
 
 	//fmt.Println(coinList)

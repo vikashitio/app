@@ -46,7 +46,7 @@
                     <td class="text-uppercase">{{.Crypto_code}}</td>
                     <td class="text-capitalize">{{.Crypto_title}}</td>
                     <td>{{.Crypto_network}}</td>
-                    <td>!!{{.Crypto_network_short}}!!</td>
+                    <td>{{.Crypto_network_short}}</td>
                     <td>{{if eq .Status 1}} <i class="fa-regular fa-circle-check text-success"></i> {{else}} <i class="fa-regular fa-circle-xmark text-danger"></i> {{end}}</td>
                     <td class="text-end mx-2"><a class="text-dark mx-2" href="/admin/crypto-currency/edit/{{.Crypto_id}}" title="EDIT COIN"><i class="fa-solid fa-pen-to-square"></i></a> <a class="text-danger mx-2" href="/admin/crypto-currency/delete/{{.Crypto_id}}" title="DELETE COIN"><i class="fa-solid fa-trash"></i></a></td>
                   </tr>

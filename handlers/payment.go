@@ -43,136 +43,6 @@ func PayView(c *fiber.Ctx) error {
 	})
 }
 
-// Function for Post Payment form and display qr code in merchant section
-func PayDataPost(c *fiber.Ctx) error {
-
-	// Get Data from ajax
-	req := new(models.PayRequest)
-	if err := c.BodyParser(req); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Failed to parse request",
-		})
-	}
-
-	// Generate randomly Transaction ID
-	transID, err := function.GenerateRandomID(16) // 16 bytes will give us a 32 character hex string
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "failed to generate random ID",
-		})
-	}
-	///////////////////////////
-	coinList := models.PayCoinAddress{}
-	database.DB.Db.Table("coin_list as a ").Select("b.address, b.lastupdate, a.coin_title, a.coin_id, a.icon, a.coin_network,a.coin_pay_url, b.address_id").Joins("left join coin_address as b on b.coin_id = a.coin_id").Where(" b.lastupdate < NOW() - INTERVAL '1 hour' AND b.status = ? AND b.coin_id = ? ", 1, req.Crypto_id).Limit(1).Find(&coinList)
-	fmt.Println("New Query = ", coinList)
-	fmt.Println("crypto_id = ", req.Crypto_id)
-	///////////////////////////
-
-	if req.Price_amount == "" || req.Price_currency == "" || req.Cid == "" {
-		return c.Redirect("/login", 301)
-
-	}
-
-	//fmt.Println("Pass Amount => ", req.Price_amount, req.Price_currency, req.Cid)
-	cryptoAmount, err := function.ConvertCurrencyToCrypto(req.Price_amount, req.Price_currency, strings.ToLower(coinList.Coin_title))
-
-	if err != nil {
-		fmt.Println("Static Crypto Value")
-		cryptoAmount = 0.00012
-	}
-
-	// Convert float64 to string
-	//convertAMT := strconv.FormatFloat(cryptoAmount, 'f', -1, 64)
-
-	//qr_code := strings.ToLower(coinList.Coin_pay_url) + ":" + coinList.Address + "?amount=" + convertAMT + "&label=Order%20ID%" + transID + "&message=ITIO" + transID
-	qr_code := coinList.Address
-
-	////////////////////////////////////
-	s, _ := store.Get(c)
-	var CID uint = 0
-	if req.Pay_type == 1 {
-		CID = req.Client_id
-		//fmt.Print("inv -> ", CID)
-
-	} else {
-		CID = s.Get("LoginMerchantID").(uint)
-		//fmt.Print("Pay -> ", CID)
-	}
-
-	// convert to float
-	requestedAmount, err := strconv.ParseFloat(req.Price_amount, 64)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	requestedCurrency := req.Price_currency
-	convertedAmountV := strconv.FormatFloat(cryptoAmount, 'f', 6, 64)
-	// convert string to float value
-	convertedAmount, err := strconv.ParseFloat(convertedAmountV, 64)
-	if err != nil {
-		fmt.Println(" Error convert string to float value :")
-	}
-
-	fmt.Println("convertedAmount ->", convertedAmount)
-	convertedcurrency := req.Cid
-
-	assetId := int(req.Crypto_id)
-	receivedcurrency := req.Cid
-
-	status := "PROCESS"
-	Transaction_type := "TRANSFER"
-	Note := "Sending " + receivedcurrency + " to Addresses - " + coinList.Address
-	Ip := c.Context().RemoteIP().String()
-	currentTime := time.Now()
-	// Format the current time as a string
-	formattedTime := currentTime.Format("2006-01-02 15:04:05")
-	Customerrefid := req.Customerrefid
-	if Customerrefid == "" {
-		Customerrefid = transID
-	}
-	qry := models.Transaction_Pay{Client_id: CID, Transaction_id: transID, Assetid: assetId, Requestedamount: requestedAmount, Requestedcurrency: requestedCurrency, Convertedamount: convertedAmount, Convertedcurrency: convertedcurrency, Receivedcurrency: receivedcurrency, Customerrefid: Customerrefid, Transaction_type: Transaction_type, Ip: Ip, Note: Note, Status: status, Destinationaddress: coinList.Address, Createdate: formattedTime}
-	result := database.DB.Db.Table("transaction").Select("client_id", "transaction_id", "assetid", "requestedamount", "requestedcurrency", "convertedamount", "convertedcurrency", "receivedcurrency", "customerrefid", "transaction_type", "ip", "note", "status", "destinationaddress", "createdate").Create(&qry)
-
-	if result.Error != nil {
-		fmt.Println("ERROR in QUERY qry ", result.Error)
-
-	}
-
-	customerData := models.CustomerData{Customer_name: req.Sender_name, Customer_email: req.Sender_email, Customer_tid: transID, Client_id: CID}
-	result = database.DB.Db.Table("customer").Select("customer_name", "customer_email", "customer_tid", "client_id").Create(&customerData)
-
-	if result.Error != nil {
-		fmt.Println("ERROR in QUERY customerData ", result.Error)
-
-	}
-
-	///////////////////////////////////
-
-	address := coinList.Address
-	coinicon := coinList.Icon
-	coinnetwork := coinList.Coin_network
-	coin_id := coinList.Coin_id
-	response := models.PayResponse{
-		Qr_code:     qr_code,
-		Address:     address,
-		Amount:      convertedAmount,
-		Transid:     transID,
-		Coinicon:    coinicon,
-		Coinnetwork: coinnetwork,
-		Coin_id:     coin_id,
-	}
-
-	aid, err := strconv.ParseUint(coinList.Address_id, 10, 32)
-	if err != nil {
-		fmt.Println("Error 105")
-	}
-	address_id := uint(aid)
-
-	currentTime = time.Now()
-	database.DB.Db.Table("coin_address").Save(&models.AddressDateUpdate{Address_id: address_id, Lastupdate: currentTime}).Where("address = ?", address)
-	return c.JSON(response)
-}
-
 // Function for Display Transaction Listing in merchant section
 func TransactionsView(c *fiber.Ctx) error {
 
@@ -567,4 +437,142 @@ func PayLinkPost(c *fiber.Ctx) error {
 		"PayLink":      payLink,
 		"MerchantData": merchantData,
 	})
+}
+
+// Function for Post Payment form and display qr code in merchant section
+func PayDataPost(c *fiber.Ctx) error {
+
+	// Get Data from ajax
+	req := new(models.PayRequest)
+	if err := c.BodyParser(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Failed to parse request",
+		})
+	}
+
+	fmt.Println("req=>", req)
+
+	// Generate randomly Transaction ID
+	transID, err := function.GenerateRandomID(16) // 16 bytes will give us a 32 character hex string
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "failed to generate random ID",
+		})
+	}
+	///////////////////////////
+	// Fetch Coin Data With Address
+	coinList := models.PayCoinAddress{}
+	database.DB.Db.Table("coin_list as a ").Select("b.address, b.lastupdate, a.coin_title, a.coin_id, a.icon, a.coin_network,a.coin_pay_url, b.address_id").Joins("left join coin_address as b on b.coin_id = a.coin_id").Where(" b.lastupdate < NOW() - INTERVAL '1 hour' AND b.status = ? AND b.coin_id = ? ", 1, req.Crypto_id).Limit(1).Find(&coinList)
+
+	// Fetch Data for Order List
+	invoiceList := models.Invoice_Data{}
+	database.DB.Db.Table("invoice").Where("trackid = ?", req.Customerrefid).Find(&invoiceList)
+	fmt.Println("invoiceList = ", invoiceList)
+	price_amount := fmt.Sprintf("%f", invoiceList.Requestedamount)
+	price_currency := strings.ToLower(invoiceList.Requestedcurrency)
+
+	///////////////////////////
+
+	if price_amount == "" || price_currency == "" || req.Cid == "" {
+		return c.Redirect("/login", 301)
+
+	}
+
+	cryptoAmount, err := function.ConvertCurrencyToCrypto(price_amount, price_currency, strings.ToLower(coinList.Coin_title))
+
+	if err != nil {
+		fmt.Println("Static Crypto Value")
+		cryptoAmount = 0.00012
+	}
+
+	// Convert float64 to string
+	//convertAMT := strconv.FormatFloat(cryptoAmount, 'f', -1, 64)
+
+	//qr_code := strings.ToLower(coinList.Coin_pay_url) + ":" + coinList.Address + "?amount=" + convertAMT + "&label=Order%20ID%" + transID + "&message=ITIO" + transID
+	qr_code := coinList.Address
+
+	////////////////////////////////////
+	s, _ := store.Get(c)
+	var CID uint = 0
+	if req.Pay_type == 1 {
+		CID = req.Client_id
+		//fmt.Print("inv -> ", CID)
+
+	} else {
+		CID = s.Get("LoginMerchantID").(uint)
+		//fmt.Print("Pay -> ", CID)
+	}
+
+	// convert to float
+	requestedAmount, err := strconv.ParseFloat(req.Price_amount, 64)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	requestedCurrency := price_currency
+	convertedAmountV := strconv.FormatFloat(cryptoAmount, 'f', 6, 64)
+	// convert string to float value
+	convertedAmount, err := strconv.ParseFloat(convertedAmountV, 64)
+	if err != nil {
+		fmt.Println(" Error convert string to float value :")
+	}
+
+	fmt.Println("convertedAmount ->", convertedAmount)
+	convertedcurrency := req.Cid
+
+	assetId := int(req.Crypto_id)
+	receivedcurrency := req.Cid
+
+	status := "Waiting"
+	Transaction_type := "Collection"
+	Note := "Sending " + receivedcurrency + " to Addresses - " + coinList.Address
+	Ip := c.Context().RemoteIP().String()
+	currentTime := time.Now()
+	// Format the current time as a string
+	formattedTime := currentTime.Format("2006-01-02 15:04:05")
+	Customerrefid := req.Customerrefid
+	if Customerrefid == "" {
+		Customerrefid = transID
+	}
+	qry := models.Transaction_Pay{Client_id: CID, Transaction_id: transID, Assetid: assetId, Requestedamount: requestedAmount, Requestedcurrency: requestedCurrency, Convertedamount: convertedAmount, Convertedcurrency: convertedcurrency, Receivedcurrency: receivedcurrency, Customerrefid: Customerrefid, Transaction_type: Transaction_type, Ip: Ip, Note: Note, Status: status, Destinationaddress: coinList.Address, Createdate: formattedTime, Order_id: invoiceList.Order_id, Is_fee_paid_by_user: invoiceList.Is_fee_paid_by_user}
+	result := database.DB.Db.Table("transaction").Select("client_id", "transaction_id", "assetid", "requestedamount", "requestedcurrency", "convertedamount", "convertedcurrency", "receivedcurrency", "customerrefid", "transaction_type", "ip", "note", "status", "destinationaddress", "createdate", "order_id", "is_fee_paid_by_user").Create(&qry)
+
+	if result.Error != nil {
+		fmt.Println("ERROR in QUERY qry ", result.Error)
+
+	}
+
+	customerData := models.CustomerData{Customer_name: req.Sender_name, Customer_email: req.Sender_email, Customer_tid: transID, Client_id: CID}
+	result = database.DB.Db.Table("customer").Select("customer_name", "customer_email", "customer_tid", "client_id").Create(&customerData)
+
+	if result.Error != nil {
+		fmt.Println("ERROR in QUERY customerData ", result.Error)
+
+	}
+
+	///////////////////////////////////
+
+	address := coinList.Address
+	coinicon := coinList.Icon
+	coinnetwork := coinList.Coin_network
+	coin_id := coinList.Coin_id
+	response := models.PayResponse{
+		Qr_code:     qr_code,
+		Address:     address,
+		Amount:      convertedAmount,
+		Transid:     transID,
+		Coinicon:    coinicon,
+		Coinnetwork: coinnetwork,
+		Coin_id:     coin_id,
+	}
+
+	aid, err := strconv.ParseUint(coinList.Address_id, 10, 32)
+	if err != nil {
+		fmt.Println("Error 105")
+	}
+	address_id := uint(aid)
+
+	currentTime = time.Now()
+	database.DB.Db.Table("coin_address").Save(&models.AddressDateUpdate{Address_id: address_id, Lastupdate: currentTime}).Where("address = ?", address)
+	return c.JSON(response)
 }

@@ -181,3 +181,51 @@ type BTCOutput struct {
 	Value int    `json:"value"`
 	Addr  string `json:"addr"`
 }
+
+// Main struct for the address data
+type DogeAddressData struct {
+	Address string      `json:"address"`
+	TxRefs  []DogeTxRef `json:"txrefs"`
+}
+
+// Struct for each transaction reference (txrefs)
+type DogeTxRef struct {
+	TxHash      string    `json:"tx_hash"`
+	Value       int64     `json:"value"`
+	Spent       bool      `json:"spent,omitempty"` // Omit if not present
+	Spent_by    string    `json:"spent_by"`
+	Confirmed   time.Time `json:"confirmed"` // Parsed as time
+	DoubleSpend bool      `json:"double_spend"`
+}
+
+// Main struct for the address data
+type LiteAddressData struct {
+	Address string      `json:"address"`
+	TxRefs  []LiteTxRef `json:"txrefs"`
+}
+
+// Struct for each transaction reference (txrefs)
+type LiteTxRef struct {
+	TxHash      string    `json:"tx_hash"`
+	Value       int64     `json:"value"`
+	Spent       bool      `json:"spent,omitempty"` // Omit if not present
+	Spent_by    string    `json:"spent_by"`
+	Confirmed   time.Time `json:"confirmed"` // Parsed as time
+	DoubleSpend bool      `json:"double_spend"`
+}
+
+// Main struct for the address data
+type DashAddressData struct {
+	Address string      `json:"address"`
+	TxRefs  []DashTxRef `json:"txrefs"`
+}
+
+// Struct for each transaction reference (txrefs)
+type DashTxRef struct {
+	TxHash      string    `json:"tx_hash"`
+	Value       int64     `json:"value"`
+	Spent       bool      `json:"spent,omitempty"` // Omit if not present
+	Spent_by    string    `json:"spent_by"`
+	Confirmed   time.Time `json:"confirmed"` // Parsed as time
+	DoubleSpend bool      `json:"double_spend"`
+}

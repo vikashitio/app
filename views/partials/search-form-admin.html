@@ -27,7 +27,7 @@
 <div class="col-sm-2 px-1">
       <select name="status" id="status" class="select_cs_2 cole form-select form-select-sm my-1 bg-transparent">
               <option value="" selected="selected">All Status</option>
-              <option value="0" {{ if eq .Substatus "0" }}selected{{ end }}>Process</option>
+              <option value="0" {{ if eq .Substatus "0" }}selected{{ end }}>Waiting</option>
               <option value="1" {{ if eq .Substatus "1" }}selected{{ end }}>Full Pay</option>
               <option value="2" {{ if eq .Substatus "2" }}selected{{ end }}>Over Pay</option>
               <option value="3" {{ if eq .Substatus "3" }}selected{{ end }}>Under Pay</option>

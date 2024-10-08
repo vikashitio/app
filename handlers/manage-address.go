@@ -46,20 +46,27 @@ func GetAddressList(c *fiber.Ctx) error {
 	var total int64
 	// For Address
 	coinAddress := []models.AddressListing{}
-	database.DB.Db.Table("coin_address").Order("status ASC,coin ASC").Limit(limit).Offset(offset).Find(&coinAddress).Count(&total)
-
+	database.DB.Db.Table("coin_address").Order("status ASC,coin ASC").Limit(limit).Offset(offset).Find(&coinAddress)
+	database.DB.Db.Table("coin_address").Count(&total)
+	//fmt.Println("total => ", total)
 	// For Address
 
 	addressUrl := []models.CoinList{}
 	database.DB.Db.Table("coin_list").Select("coin", "coin_id", "coin_network", "coin_status_url").Find(&addressUrl)
 
+	// Prepare pagination data
+	totalPage := total / 10
+	//fmt.Println(totalPage)
 	nextPage := page + 1
 	prevPage := page - 1
 	if page == 1 {
 		prevPage = 0
 	}
 
-	//fmt.Println(addressUrl)
+	if page >= int(totalPage+1) {
+		nextPage = 0
+	}
+
 	return c.Render("admin/manage-address", fiber.Map{
 		"Title":       "Manage Address",
 		"Subtitle":    "Manage Address",
