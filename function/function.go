@@ -191,9 +191,15 @@ type CurrencyResponse map[string]map[string]float64
 // convertCurrencyToCrypto fetches the current crypto exchange rate and converts the given amount of fiat currency to cryptocurrency
 func ConvertCurrencyToCrypto(amount, fromCurrency, toCrypto string) (float64, error) {
 	client := resty.New()
+	fmt.Print("toCrypto", toCrypto)
+	if toCrypto == "polygon" {
+		toCrypto = "matic-network"
+	} else if toCrypto == "binance coin" {
+		toCrypto = "binancecoin"
+	}
 	apiURL := "https://api.coingecko.com/api/v3/simple/price?ids=" + toCrypto + "&vs_currencies=" + fromCurrency
 
-	//fmt.Print(apiURL)
+	fmt.Print(apiURL)
 
 	var apiResponse CurrencyResponse
 	_, err := client.R().SetResult(&apiResponse).Get(apiURL)

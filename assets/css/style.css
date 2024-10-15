@@ -13889,5 +13889,11 @@ td.fc-header-center {
   background-color: var(--white);
   margin-block-start: auto;
 }
+.crypto-pair {
+    margin-left: -15px !important;
+    height: 20px !important;
+    width: 20px !important;
+    margin-bottom: 15px !important;
+}
 
 /* === footer css end === */

@@ -212,13 +212,10 @@
                                       <td><span class="d-inline-block text-truncate" style="max-width: 150px;"></span>{{.Transaction_id}}</td></td>
                                       <td >{{range index $.CoinList}}{{if eq $dataContext.Assetid .Coin_id}}
                                         
-                                        <button type="button" class="btn btn-primary btn-sm position-relative" style="height: 28px;padding-top: 5px;">
-                                          {{$dataContext.Receivedcurrency}}
-                                          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                            {{.Coin_network}}
-                                            <span class="visually-hidden">{{$dataContext.Receivedcurrency}}</span>
-                                          </span>
-                                        </button>
+                                        <img src="/views/images/{{tolower $dataContext.Receivedcurrency}}.png" alt="{{$dataContext.Receivedcurrency}}" title="{{$dataContext.Receivedcurrency}}" class="w-40-px h-40-px rounded-circle flex-shrink-0">
+                                        {{if ne (tolower .Coin_network) $dataContext.Receivedcurrency}}
+                                        <img src="/views/images/{{tolower .Coin_network}}.png" alt="{{.Coin_network}}" title="{{.Coin_network}}" class="w-40-px h-40-px rounded-circle flex-shrink-0 crypto-pair">
+                                        {{end}}
                                        
                                         <!-- <img src="/views/images/{{.Icon}}" alt="" class="w-40-px h-40-px rounded-circle flex-shrink-0"> <span class="text-uppercase">{{$dataContext.Receivedcurrency}}</span>  <span class="badge text-bg-danger">{{.Coin_network}}</span>--> {{end}}{{end}}</td>
                                       <td class="text-uppercase">{{.Requestedcurrency}} {{.Requestedamount}}</td>

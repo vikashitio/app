@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"log"
 	"os"
+	"strings"
 	"template/database"
 	"template/routes"
 
@@ -43,6 +44,9 @@ func main() {
 	// Load templates with custom functions
 	engine := html.New("./views", ".html")
 	engine.AddFuncMap(funcMap)
+
+	// Register the function `tolower`
+	engine.AddFunc("tolower", strings.ToLower)
 
 	app := fiber.New(fiber.Config{
 		Views:             engine,

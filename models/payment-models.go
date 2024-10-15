@@ -229,3 +229,19 @@ type DashTxRef struct {
 	Confirmed   time.Time `json:"confirmed"` // Parsed as time
 	DoubleSpend bool      `json:"double_spend"`
 }
+
+// Response is the root structure
+type CoinXAddressData struct {
+	Status  string          `json:"status"`
+	Message string          `json:"message"`
+	Data    []PolygonResult `json:"result"`
+}
+
+// Result represents each transaction detail
+type PolygonResult struct {
+	TimeStamp string `json:"timeStamp"`
+	Hash      string `json:"hash"`
+	From      string `json:"from"`
+	To        string `json:"to"`
+	Value     string `json:"value"`
+}

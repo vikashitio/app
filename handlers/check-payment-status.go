@@ -247,8 +247,8 @@ func FetchPaymentStatus(c *fiber.Ctx) error {
 			receivedFinalResult = "Declined"
 		}
 
-		fetchTimestamp = "2024-09-30 07:00:09"
-		//fetchTimestamp = coinAddress.Lastupdate.Format("2006-01-02 15:04:05")
+		//fetchTimestamp = "2024-09-30 07:00:09"
+		fetchTimestamp = coinAddress.Lastupdate.Format("2006-01-02 15:04:05")
 		// Format the time to "2006-01-02 15:04:05"
 		responseTimestamp = timestamp.Format("2006-01-02 15:04:05")
 	} else if status_coinid == "1" { // For ADA Cardano Mainnet
@@ -377,8 +377,8 @@ func FetchPaymentStatus(c *fiber.Ctx) error {
 
 		//fmt.Println("receivedFinalResult => ", receivedFinalResult)
 
-		fetchTimestamp = "2024-10-06 16:00:09"
-		//fetchTimestamp = coinAddress.Lastupdate.Format("2006-01-02 15:04:05")
+		//fetchTimestamp = "2024-10-06 16:00:09"
+		fetchTimestamp = coinAddress.Lastupdate.Format("2006-01-02 15:04:05")
 	} else if status_coinid == "6" { // For Litecoin
 
 		// Construct the API URL
@@ -444,8 +444,8 @@ func FetchPaymentStatus(c *fiber.Ctx) error {
 
 		//fmt.Println("receivedFinalResult => ", receivedFinalResult)
 
-		fetchTimestamp = "2024-09-30 16:00:09"
-		//fetchTimestamp = coinAddress.Lastupdate.Format("2006-01-02 15:04:05")
+		//fetchTimestamp = "2024-09-30 16:00:09"
+		fetchTimestamp = coinAddress.Lastupdate.Format("2006-01-02 15:04:05")
 	} else if status_coinid == "3" { // For Dash
 
 		// Construct the API URL
@@ -511,8 +511,8 @@ func FetchPaymentStatus(c *fiber.Ctx) error {
 
 		//fmt.Println("receivedFinalResult => ", receivedFinalResult)
 
-		fetchTimestamp = "2024-10-07 16:00:09"
-		//fetchTimestamp = coinAddress.Lastupdate.Format("2006-01-02 15:04:05")
+		//fetchTimestamp = "2024-10-07 16:00:09"
+		fetchTimestamp = coinAddress.Lastupdate.Format("2006-01-02 15:04:05")
 	} else if status_coinid == "2" { // For BTC Mainnet
 		// URL of the external site to fetch JSON from
 		url := "https://blockchain.info/rawaddr/" + status_address + "?limit=1"
@@ -578,12 +578,111 @@ func FetchPaymentStatus(c *fiber.Ctx) error {
 		receivedTo = responseD.Txs[0].Out[0].Addr              // Get Address To
 		receivedHash = responseD.Txs[0].Hash                   // Get Hash Code
 
-		fetchTimestamp = "2024-09-26 16:00:09"
-		//fetchTimestamp = coinAddress.Lastupdate.Format("2006-01-02 15:04:05")
+		//fetchTimestamp = "2024-09-26 16:00:09"
+		fetchTimestamp = coinAddress.Lastupdate.Format("2006-01-02 15:04:05")
 		// Convert the timestamp to a Time object
 		t := time.Unix(responseD.Txs[0].Time, 0)
 		// Format the time to "2006-01-02 15:04:05"
 		responseTimestamp = t.Format("2006-01-02 15:04:05")
+	} else if status_coinid == "8" || status_coinid == "9" || status_coinid == "10" { // For Polygon
+		// URL of the external site to fetch JSON from
+
+		apiKey := ""
+		url := ""
+		if status_coin == "arb" {
+			apiKey = os.Getenv("ARBITRUM_API_KEY")
+			url = "https://api.arbiscan.io/api?module=account&action=txlist&address=" + status_address + "&startblock=0&endblock=99999999&page=1&offset=1&sort=desc&apikey=" + apiKey
+		} else if status_coin == "bnb" {
+			apiKey = os.Getenv("BNB_API_KEY")
+			url = "https://api.bscscan.com/api?module=account&action=txlist&address=" + status_address + "&startblock=0&endblock=99999999&page=1&offset=1&sort=desc&apikey=" + apiKey
+		} else if status_coin == "matic" {
+			apiKey = os.Getenv("POLYGON_API_KEY")
+			url = "https://api.polygonscan.com/api?module=account&action=txlist&address=" + status_address + "&startblock=0&endblock=99999999&page=1&offset=1&sort=desc&apikey=" + apiKey
+		} else if status_coin == "vikash" {
+			apiKey = os.Getenv("ETHER_SCAN_API_KEY")
+			url = "https://api.etherscan.io/api?module=account&action=txlist&address=" + status_address + "&startblock=0&endblock=99999999&page=1&offset=1&sort=desc&apikey=" + apiKey
+		}
+		fmt.Println("url => ", url)
+		//////////////////////////////////////
+		resp, err := http.Get(url)
+		if err != nil {
+			return c.Status(http.StatusInternalServerError).SendString("Failed to fetch data")
+		}
+		defer resp.Body.Close()
+
+		// Reading the response body
+		body, err = ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return c.Status(http.StatusInternalServerError).SendString("Failed to read response body")
+		}
+		//fmt.Println("body => ", string(body))
+		// Initialize the Response struct
+		var responseD models.CoinXAddressData
+
+		// Unmarshal the byte data into the struct
+		err = json.Unmarshal(body, &responseD)
+		if err != nil {
+			//return c.Status(http.StatusInternalServerError).SendString("Failed to parse JSON")
+			fmt.Println("Failed to parse JSON")
+		}
+
+		//fmt.Println("responseD => ", responseD)
+
+		// Check if data not found
+		if responseD.Status == "0" {
+			response := StatusResponse{
+				Hashcode:       "",
+				Payment_status: "",
+				Payment_id:     "",
+			}
+			return c.JSON(response)
+		}
+
+		receivedAmount := responseD.Data[0].Value
+
+		// convert string to float value
+		receivedAmt, err := strconv.ParseFloat(receivedAmount, 64)
+		if err != nil {
+			fmt.Println(" Error convert string to float value :")
+		}
+		// Convert the integer to a float64 with 18 decimal places
+		AmountInFloat := float64(receivedAmt) / 1000000000000000000
+
+		// Format the float to 6 decimal places as a string
+		formattedResult := strconv.FormatFloat(AmountInFloat, 'f', 6, 64)
+
+		// convert string to float value
+		receivedAmountNew, err = strconv.ParseFloat(formattedResult, 64)
+		if err != nil {
+			fmt.Println(" Error convert string to float value :")
+		}
+
+		//fmt.Println("receivedAmountNew", receivedAmountNew)
+		receivedFrom = responseD.Data[0].From
+		receivedTo = responseD.Data[0].To
+		receivedHash = responseD.Data[0].Hash
+		// Convert string to int
+
+		// Convert the string to an int64
+		unixTime, err := strconv.ParseInt(responseD.Data[0].TimeStamp, 10, 64)
+		if err != nil {
+			fmt.Println("Error converting string to int64:", err)
+		}
+		// Convert Unix timestamp (seconds) to time.Time
+		timestamp := time.Unix(unixTime, 0)
+
+		//receivedDecimals := responseD.Data[0].Decimals
+		receivedFinalResult = responseD.Status
+		if receivedFinalResult == "1" {
+			receivedFinalResult = "Success"
+		} else {
+			receivedFinalResult = "Declined"
+		}
+
+		//fetchTimestamp = "2024-09-09 07:00:09"
+		fetchTimestamp = coinAddress.Lastupdate.Format("2006-01-02 15:04:05")
+		// Format the time to "2006-01-02 15:04:05"
+		responseTimestamp = timestamp.Format("2006-01-02 15:04:05")
 	} else {
 		fmt.Println("Crypto Not Supported ==> ", status_coin)
 	}

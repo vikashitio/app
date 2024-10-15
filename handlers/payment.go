@@ -109,8 +109,6 @@ func TransactionsView(c *fiber.Ctx) error {
 		fmt.Println(err)
 	}
 
-	fmt.Println("Alerts = ", Alerts)
-
 	return c.Render("merchant-transactions", fiber.Map{
 		"Title":           "Transactions List",
 		"Subtitle":        "Transactions List",
