@@ -588,3 +588,42 @@ func AdminResetPasswordPost(c *fiber.Ctx) error {
 		"Alertx": Alerts,
 	})
 }
+
+// Function for Coin ID Listing in admin section
+func AdminCoinIDView(c *fiber.Ctx) error {
+
+	AdminSession(c)
+	sess, _ := store.Get(c)
+	adminData := sess.Get("AdminData")
+
+	// Get query parameters
+	search := c.Query("search", "")
+
+	fmt.Println("search => ", search)
+
+	searchStringFull := ""
+
+	if search != "" {
+		searchStringFull = " coin_id ILIKE " + "'%" + search + "%' OR  symbol ILIKE " + "'%" + search + "%'"
+	}
+
+	coinList := []models.CoinIDDetails{}
+	database.DB.Db.Table("exchange_coinid").Where(searchStringFull).Limit(200).Find(&coinList)
+
+	Alerts := sess.Get("AlertX")
+	if Alerts != "" {
+		sess.Delete("AlertX")
+		if err := sess.Save(); err != nil {
+			panic(err)
+		}
+	}
+
+	//fmt.Println(transactionList)
+	return c.Render("admin/coinid", fiber.Map{
+		"Title":     "Search COIN ID",
+		"Subtitle":  "Search COIN ID",
+		"AlertX":    Alerts,
+		"AdminData": adminData,
+		"CoinList":  coinList,
+	})
+}

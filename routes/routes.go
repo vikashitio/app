@@ -48,6 +48,10 @@ func InitRoutes(app *fiber.App) {
 	app.Get("/crypto-wallet/delete/:TID", handlers.DeleteCryptoWallet)
 	app.Get("/add-crypto-wallet", handlers.AddCryptoWalletView)
 	app.Post("/cryptoWalletPost", handlers.CryptoWalletPost)
+
+	app.Get("/settlement-settings", handlers.SettlementSettingsView)
+	//app.Post("/cryptoWalletPost", handlers.CryptoWalletPost)
+
 	app.Get("/get-network", handlers.GetNetwork)
 	app.Post("/pay-data", handlers.PayDataPost)
 	app.Get("/pay", handlers.PayQRView)
@@ -87,6 +91,7 @@ func InitRoutes(app *fiber.App) {
 	app.Get("/admin/login-history", handlers.AdminLoginHistory)
 	app.Get("/admin/reset-password", handlers.AdminResetPasswordView)
 	app.Post("/admin/resetPasswordPost", handlers.AdminResetPasswordPost)
+	app.Get("/admin/coinid", handlers.AdminCoinIDView)
 	// // For Crypto Coin List
 	app.Get("/admin/coin-list/edit/:TID", handlers.EditCoin)
 	app.Get("/admin/coin-list/delete/:TID", handlers.DeleteCoin)

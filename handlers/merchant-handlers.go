@@ -1275,3 +1275,28 @@ func GetNetwork(c *fiber.Ctx) error {
 	}
 
 }
+
+// function for Display Currency Form
+func SettlementSettingsView(c *fiber.Ctx) error {
+	fmt.Println("ADD WALLET")
+	// check session
+	s, _ := store.Get(c)
+	merchantData := s.Get("MerchantData")
+	if merchantData == nil {
+		fmt.Println("Session Expired116")
+		return c.Redirect("/login", 301)
+	}
+	LoginMerchantID := s.Get("LoginMerchantID")
+
+	//fmt.Print("LoginMerchantID =>", LoginMerchantID)
+	settlementSetting := []models.SettlementSetting{}
+	database.DB.Db.Table("coin_list A ").Select("a.coin_id, a.coin, a.coin_title, b.crypto_address, b.assetid, b.status, b.wallet_id").Joins("LEFT JOIN client_wallet B ON A.coin_id = B.assetid AND B.client_id = ?", LoginMerchantID).Order("a.coin_title asc").Find(&settlementSetting)
+	// .Where(" a.status = ?", 1)
+	//fmt.Println("settlementSetting => ", settlementSetting)
+	return c.Render("settlement-settings", fiber.Map{
+		"Title":             "Settlement Settings",
+		"Subtitle":          "Settlement Settings",
+		"MerchantData":      merchantData,
+		"SettlementSetting": settlementSetting,
+	})
+}
