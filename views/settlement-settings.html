@@ -1,0 +1,115 @@
+{{template "partials/header" .}}
+<style>
+    .img-icon { width: 40px;margin-right: 10px;}
+    .process {
+    background: linear-gradient(#ffffff, #d7dae0) !important;
+    border: solid 0.15em #7c7f853d !important;
+}
+    </style>
+    <style>
+      /* Basic styles for the flash message */
+      .flashMessage {
+          display: none; /* Initially hidden */
+          position: relative;
+          left: 40%;
+          margin-bottom: 20px;
+          padding: 10px 20px;
+          width: 250px;
+          padding: 10px 20px;
+          background-color: #28a745; /* Green background */
+          color: white;
+          border-radius: 5px;
+          font-size: 16px;
+          z-index: 9999; /* Appear above other elements */
+      }
+  </style>
+<div class="dashboard-main-body">
+
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
+<h6 class="fw-semibold mb-0">{{.Title}}</h6>
+
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-body">
+    {{range .SettlementSetting}}
+
+    <div class="border border-5 rounded p-3 my-3 bg-info-subtle">
+     <div class="row m-1 "  title="Create Cardano Payment" data-bs-toggle="collapse" data-bs-target="#collapse{{.Coin_id}}" aria-expanded="false" aria-controls="collapse{{.Coin_id}}">
+        <div class="col img-icon-box text-start px-2"><img class="img-icon" src="/views/images/{{.Coin}}.png" style="width: 25px !important;"> <span class="col text-secondary-light"><strong>{{.Coin_title}}</strong> <span class="text-uppercase">({{.Coin}})</span></span></div>
+        <div class="col text-end form-switch"><input class="form-check-input checkstatus" data-tid="{{.Coin_id}}" data-coin="{{.Coin}}" type="checkbox" role="switch" {{if eq .Status 1}} checked="checked" {{end}} ></div>
+     </div>      
+      <div class="collapse" id="collapse{{.Coin_id}}">
+        <div class="border border-4 border-bottom border-primary my-3"></div> 
+        <div class="mb-20">  
+          <label for="sender_name" class="fw-semibold mb-8 text-primary-light"><span class="text-uppercase">{{.Coin}}</span> settlement address</label>
+          <div class="">
+            <div id="flashMessage_{{.Coin_id}}" class="flashMessage mdi-format-float-center"></div>
+            
+              {{if .Wallet_id}}
+              <input type="hidden" name="wallet_id_{{.Coin_id}}" id="wallet_id_{{.Coin_id}}" value="{{.Wallet_id}}">
+              {{end}}
+              <input type="text" class="form-control form-control-sm bg-base border-0 radius-8 float-start" id="coin_address_{{.Coin_id}}" name="coin_address_{{.Coin_id}}" placeholder="Enter {{.Coin}} wallet address" required="" value="{{if .Crypto_address}}{{.Crypto_address}}{{end}}" style="width:calc(100% - 90px);">
+              <button type="submit" id="submit" data-id="{{if .Coin_id}}{{.Coin_id}}{{end}}" class="btn btn-primary text-sm btn-sm mx-1 float-start submitData" style="width: 80px;">Save</button>
+              <div class="clearfix"></div>
+            
+          </div>
+      </div>
+      </div>
+    </div>
+      
+    {{end}}
+      
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div> 
+
+  {{template "partials/footer" .}}
+  <script>
+  
+    $('.submitData').click(function() {
+      var cid=$(this).attr('data-id');
+      var wallet_id=$('#wallet_id_'+cid).val();
+      var coin_address=$('#coin_address_'+cid).val();
+      alert(cid)
+      alert(wallet_id)
+      alert(coin_address)
+      var message="Doneeeeeeeee"
+
+      // Set the message text and display it
+      $('#flashMessage_'+cid).text(message).fadeIn();
+
+      // Hide the message after 5 seconds
+     setTimeout(function() {
+     $('#flashMessage_'+cid).fadeOut();
+     }, 5000); // 5000 milliseconds = 5 seconds
+
+
+    });
+
+    $('.checkstatus').click(function() {
+      
+
+      var cid=$(this).attr('data-tid');
+      var cdata=$(this).attr('data-coin');
+      var coin_address=$('#coin_address_'+cid).val();
+
+      if(coin_address){
+      alert (coin_address)
+    
+       
+            if (!$(this).is(':checked')) { 
+              return confirm("Are you sure? DeActive this Coin"); 
+            }else{
+              return confirm("Are you sure? Activate this Coin");   
+            } 
+
+    }
+  });
+
+  </script>

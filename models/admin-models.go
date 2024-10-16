@@ -202,3 +202,12 @@ type TemplateDeleted struct {
 	Template_id uint `gorm:"primaryKey"`
 	Status      int  `json:"status,omitempty"`
 }
+
+// For COIN ID Listing
+type CoinIDDetails struct {
+	//gorm.Model
+	Id      uint   `gorm:"primaryKey"`
+	Coin_id string `json:"coin_id,omitempty"`
+	Symbol  string `json:"symbol,omitempty"`
+	Name    string `json:"name,omitempty"`
+}

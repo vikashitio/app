@@ -636,6 +636,17 @@ type CryptoWalletList struct {
 	Status         int    `json:"status,omitempty"`
 }
 
+// for manage Settlement Setting
+type SettlementSetting struct {
+	Coin_id        int    `json:"coin_id,omitempty"`
+	Coin           string `json:"coin,omitempty"`
+	Coin_title     string `json:"coin_title,omitempty"`
+	Crypto_address string `json:"crypto_address,omitempty"`
+	Assetid        int    `json:"assetid,omitempty"`
+	Status         int    `json:"status,omitempty"`
+	Wallet_id      int    `json:"wallet_id,omitempty"`
+}
+
 // for manage coin
 type CryptoWalletDeleted struct {
 	Wallet_id uint `gorm:"primaryKey"`
