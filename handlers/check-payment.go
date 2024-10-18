@@ -165,9 +165,12 @@ func PayQRView(c *fiber.Ctx) error {
 	//=============Fetch Invoice Details by trackid===============
 	invoiceData := models.Invoice_Master{}
 	database.DB.Db.Table("invoice").Where("trackid = ?", PaymentID).Find(&invoiceData)
+	MID := invoiceData.Client_id
 	//=============Fetch coin list ===============
 	coinList := []models.CoinList{}
-	database.DB.Db.Table("coin_list").Order("coin ASC").Where("status = ?", 1).Find(&coinList)
+	//database.DB.Db.Table("coin_list").Order("coin ASC").Where("status = ?", 1).Find(&coinList)
+	database.DB.Db.Table("coin_list A ").Select("a.*").Joins("LEFT JOIN client_wallet B ON A.coin_id = B.assetid ").Where(" a.status = ? AND B.client_id = ? AND B.status = ?", 1, MID, 1).Order("a.coin_title asc").Find(&coinList)
+
 	fmt.Println(invoiceData)
 	var commonURL = os.Getenv("CommonURL")
 	return c.Render("checkout-pay-views", fiber.Map{

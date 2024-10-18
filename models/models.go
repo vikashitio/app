@@ -706,3 +706,23 @@ type CustomerList struct {
 	Total_customer string `json:"total_customer,omitempty"`
 	Client_id      uint   `json:"client_id,omitempty"`
 }
+
+type SettlementRequest struct {
+	Coin_id     int    `json:"coin_id,omitempty"`
+	Wallet_id   int    `json:"wallet_id,omitempty"`
+	CoinAddress string `json:"coinAddress,omitempty"`
+	Action      string `json:"action,omitempty"`
+}
+type SettlementResponse struct {
+	Status  int    `json:"status" form:"sender_name"`
+	Message string `json:"message" form:"sender_email"`
+}
+
+type SettlementCoin struct {
+	Coin         string `json:"coin,omitempty"`
+	Coin_title   string `json:"coin_title,omitempty"`
+	Coin_network string `json:"coin_network,omitempty"`
+}
+type SettlementStatus struct {
+	Status string `json:"status" form:"sender_name"`
+}
