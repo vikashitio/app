@@ -307,6 +307,8 @@ type EmailData struct {
 	HashCode    string
 	TransID     string
 	Crypto      string
+	Title       string
+	Details     string
 }
 
 /// Struct for Now Payment //////////
@@ -624,6 +626,17 @@ type Support_Ticket struct {
 	Timestamp      string `json:"timestamp,omitempty"`
 }
 
+// for manage support ticket reply
+type Support_Ticket_Reply struct {
+	//gorm.Model
+	Reply_id   uint   `gorm:"primaryKey"`
+	Ticket_id  int64  `json:"ticket_id,omitempty"`
+	Reply_desc string `json:"reply_desc,omitempty"`
+	Reply_by   string `json:"reply_by,omitempty"`
+	Type       string `json:"type,omitempty"`
+	Timestamp  string `json:"timestamp,omitempty"`
+}
+
 // for manage Currency
 type CryptoWalletList struct {
 	Wallet_id      uint   `gorm:"primaryKey"`
@@ -705,4 +718,24 @@ type CustomerList struct {
 	Customer_email string `json:"customer_email,omitempty"`
 	Total_customer string `json:"total_customer,omitempty"`
 	Client_id      uint   `json:"client_id,omitempty"`
+}
+
+type SettlementRequest struct {
+	Coin_id     int    `json:"coin_id,omitempty"`
+	Wallet_id   int    `json:"wallet_id,omitempty"`
+	CoinAddress string `json:"coinAddress,omitempty"`
+	Action      string `json:"action,omitempty"`
+}
+type SettlementResponse struct {
+	Status  int    `json:"status" form:"sender_name"`
+	Message string `json:"message" form:"sender_email"`
+}
+
+type SettlementCoin struct {
+	Coin         string `json:"coin,omitempty"`
+	Coin_title   string `json:"coin_title,omitempty"`
+	Coin_network string `json:"coin_network,omitempty"`
+}
+type SettlementStatus struct {
+	Status string `json:"status" form:"sender_name"`
 }

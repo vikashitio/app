@@ -1,10 +1,14 @@
 package function
 
 import (
+	"bytes"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"math"
 	"math/rand"
+	"net/http"
 	"net/smtp"
 	"os"
 	"strconv"
@@ -33,6 +37,8 @@ func SendEmail(template_code string, p models.EmailData) error {
 	Status := ""
 	HashCode := ""
 	TransID := ""
+	Title := ""
+	Details := ""
 
 	// Set Variables
 	if p.Email != "" {
@@ -49,6 +55,12 @@ func SendEmail(template_code string, p models.EmailData) error {
 	}
 	if p.Crypto != "" {
 		Crypto = p.Crypto
+	}
+	if p.Title != "" {
+		Title = p.Title
+	}
+	if p.Details != "" {
+		Details = p.Details
 	}
 	if p.Status != "" {
 		Status = p.Status
@@ -116,6 +128,8 @@ func SendEmail(template_code string, p models.EmailData) error {
 	EmailBody = strings.Replace(EmailBody, "[status]", Status, 1)
 	EmailBody = strings.Replace(EmailBody, "[hashCode]", HashCode, 1)
 	EmailBody = strings.Replace(EmailBody, "[transid]", TransID, 1)
+	EmailBody = strings.Replace(EmailBody, "[title]", Title, 1)
+	EmailBody = strings.Replace(EmailBody, "[details]", Details, 1)
 
 	to := []string{Email}
 	// Set up authentication information.
@@ -216,6 +230,65 @@ func ConvertCurrencyToCrypto(amount, fromCurrency, toCrypto string) (float64, er
 	cryptoAmount := usdAmount / rate
 
 	return cryptoAmount, nil
+}
+
+type RequestAddress struct {
+	Address string `json:"address"`
+	Network string `json:"network"`
+}
+
+type ResponseAddress struct {
+	Valid   bool   `json:"valid"`
+	Message string `json:"message"`
+}
+
+// function for Crypto currency address validator
+func CryptoAddressValidator(address, currency string) (string, bool) {
+	data := RequestAddress{
+		Address: address,
+		Network: currency,
+	}
+
+	// Marshal data to JSON
+	body, err := json.Marshal(data)
+	if err != nil {
+		fmt.Println("Error marshalling request")
+	}
+	// Create request
+	req, err := http.NewRequest(http.MethodPost, "https://api.checkcryptoaddress.com/wallet-checks", bytes.NewReader(body))
+	if err != nil {
+		fmt.Println("Error creating request")
+	}
+	// Set content type header
+	req.Header.Set("Content-Type", "application/json")
+
+	// Send request
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Error sending request")
+
+	}
+	defer resp.Body.Close()
+
+	// Read response body (optional)
+	responseBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("responseBody Error : ", err)
+	}
+	// Print or process response body
+	//fmt.Println(string(responseBody))
+	// Parse the response
+	var responseAddress ResponseAddress
+	if err := json.Unmarshal(responseBody, &responseAddress); err != nil {
+		fmt.Println("Error parsing API response", err)
+	}
+	message := responseAddress.Message
+	valid := responseAddress.Valid
+
+	//fmt.Println("Result =>", message, valid)
+
+	return message, valid
 }
 
 type APIKeyResponse struct {

@@ -523,7 +523,7 @@ func PayDataPost(c *fiber.Ctx) error {
 
 	status := "Waiting"
 	Transaction_type := "Collection"
-	Note := "Sending " + receivedcurrency + " to Addresses - " + coinList.Address
+	Note := "Sending " + strings.ToUpper(receivedcurrency) + " to Addresses - " + coinList.Address
 	Ip := c.Context().RemoteIP().String()
 	currentTime := time.Now()
 	// Format the current time as a string

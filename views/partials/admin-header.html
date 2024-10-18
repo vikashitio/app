@@ -17,6 +17,7 @@
     width: 2.5rem !important;
 }
   </style>
+   {{if ne .Modal 1}}
 <header id="page-topbar" style="border:1px solid #E5E5E5 !important;box-shadow:5px 5px 10px #e8e8e8,-5px -5px 10px #ffffff;">
     <!-- making lienaer greand in background on header bar using the sytle shheret -->
     <div class="navbar-header bg">
@@ -103,7 +104,7 @@
           <li class="list-item "><a href="/admin/crypto-currency"><i class="fa-brands fa-bitcoin fa-fw"></i> <span>Crypto Currency</span></a></li>
           <li class="list-item "><a href="/admin/members"><i class="fa-solid fa-users fa-fw"></i> <span>Members</span></a></li>
           <li class="list-item "><a href="/admin/coinid"><i class="fa-solid fa-right-left"></i> <span>Exchange Coin ID</span></a></li>
-          <li class="list-item "><a href="/admin/developer"><i class="fa-solid fa-code"></i> <span>Developer Guide</span></a></li>
+          <!-- <li class="list-item "><a href="/admin/developer"><i class="fa-solid fa-code"></i> <span>Developer Guide</span></a></li> -->
           <li class="list-item "><a href="/admin/support-ticket"><i class="fa-solid fa-envelope fa-fw"></i> <span>Support Ticket</span></a></li>
           <li class="list-item "><a href="/admin/email-template"><i class="fa-solid fa-envelope-open fa-fw"></i> <span>Email Template</span></a></li>
           <li class="list-item "><a href="/admin/acquirer"><i class="fas fa-handshake fa-fw"></i> <span>Acquirer</span></a></li> 
@@ -119,6 +120,15 @@
       <!-- Sidebar -->
     </div>
   </div>
+ 
+  {{else}}
+  <style>
+  body[data-layout=horizontal] .page-content {
+    margin-top: 0px !important;
+    padding: calc(0px + 24px) calc(21px / 2) 20px calc(24px / 2) !important;
+}
+</style>
+  {{end}}
   <script src="/views/js/metismenu/metisMenu.min.js"></script>
   <script src="/views/js/dist/app.js"></script>
   

@@ -27,6 +27,9 @@ SMTPusername="mailers@itio.in"
 SMTPpassword="India@992@@"
 SMTPhost="smtppro.zoho.in"
 SMTPport="587"
+#Support
+SupportEmail="vikashg@itio.in"
+SupportContactNo="9555538740"
 #API KEY
 CARDANO_SCAN_API_KEY="ae80434f-22ef-4e5d-872b-6c84c724074c"
 ETHER_SCAN_API_KEY="5Q4JIH4EXKUTM6CRDVK4B8WZR46AXXX3KU"

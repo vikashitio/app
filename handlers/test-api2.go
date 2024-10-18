@@ -2,40 +2,22 @@ package handlers
 
 import (
 	"fmt"
-	"template/database"
+	"template/function"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-type TxResponse struct {
-	Txhash    string `json:"txhash"`
-	Height    string `json:"height"`
-	GasWanted string `json:"gas_wanted"`
-	GasUsed   string `json:"gas_used"`
-	Timestamp string `json:"timestamp"`
-}
-
 // Handler to get balance by address
 func TestAPIS(c *fiber.Ctx) error {
-	// PostgreSQL connection string
 
-	// Prepare the insert statement
-	insertQuery := `
-        INSERT INTO exchange_coinid (coin_id, symbol, name)
-        VALUES ($1, $2, $3)`
+	address := "0x5009317fd4f6f8feea9dae41e5f0a4737bb7a7d5"
+	currency := "bnb"
 
-	// Sample data to insert
-	coins := [][]interface{}{}
+	message, valid := function.CryptoAddressValidator(address, currency)
 
-	// Insert data
-	for _, coin := range coins {
-		err := database.DB.Db.Exec(insertQuery, coin[0], coin[1], coin[2])
+	fmt.Println("message =>", message)
+	fmt.Println("valid =>", valid)
 
-		fmt.Println(err)
-
-	}
-
-	fmt.Println("Data inserted successfully!")
-	return nil
+	return c.SendString(message)
 
 }

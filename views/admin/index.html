@@ -52,11 +52,11 @@
                   <div class="card-body">
                   <div class="media">
                     <div class="media-body">
-                      <h5><span class="text-uppercase">{{.Coin}}</span> {{.Coin_title}} <br><span class="badge text-bg-danger">{{.Coin_network}}</span>  </h5>
+                      <h5><span class="text-uppercase">{{.Coin}}</span> {{.Coin_title}} <br><span  class="fw-bold">{{.Coin_network}}</span>  </h5>
                     </div>
                     <div class="avatar-xs"> <span class="mx-2"><img class="img-icon" src="/views/images/{{.Icon}}">  </span> </div>
                   </div>
-                  <h4 class="m-0 align-self-center">Balance - {{$dataContext.Balance}}  <span class="text-uppercase">{{.Coin}}</span></h4>
+                  <h4 class="m-0 align-self-center"><span class="balance-limit">{{$dataContext.Balance}}</span> </h4>
                 </div>
                   {{end}}{{end}}
                   
@@ -101,7 +101,8 @@
                 <tr>
                   <td ><span class="accordion-button88" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{.Id}}" aria-expanded="false" aria-controls="collapse{{.Id}}"><i class="fa-solid fa-plus"></i></span></td>
                   <td>{{.Transaction_id}}</td>
-                  <td  class="text-uppercase">{{.Receivedcurrency}} {{range index $.CoinList}}{{if eq $dataContext.Assetid .Coin_id}} <span class="badge text-bg-danger">{{.Coin_network}}</span> {{end}}{{end}}</td>
+                  <td  class="text-uppercase">{{.Receivedcurrency}} {{range index $.CoinList}}{{if eq $dataContext.Assetid .Coin_id}} 
+                    <p class="text-muted fw-bold" title="Network">{{.Coin_network}}</p> {{end}}{{end}}</td>
                   <td class="text-uppercase">{{.Requestedcurrency}} {{.Requestedamount}}</td>
                   <td class="text-uppercase">{{.Convertedcurrency}} {{.Convertedamount}}</td>
                   <td class="text-uppercase">{{.Receivedcurrency}} {{.Receivedamount}}</td>

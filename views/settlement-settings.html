@@ -12,14 +12,12 @@
           display: none; /* Initially hidden */
           position: relative;
           left: 40%;
-          margin-bottom: 20px;
-          padding: 10px 20px;
-          width: 250px;
-          padding: 10px 20px;
-          background-color: #28a745; /* Green background */
+          /* margin-bottom: 20px;
+          padding: 10px 20px; */
+          width: 300px;
+          background-color: #358bba; /* Green background */
           color: white;
-          border-radius: 5px;
-          font-size: 16px;
+          border-radius: 8px;
           z-index: 9999; /* Appear above other elements */
       }
   </style>
@@ -36,22 +34,23 @@
         <div class="card-body">
     {{range .SettlementSetting}}
 
-    <div class="border border-5 rounded p-3 my-3 bg-info-subtle">
+    <div class="border border-5 rounded p-3 my-3">
+      <div id="flashMessage_{{.Coin_id}}" class="flashMessage px-3 text-center"></div>
      <div class="row m-1 "  title="Create Cardano Payment" data-bs-toggle="collapse" data-bs-target="#collapse{{.Coin_id}}" aria-expanded="false" aria-controls="collapse{{.Coin_id}}">
         <div class="col img-icon-box text-start px-2"><img class="img-icon" src="/views/images/{{.Coin}}.png" style="width: 25px !important;"> <span class="col text-secondary-light"><strong>{{.Coin_title}}</strong> <span class="text-uppercase">({{.Coin}})</span></span></div>
-        <div class="col text-end form-switch"><input class="form-check-input checkstatus" data-tid="{{.Coin_id}}" data-coin="{{.Coin}}" type="checkbox" role="switch" {{if eq .Status 1}} checked="checked" {{end}} ></div>
+        <div class="col text-end form-switch"><input class="form-check-input checkstatus" id="check_{{.Coin_id}}" data-tid="{{.Coin_id}}" data-coin="{{.Coin}}" type="checkbox" role="switch" {{if eq .Status 1}} checked="checked" {{end}} ></div>
      </div>      
       <div class="collapse" id="collapse{{.Coin_id}}">
         <div class="border border-4 border-bottom border-primary my-3"></div> 
         <div class="mb-20">  
           <label for="sender_name" class="fw-semibold mb-8 text-primary-light"><span class="text-uppercase">{{.Coin}}</span> settlement address</label>
           <div class="">
-            <div id="flashMessage_{{.Coin_id}}" class="flashMessage mdi-format-float-center"></div>
+            
             
               {{if .Wallet_id}}
               <input type="hidden" name="wallet_id_{{.Coin_id}}" id="wallet_id_{{.Coin_id}}" value="{{.Wallet_id}}">
               {{end}}
-              <input type="text" class="form-control form-control-sm bg-base border-0 radius-8 float-start" id="coin_address_{{.Coin_id}}" name="coin_address_{{.Coin_id}}" placeholder="Enter {{.Coin}} wallet address" required="" value="{{if .Crypto_address}}{{.Crypto_address}}{{end}}" style="width:calc(100% - 90px);">
+              <input type="text" class="form-control form-control-sm float-start" id="coin_address_{{.Coin_id}}" name="coin_address_{{.Coin_id}}" placeholder="Enter {{.Coin}} wallet address" required="" value="{{if .Crypto_address}}{{.Crypto_address}}{{end}}" style="width:calc(100% - 90px);">
               <button type="submit" id="submit" data-id="{{if .Coin_id}}{{.Coin_id}}{{end}}" class="btn btn-primary text-sm btn-sm mx-1 float-start submitData" style="width: 80px;">Save</button>
               <div class="clearfix"></div>
             
@@ -73,22 +72,76 @@
   <script>
   
     $('.submitData').click(function() {
+
+       ///////////Fetch Data////////////
       var cid=$(this).attr('data-id');
       var wallet_id=$('#wallet_id_'+cid).val();
-      var coin_address=$('#coin_address_'+cid).val();
-      alert(cid)
-      alert(wallet_id)
-      alert(coin_address)
-      var message="Doneeeeeeeee"
+      var str=$('#coin_address_'+cid).val();
+      var coin_address = str.trim(); // Removes whitespace from both ends
+      var action="Update";
 
-      // Set the message text and display it
-      $('#flashMessage_'+cid).text(message).fadeIn();
+       ///////////Validation////////////
+    if(coin_address==''){
+      alert('Please enter coin address');
+      $( '#coin_address_'+cid ).focus();
+    return false;
+    }else if(cid==''){
+      alert('Data tampered please try again');
+      location.reload();
+      
+    }
+      
 
-      // Hide the message after 5 seconds
-     setTimeout(function() {
-     $('#flashMessage_'+cid).fadeOut();
-     }, 5000); // 5000 milliseconds = 5 seconds
+     
 
+      ///////////Create Json Data////////////
+      var formData = {
+        coin_id: cid,
+        wallet_id: wallet_id,
+        CoinAddress: coin_address,
+        Action: action
+      };
+
+     // alert(JSON.stringify(formData));
+
+      /////////// Post Data by Ajax////////////
+            $.ajax({
+                url: "/settlement-settings-post",
+                data: $.param(formData),
+                type: "POST",
+                contentType: 'application/x-www-form-urlencoded',
+                success:function(resp){
+                    //alert(resp.status);
+                   // alert(resp.message);
+                    if(resp.status==1){
+                      $('#check_'+cid).prop('checked', true);
+
+                      //var message=resp.message
+                      // Set the message text and display it
+                      $('#flashMessage_'+cid).text(resp.message).fadeIn();
+
+                      // Hide the message after 5 seconds
+                      setTimeout(function() {
+                      $('#flashMessage_'+cid).fadeOut();
+                      location.reload();
+                      }, 2000); // 5000 milliseconds = 5 seconds
+                     }else if(resp.status==2){ 
+
+                      $('#coin_address_'+cid).css("border", "1px solid red");
+                      $('#flashMessage_'+cid).text(resp.message).fadeIn();
+
+                      // Hide the message after 5 seconds
+                      setTimeout(function() {
+                      $('#flashMessage_'+cid).fadeOut();
+                      }, 5000); // 5000 milliseconds = 5 seconds
+
+                    }else{
+                        alert("Address Not Updated")
+                    }
+    
+                },
+                error:function (){}
+                });
 
     });
 
@@ -100,15 +153,52 @@
       var coin_address=$('#coin_address_'+cid).val();
 
       if(coin_address){
-      alert (coin_address)
-    
-       
+         ///////////Create Json Data////////////
+      
+
+
             if (!$(this).is(':checked')) { 
-              return confirm("Are you sure? DeActive this Coin"); 
+                 var action="deactivated";      
             }else{
-              return confirm("Are you sure? Activate this Coin");   
+              var action="activated";      
             } 
 
+            var checkData = {
+                  coin_id: cid,
+                  Action: action
+                }; 
+
+               // alert(JSON.stringify(checkData));
+
+                $.ajax({
+                url: "/settlement-settings-post",
+                data: $.param(checkData),
+                type: "POST",
+                contentType: 'application/x-www-form-urlencoded',
+                success:function(resp){
+                   // alert(resp.status);
+                   // alert(resp.message);
+                    if(resp.status==1){
+                      $('#check_'+cid).prop('checked', true);
+
+                      //var message=resp.message
+                      // Set the message text and display it
+                      $('#flashMessage_'+cid).text(resp.message).fadeIn();
+
+                      // Hide the message after 5 seconds
+                      setTimeout(function() {
+                      $('#flashMessage_'+cid).fadeOut();
+                      location.reload();
+                      }, 2000); // 5000 milliseconds = 5 seconds
+                      //
+
+                    }else{
+                        alert("Address Not Updated")
+                    }
+    
+                },
+                error:function (){}
+                });
     }
   });
 

@@ -22,6 +22,20 @@
   <link rel="stylesheet" type="text/css" href="{{.CssURLS}}/assets/css/lib/file-upload.css">
   <!-- main css -->
   <link rel="stylesheet" type="text/css" href="{{.CssURLS}}/assets/css/style.css">
- 
+
+  <!-- Bootstrap js -->
+ <script src="{{.CssURLS}}/assets/js/lib/bootstrap.bundle.min.js"></script>
+
+ <script>
+const button = document.querySelector("[data-theme-toggle]");
+const localStorageTheme = localStorage.getItem("theme");
+document.querySelector("html").setAttribute("data-theme", localStorageTheme);
+//alert(localStorageTheme)
+ </script>
+ <style>
+   body::-webkit-scrollbar {
+  width: 8px;               /* width of the entire scrollbar */
+}
+ </style>
 </head>
   <body data-layout="horizontal" class="h-100">

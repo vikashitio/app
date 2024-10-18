@@ -341,7 +341,7 @@ func AdminMembersDetailsView(c *fiber.Ctx) error {
 	database.DB.Db.Table("transaction").Order("id desc").Where("status = ? AND client_id = ?", "Success", MID).Limit(50).Find(&transactionList)
 	// fetch query for transaction list
 	withdrawList := []models.Transaction_Pay{}
-	database.DB.Db.Table("transaction").Order("id desc").Where("transaction_type = ? AND client_id = ?", "WITHDRAW", MID).Limit(50).Find(&withdrawList)
+	database.DB.Db.Table("transaction").Order("id desc").Where("transaction_type = ? AND client_id = ?", "Withdraw Fee", MID).Limit(50).Find(&withdrawList)
 	Alerts := sess.Get("AlertX")
 	if Alerts != "" {
 		sess.Delete("AlertX")
@@ -626,4 +626,112 @@ func AdminCoinIDView(c *fiber.Ctx) error {
 		"AdminData": adminData,
 		"CoinList":  coinList,
 	})
+}
+
+// For  Admin Support ticket Details
+func AdminSupportTicketDetails(c *fiber.Ctx) error {
+
+	ticketID := c.Query("tid")
+	fmt.Println("ticketID => ", ticketID)
+
+	AdminSession(c)
+	sess, _ := store.Get(c)
+	adminData := sess.Get("AdminData")
+
+	// fetch data from support ticket
+	supportList := models.Support_Ticket{}
+	database.DB.Db.Table("support-ticket").Where("ticket_id = ? ", ticketID).Find(&supportList)
+
+	// fetch data from support ticket
+	replyList := []models.Support_Ticket_Reply{}
+	database.DB.Db.Table("support-ticket-reply").Where("ticket_id = ? ", ticketID).Order("reply_id desc").Find(&replyList)
+
+	Alerts := sess.Get("AlertX")
+	if Alerts != "" {
+		sess.Delete("AlertX")
+		if err := sess.Save(); err != nil {
+			panic(err)
+		}
+	}
+
+	return c.Render("admin/support-details", fiber.Map{
+		"Title":       "Support Details",
+		"Subtitle":    "Support Details",
+		"Modal":       1,
+		"SupportList": supportList,
+		"ReplyList":   replyList,
+		"AlertX":      Alerts,
+		"AdminData":   adminData,
+	})
+}
+
+// For Post Admin Support ticket form
+func AdminSubmitSupportTicketReply(c *fiber.Ctx) error {
+	AdminSession(c)
+	// // Session Check
+	sess, _ := store.Get(c)
+	adminData := sess.Get("AdminData")
+	//fmt.Println("check data - ", adminData)
+	if adminData == nil {
+		return c.Redirect("/admin/login")
+	}
+	// Convert the session data to a map
+	adminMap := adminData.(map[string]interface{})
+	//fmt.Println(adminMap["AdminID"])
+	LoginAdminName := adminMap["AdminName"].(string)
+
+	tid := c.FormValue("ticket_id")
+
+	// Convert string to uint64 first
+	mid, err := strconv.ParseUint(c.FormValue("client_id"), 10, 64)
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+
+	// Cast uint64 to uint
+	merchantID := uint(mid)
+
+	SenderEmail := function.GetEmailByMID(merchantID)
+
+	ticket_id, err := strconv.ParseInt(tid, 10, 64) // base 10 and int64 as result type
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+
+	reply_desc := c.FormValue("reply_desc")
+
+	reply_by := LoginAdminName
+	usertype := "Support"
+
+	// for Full path use- filePath & only file name use file.Filename
+	result := database.DB.Db.Table("support-ticket-reply").Omit("timestamp").Save(&models.Support_Ticket_Reply{Ticket_id: ticket_id, Reply_by: reply_by, Type: usertype, Reply_desc: reply_desc})
+
+	//////////////Email/////////////////
+
+	template_code := "SUPPORT-REPLY"
+	ticket_subject := "Re Ticket # " + tid
+
+	emailData := models.EmailData{Email: SenderEmail, Title: ticket_subject, Details: reply_desc}
+	err = function.SendEmail(template_code, emailData)
+	if err != nil {
+		fmt.Println("issue sending verification email")
+	}
+
+	//////////////////End Email/////////
+
+	//fmt.Println(loginList.Status)
+	Alerts := "Ticket replied successfully"
+	if result.Error != nil {
+		//fmt.Println("ERROR in QUERY")
+		Alerts = "Ticket Not replied"
+	}
+
+	// check session
+
+	sess.Set("AlertX", Alerts) // Set a session key
+	if err := sess.Save(); err != nil {
+		return err
+	}
+
+	return c.Redirect("/admin/support-details?tid=" + tid)
 }

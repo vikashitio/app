@@ -57,7 +57,8 @@
                     <td ><span class="accordion-button88" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{.Id}}" aria-expanded="false" aria-controls="collapse{{.Id}}"><i class="fa-solid fa-plus"></i></span></td>
                     <td><a href="/admin/members-details/{{.Client_id}}" target="_blank" title="View Merchant Details">{{.Client_id}}</a></a></td>
                     <td>{{.Transaction_id}}</a></td>
-                    <td  class="text-uppercase">{{.Receivedcurrency}} {{range index $.CoinList}}{{if eq $dataContext.Assetid .Coin_id}} <span class="badge text-bg-danger">{{.Coin_network}}</span> {{end}}{{end}}</td>
+                    <td  class="text-uppercase">{{.Receivedcurrency}} {{range index $.CoinList}}{{if eq $dataContext.Assetid .Coin_id}} 
+                      <p class="text-muted fw-bold" title="Network">{{.Coin_network}}</p> {{end}}{{end}}</td>
                     <td class="text-uppercase">{{.Requestedcurrency}} {{.Requestedamount}}</td>
                     <td class="text-uppercase">{{.Convertedcurrency}} {{.Convertedamount}}</td>
                     <td class="text-uppercase">{{.Receivedcurrency}} {{.Receivedamount}}</td>

@@ -69,7 +69,7 @@ func ApiPaymentLink(c *fiber.Ctx) error {
 	orderID := strings.TrimSpace(link.OrderID)
 	is_fee_paid_by_user := link.Is_fee_paid_by_user
 
-	fmt.Println(customerName, customerEmail, orderID, is_fee_paid_by_user)
+	//fmt.Println(customerName, customerEmail, orderID, is_fee_paid_by_user)
 
 	if errorx != "" {
 		fmt.Println(errorx)
@@ -145,6 +145,64 @@ func ApiBalanceByCrypto(c *fiber.Ctx) error {
 		database.DB.Db.Table("transaction").Select("assetid, receivedcurrency, SUM(receivedamount)  as balance").Where("client_id = ? AND status = ?", MID, "Success").Group("assetid,receivedcurrency").Having("COUNT(assetid) > ?", 0).Order("assetid ASC").Find(&assetList).Count(&totalWallet)
 
 		return c.JSON(assetList)
+	}
+
+	status := "Fail"
+	response := APIResponseFailed{
+		Status: status,
+		Error:  apiError,
+	}
+
+	return c.JSON(response)
+}
+
+// Function for Get Customer By API
+func ApiCustomer(c *fiber.Ctx) error {
+	apiError := ""
+	// Retrieve a specific header
+	apikey := c.Get("Apikey")
+
+	MID, errorx := function.GetMIDByApikey(apikey)
+	fmt.Println(MID)
+	if errorx != "" {
+		fmt.Println(errorx)
+		apiError = errorx
+
+	} else {
+
+		assetList := []models.CustomerList{}
+		database.DB.Db.Table("customer").Select("customer_name", "customer_email", "COUNT(*) AS total_customer").Limit(100).Where(&models.LoginHistory{Client_id: MID}).Group("customer_email, customer_name").Find(&assetList)
+
+		return c.JSON(assetList)
+	}
+
+	status := "Fail"
+	response := APIResponseFailed{
+		Status: status,
+		Error:  apiError,
+	}
+
+	return c.JSON(response)
+}
+
+// Function for Get Customer By API
+func ApiCheckouts(c *fiber.Ctx) error {
+	apiError := ""
+	// Retrieve a specific header
+	apikey := c.Get("Apikey")
+
+	MID, errorx := function.GetMIDByApikey(apikey)
+	fmt.Println(MID)
+	if errorx != "" {
+		fmt.Println(errorx)
+		apiError = errorx
+
+	} else {
+
+		dataList := []models.Invoice_Master{}
+		database.DB.Db.Table("invoice").Where("status=? AND client_id = ?", 1, MID).Order("invoice_id desc").Limit(100).Find(&dataList)
+
+		return c.JSON(dataList)
 	}
 
 	status := "Fail"

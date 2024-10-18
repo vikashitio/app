@@ -1,5 +1,7 @@
 {{template "partials/support-files" .}}
   <!-- ========== Left Sidebar Start ========== -->
+
+  {{if ne .Modal 1}}
   <aside class="sidebar">
     <button type="button" class="sidebar-close-btn">
       <iconify-icon icon="radix-icons:cross-2"></iconify-icon>
@@ -36,16 +38,11 @@
         </li>
         <li>
           <a href="/withdraw">
-            <iconify-icon icon="solar:calendar-outline" class="menu-icon"></iconify-icon>
+            <iconify-icon icon="hugeicons:bitcoin-withdraw" class="menu-icon"></iconify-icon>
             <span>Withdraw</span> 
           </a>
         </li>
-        <li>
-          <a href="/api-key">
-            <iconify-icon icon="material-symbols-light:api" class="menu-icon"></iconify-icon>
-            <span>API Key</span> 
-          </a>
-        </li>
+        
         <li>
           <a href="/merchant-transactions">
             <iconify-icon icon="material-symbols:map-outline" class="menu-icon"></iconify-icon>
@@ -59,6 +56,18 @@
             <span>Customer</span> 
           </a>
         </li>
+        <li>
+          <a href="/api-key">
+            <iconify-icon icon="pajamas:api" class="menu-icon">></iconify-icon>
+            <span>API & Store</span> 
+          </a>
+        </li>
+        <li>
+          <a href="/settlement-settings">
+            <iconify-icon icon="ri:coins-line" class="menu-icon"></iconify-icon>
+            <span>Settlement Settings</span> 
+          </a>
+        </li>
         <li class="dropdown">
           <a href="javascript:void(0)">
             <iconify-icon icon="icon-park-outline:setting-two" class="menu-icon"></iconify-icon>
@@ -69,9 +78,9 @@
               <a href="/profile"><i class="ri-circle-fill circle-icon text-primary-600 w-auto"></i> My Profile</a>
             </li>
           
-            <li>
+            <!-- <li>
               <a href="/crypto-wallet"><i class="ri-circle-fill circle-icon text-danger-main w-auto"></i> Settlement Wallet</a>
-            </li>
+            </li> -->
            
             <li>
               <a href="/logged-history"><i class="ri-circle-fill circle-icon text-danger-main w-auto"></i> Login History</a>
@@ -92,8 +101,10 @@
       </ul>
     </div>
   </aside>
+  {{end}}
 
   <main class="dashboard-main">
+    {{if ne .Modal 1}}
     <div class="navbar-header">
   <div class="row align-items-center justify-content-between">
     <div class="col-auto">
@@ -117,6 +128,7 @@
     <div class="col-auto">
       <div class="d-flex flex-wrap align-items-center gap-3">
         <button type="button" data-theme-toggle class="w-40-px h-40-px bg-neutral-200 rounded-circle d-flex justify-content-center align-items-center"></button>
+        
         <a href="/support-tickets" class="w-40-px h-40-px bg-neutral-200 rounded-circle d-flex justify-content-center align-items-center"> <iconify-icon icon="mdi:support" width="48" height="48"  style="color: #db1f32" title="Support"></iconify-icon></a>
 
 
@@ -161,3 +173,4 @@
     </div>
   </div>
 </div> 
+{{end}}

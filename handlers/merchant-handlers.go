@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"template/database"
 	"template/function"
@@ -824,6 +825,46 @@ func AddSupportTicket(c *fiber.Ctx) error {
 	})
 }
 
+// For  Merchant Support ticket Details
+func SupportTicketDetails(c *fiber.Ctx) error {
+
+	ticketID := c.Query("tid")
+	fmt.Println("ticketID => ", ticketID)
+
+	s, _ := store.Get(c)
+	merchantData := s.Get("MerchantData")
+	if merchantData == nil {
+		fmt.Println("Session Expired115")
+		return c.Redirect("/login", 301)
+	}
+	LoginMerchantID := s.Get("LoginMerchantID")
+
+	Alerts := s.Get("Alert")
+	if Alerts != "" {
+		s.Delete("Alert")
+		if err := s.Save(); err != nil {
+			panic(err)
+		}
+	}
+	// fetch data from support ticket
+	supportList := models.Support_Ticket{}
+	database.DB.Db.Table("support-ticket").Where("client_id = ? AND ticket_id = ? ", LoginMerchantID, ticketID).Find(&supportList)
+
+	// fetch data from support ticket
+	replyList := []models.Support_Ticket_Reply{}
+	database.DB.Db.Table("support-ticket-reply").Where("ticket_id = ? ", ticketID).Order("reply_id desc").Find(&replyList)
+
+	return c.Render("support-details", fiber.Map{
+		"Title":        "Support Details",
+		"Subtitle":     "Support Details",
+		"Alert":        Alerts,
+		"Modal":        1,
+		"SupportList":  supportList,
+		"ReplyList":    replyList,
+		"MerchantData": merchantData,
+	})
+}
+
 // For Post Merchant Support ticket form
 func SubmitSupportTicket(c *fiber.Ctx) error {
 
@@ -840,9 +881,25 @@ func SubmitSupportTicket(c *fiber.Ctx) error {
 	client_id := s.Get("LoginMerchantID").(uint)
 
 	// for Full path use- filePath & only file name use file.Filename
-	result := database.DB.Db.Table("support-ticket").Omit("Status", "timestamp").Save(&models.Support_Ticket{Client_id: client_id, Ticket_subject: ticket_subject, Ticket_desc: ticket_desc})
+	supportTicket := models.Support_Ticket{Client_id: client_id, Ticket_subject: ticket_subject, Ticket_desc: ticket_desc}
+	result := database.DB.Db.Table("support-ticket").Omit("Status", "timestamp").Save(&supportTicket)
 
 	//fmt.Println(loginList.Status)
+	//////////////Email/////////////////
+	ticket_id := strconv.FormatUint(uint64(supportTicket.Ticket_id), 10)
+
+	template_code := "SUPPORT-TICKET"
+	receiverEmail := os.Getenv("SupportEmail")
+	ticket_subject = "Ticket # " + ticket_id + " - " + ticket_subject
+
+	emailData := models.EmailData{Email: receiverEmail, Title: ticket_subject, Details: ticket_desc}
+	err := function.SendEmail(template_code, emailData)
+	if err != nil {
+		fmt.Println("issue sending verification email")
+	}
+
+	//////////////////End Email/////////
+
 	Alerts := "Support Ticket Submitted successfully"
 	if result.Error != nil {
 		//fmt.Println("ERROR in QUERY")
@@ -857,6 +914,61 @@ func SubmitSupportTicket(c *fiber.Ctx) error {
 	}
 
 	return c.Redirect("/support-tickets")
+}
+
+// For Post Merchant Support ticket form
+func SubmitSupportTicketReply(c *fiber.Ctx) error {
+
+	tid := c.FormValue("ticket_id")
+	ticket_id, err := strconv.ParseInt(tid, 10, 64) // base 10 and int64 as result type
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+	reply_desc := c.FormValue("reply_desc")
+
+	fmt.Println(ticket_id, reply_desc)
+
+	s, _ := store.Get(c)
+	merchantData := s.Get("MerchantData")
+	if merchantData == nil {
+		fmt.Println("Session Expired118")
+		return c.Redirect("/login", 301)
+	}
+
+	reply_by := s.Get("LoginMerchantName").(string)
+	usertype := "Merchant"
+
+	// for Full path use- filePath & only file name use file.Filename
+	result := database.DB.Db.Table("support-ticket-reply").Omit("timestamp").Save(&models.Support_Ticket_Reply{Ticket_id: ticket_id, Reply_by: reply_by, Type: usertype, Reply_desc: reply_desc})
+
+	//////////////Email/////////////////
+
+	template_code := "SUPPORT-REPLY"
+	ticket_subject := "Re Ticket # " + tid
+	SenderEmail := os.Getenv("SupportEmail")
+	emailData := models.EmailData{Email: SenderEmail, Title: ticket_subject, Details: reply_desc}
+	err = function.SendEmail(template_code, emailData)
+	if err != nil {
+		fmt.Println("issue sending verification email")
+	}
+
+	//////////////////End Email/////////
+
+	//fmt.Println(loginList.Status)
+	Alerts := "Ticket replied successfully"
+	if result.Error != nil {
+		//fmt.Println("ERROR in QUERY")
+		Alerts = "Ticket Not replied"
+	}
+
+	// check session
+
+	s.Set("Alert", Alerts) // Set a session key
+	if err := s.Save(); err != nil {
+		return err
+	}
+
+	return c.Redirect("/support-details?tid=" + tid)
 }
 
 // For Display Merchant Change Password form
@@ -1274,29 +1386,4 @@ func GetNetwork(c *fiber.Ctx) error {
 		return c.JSON(networks)
 	}
 
-}
-
-// function for Display Currency Form
-func SettlementSettingsView(c *fiber.Ctx) error {
-	fmt.Println("ADD WALLET")
-	// check session
-	s, _ := store.Get(c)
-	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		fmt.Println("Session Expired116")
-		return c.Redirect("/login", 301)
-	}
-	LoginMerchantID := s.Get("LoginMerchantID")
-
-	//fmt.Print("LoginMerchantID =>", LoginMerchantID)
-	settlementSetting := []models.SettlementSetting{}
-	database.DB.Db.Table("coin_list A ").Select("a.coin_id, a.coin, a.coin_title, b.crypto_address, b.assetid, b.status, b.wallet_id").Joins("LEFT JOIN client_wallet B ON A.coin_id = B.assetid AND B.client_id = ?", LoginMerchantID).Order("a.coin_title asc").Find(&settlementSetting)
-	// .Where(" a.status = ?", 1)
-	//fmt.Println("settlementSetting => ", settlementSetting)
-	return c.Render("settlement-settings", fiber.Map{
-		"Title":             "Settlement Settings",
-		"Subtitle":          "Settlement Settings",
-		"MerchantData":      merchantData,
-		"SettlementSetting": settlementSetting,
-	})
 }
