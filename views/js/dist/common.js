@@ -189,13 +189,13 @@ function statusData(status,tid) {
       statusHtml='<span class="bg-warning-600 text-white border-warning-600 px-16 py-2 radius-12 fw-medium text-sm">Waiting</span>';
     }else if(status==1){
       statusVal="FullPay";
-      statusHtml='<span class="bg-success-600 text-white border-success-600 px-16 py-2 radius-12 fw-medium text-sm">FullPay</span>';
+      statusHtml='<span class="bg-success-500 text-white border-success-600 px-16 py-2 radius-12 fw-medium text-sm">FullPay</span>';
     }else if(status==2){
       statusVal="OverPay";
       statusHtml='<span class="bg-success-600 text-white border-success-600 px-16 py-2 radius-12 fw-medium text-sm">OverPay</span>';
     }else if(status==3){
       statusVal="UnderPay";
-      statusHtml='<span class="bg-success-600 text-white border-success-600 px-16 py-2 radius-12 fw-medium text-sm">UnderPay</span>';
+      statusHtml='<span class="bg-success-400 text-white border-success-600 px-16 py-2 radius-12 fw-medium text-sm">UnderPay</span>';
     }else if(status==8){
       statusVal="Decline";
       statusHtml='<span class="bg-danger-600 text-white border-danger-600 px-16 py-2 radius-12 fw-medium text-sm">Decline</span>';
@@ -224,3 +224,13 @@ function statusData(status,tid) {
       const fetchedStatus = statusData(statusId,2);
       cell.innerHTML = fetchedStatus;
   });
+
+// Display Balance on 6 digit decimal number
+  // Get all Balance Amount cells
+const balanceCells = document.querySelectorAll('.balance-limit');
+// Loop through each Balance cell and update its content
+balanceCells.forEach(cell => {
+    const originalAmount = cell.textContent;
+    const formattedAmount = parseFloat(originalAmount).toFixed(6); // set 6 digit decimal number
+    cell.textContent = formattedAmount;
+});

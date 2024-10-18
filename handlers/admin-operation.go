@@ -341,7 +341,7 @@ func AdminMembersDetailsView(c *fiber.Ctx) error {
 	database.DB.Db.Table("transaction").Order("id desc").Where("status = ? AND client_id = ?", "Success", MID).Limit(50).Find(&transactionList)
 	// fetch query for transaction list
 	withdrawList := []models.Transaction_Pay{}
-	database.DB.Db.Table("transaction").Order("id desc").Where("transaction_type = ? AND client_id = ?", "WITHDRAW", MID).Limit(50).Find(&withdrawList)
+	database.DB.Db.Table("transaction").Order("id desc").Where("transaction_type = ? AND client_id = ?", "Withdraw Fee", MID).Limit(50).Find(&withdrawList)
 	Alerts := sess.Get("AlertX")
 	if Alerts != "" {
 		sess.Delete("AlertX")

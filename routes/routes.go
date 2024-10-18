@@ -50,6 +50,7 @@ func InitRoutes(app *fiber.App) {
 	app.Post("/cryptoWalletPost", handlers.CryptoWalletPost)
 
 	app.Get("/settlement-settings", handlers.SettlementSettingsView)
+	app.Post("/settlement-settings-post", handlers.SettlementSettingsPost)
 	//app.Post("/cryptoWalletPost", handlers.CryptoWalletPost)
 
 	app.Get("/get-network", handlers.GetNetwork)
@@ -62,6 +63,8 @@ func InitRoutes(app *fiber.App) {
 	app.Get("/dispute/:TransID", handlers.DisputeView)
 	app.Post("/check-payment-status", handlers.FetchPaymentStatus)
 	app.Post("/API/PayLink", handlers.ApiPaymentLink)
+	app.Get("/API/Customer", handlers.ApiCustomer)
+	app.Get("/API/Checkouts", handlers.ApiCheckouts)
 	app.Get("/API/CryptoBalance", handlers.ApiBalanceByCrypto)
 	app.Get("/API/Transaction/:TransID", handlers.ApiTransactionByTransID)
 	app.Get("/API/Reference/:ReferenceID", handlers.ApiTransactionByReferenceID)

@@ -41,7 +41,7 @@
             {{template "partials/search-form" .}}
             {{if ge  .Total 1}}
             <div class="accordion mt-2" id="accordionExample">
-          <div class="table-responsive">
+          <div class="table-responsive scroll-sm">
             <table class="table table-centered table-nowrap mb-0 bordered-table xsm-table">
               <thead>
                 <tr class="font-weight-bolder">
@@ -63,7 +63,7 @@
                     <td ><span class="accordion-button88" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{.Id}}" aria-expanded="false" aria-controls="collapse{{.Id}}"><iconify-icon icon="lets-icons:view-duotone" width="30" height="30"></iconify-icon></span></td>
                     <td><span class="d-inline-block text-truncate" style="max-width: 150px;"></span>{{.Transaction_id}}</td></td>
                     <td >{{range index $.CoinList}}{{if eq $dataContext.Assetid .Coin_id}}
-                      <img src="/views/images/{{tolower $dataContext.Receivedcurrency}}.png" alt="{{$dataContext.Receivedcurrency}}" title="{{$dataContext.Receivedcurrency}}" class="w-40-px h-40-px rounded-circle flex-shrink-0">
+                      <img src="/views/images/{{tolower $dataContext.Receivedcurrency}}.png" alt="{{$dataContext.Receivedcurrency}}" title="{{toupper $dataContext.Receivedcurrency}}" class="w-40-px h-40-px rounded-circle flex-shrink-0">
                       {{if ne (tolower .Coin_network) $dataContext.Receivedcurrency}}
                       <img src="/views/images/{{tolower .Coin_network}}.png" alt="{{.Coin_network}}" title="{{.Coin_network}}" class="w-40-px h-40-px rounded-circle flex-shrink-0 crypto-pair">
                       {{end}}
@@ -71,8 +71,8 @@
                      
                       <!-- <img src="/views/images/{{.Icon}}" alt="" class="w-40-px h-40-px rounded-circle flex-shrink-0"> <span class="text-uppercase">{{$dataContext.Receivedcurrency}}</span>  <span class="badge text-bg-danger">{{.Coin_network}}</span>--> {{end}}{{end}}</td>
                     <td class="text-uppercase">{{.Requestedcurrency}} {{.Requestedamount}}</td>
-                    <td class="text-uppercase">{{.Convertedcurrency}} {{.Convertedamount}}</td>
-                    <td class="text-uppercase">{{.Receivedcurrency}} {{.Receivedamount}}</td>
+                    <td class="text-uppercase">{{.Convertedcurrency}} <span class="balance-limit">{{.Convertedamount}}</span></td>
+                    <td class="text-uppercase">{{.Receivedcurrency}} <span class="balance-limit">{{.Receivedamount}}</span></td>
                     <td>{{if eq .Transaction_type "Collection"}} 
                       <span class="text-success-main bg-success-focus w-32-px h-32-px d-flex align-items-center justify-content-center rounded-circle text-xl">
                        <iconify-icon icon="tabler:arrow-up-right" class="icon" title="{{.Transaction_type}}"></iconify-icon>

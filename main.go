@@ -48,6 +48,9 @@ func main() {
 	// Register the function `tolower`
 	engine.AddFunc("tolower", strings.ToLower)
 
+	// Register the function `toupper`
+	engine.AddFunc("toupper", strings.ToUpper)
+
 	app := fiber.New(fiber.Config{
 		Views:             engine,
 		ViewsLayout:       "layouts/main",

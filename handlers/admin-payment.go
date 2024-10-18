@@ -289,7 +289,7 @@ func AdminWithdrawsView(c *fiber.Ctx) error {
 	offset := (page - 1) * limit
 
 	searchString := ""
-	searchStringFull := " AND transaction_type='WITHDRAW' "
+	searchStringFull := " AND transaction_type='Withdraw Fee' "
 
 	if searchKey != "" && searchBy != "" {
 		searchString = " AND " + searchBy + " ILIKE " + "'%" + searchKey + "%'"
