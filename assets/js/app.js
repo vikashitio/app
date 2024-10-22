@@ -79,7 +79,7 @@ function updateButton({ buttonEl, isDark }) {
 * Utility function to update the theme setting on the html tag
 */
 function updateThemeOnHtmlEl({ theme }) {
-  // document.querySelector("html").setAttribute("data-theme", theme);
+ document.querySelector("html").setAttribute("data-theme", theme);
 }
 
 /**
