@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 	"template/database"
@@ -31,16 +32,8 @@ func GetAddressList(c *fiber.Ctx) error {
 	}
 
 	// Get query parameters for page and limit
-	page, err := strconv.Atoi(c.Query("page", "1"))
-	if err != nil || page < 1 {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid page number")
-	}
-	limit, err := strconv.Atoi(c.Query("limit", "10"))
-	if err != nil || limit < 1 {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid limit number")
-	}
-
-	// Calculate offset
+	page, _ := strconv.Atoi(c.Query("page", "1"))
+	limit, _ := strconv.Atoi(c.Query("limit", os.Getenv("PagingSize")))
 	offset := (page - 1) * limit
 
 	var total int64
@@ -54,19 +47,6 @@ func GetAddressList(c *fiber.Ctx) error {
 	addressUrl := []models.CoinList{}
 	database.DB.Db.Table("coin_list").Select("coin", "coin_id", "coin_network", "coin_status_url").Find(&addressUrl)
 
-	// Prepare pagination data
-	totalPage := total / 10
-	//fmt.Println(totalPage)
-	nextPage := page + 1
-	prevPage := page - 1
-	if page == 1 {
-		prevPage = 0
-	}
-
-	if page >= int(totalPage+1) {
-		nextPage = 0
-	}
-
 	return c.Render("admin/manage-address", fiber.Map{
 		"Title":       "Manage Address",
 		"Subtitle":    "Manage Address",
@@ -74,10 +54,9 @@ func GetAddressList(c *fiber.Ctx) error {
 		"AlertX":      Alerts,
 		"CoinAddress": coinAddress,
 		"AdminData":   adminData,
-		"NextPage":    nextPage,
-		"PrevPage":    prevPage,
+		"Page":        page,
 		"Limit":       limit,
-		"Count":       total,
+		"Total":       total,
 		"AddressUrl":  addressUrl,
 	})
 }

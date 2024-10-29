@@ -31,7 +31,7 @@
           {{range .ClientAPI}}
           <div class="row  border rounded mb-2 py-4 mx-2">
             <h6 class="mb-2 fw-bold text-lg mb-0"> <i class="ri-checkbox-circle-line text-success" ></i> Generated API Key</h6>
-            <div class="col-sm-8 "><span class="btn btn-sm btn-outline-warning float-start my-4 py-4" title="Api Key : " id="copyAPI">{{.Apikey}}</span><iconify-icon icon="solar:copy-bold" class="float-start text-warning  mt-4" width="32" height="32" title="Click to copy" onclick="CopyToClipboard('#copyAPI')"></iconify-icon></div>
+            <div class="col-sm-8 "><span class="btn btn-sm btn-outline-primary float-start my-4 py-4" title="Api Key : " id="copyAPI">{{.Apikey}}</span><iconify-icon icon="solar:copy-bold" class="float-start text-primary  mt-4" width="32" height="32" title="Click to copy" onclick="CopyToClipboard('#copyAPI')"></iconify-icon></div>
             <div class="col-sm-4 date-cell  mt-4 text-end">{{.Timestamp}}</div>
           </div>
           {{end}}
@@ -55,13 +55,20 @@
               <input type="hidden" name="tableID" value="{{if .ClientStore.ID}}{{.ClientStore.ID}}{{end}}">
 
               <div class="mb-20">  
-                  <label for="webhookurl" class="fw-semibold mb-8 text-primary-light">Webhook URL</label>
+                  <label for="webhookurl" class="fw-semibold mb-8 text-primary-light">Return URL</label>
                   <div class="input-group input-group-lg border input-form-light radius-8">
-                      <input type="text" class="form-control bg-base border-0 radius-8" id="webhookurl" name="webhookurl" placeholder="Webhook URL" value="{{if .ClientStore.Webhookurl}}{{.ClientStore.Webhookurl}}{{end}}" required="">
+                      <input type="text" class="form-control bg-base border-0 radius-8" id="return_url" name="return_url" placeholder="Return URL" value="{{if .ClientStore.Return_url}}{{.ClientStore.Return_url}}{{end}}">
                   </div>
               </div>
+
+              <div class="mb-20">  
+                <label for="webhookurl" class="fw-semibold mb-8 text-primary-light">Webhook URL</label>
+                <div class="input-group input-group-lg border input-form-light radius-8">
+                    <input type="text" class="form-control bg-base border-0 radius-8" id="webhookurl" name="webhookurl" placeholder="Webhook URL" value="{{if .ClientStore.Webhookurl}}{{.ClientStore.Webhookurl}}{{end}}">
+                </div>
+            </div>
               <div class="mb-2">  
-                <button type="submit" id="submit" class="btn btn-primary text-sm btn-sm px-8 py-12 radius-8"> Submit</button>
+                <button type="submit" id="submit" class="btn btn-primary text-sm btn-sm px-8 py-12 radius-8 api-validationxx"> Submit</button>
             </div>
           </form>
            
@@ -75,3 +82,15 @@
 </div> 
 
   {{template "partials/footer" .}}
+  <script>
+$('.api-validation').click(function(){
+
+  return_url = $('#return_url').val();
+  webhookurl = $('#webhookurl').val();
+    
+    if(return_url == "" && webhookurl == ""){
+      alert("Add Return URL / Webhook URL or both before submit");
+      return false;
+    }
+});
+  </script>

@@ -89,7 +89,7 @@ func SendEmail(template_code string, p models.EmailData) error {
 
 	if template_code == "2FA-STATUS" {
 		//fmt.Println("Invoice_url==>", Invoice_url)
-		Invoice_url_html = "<img src=" + Invoice_url + "  />"
+		Invoice_url_html = "<img src=" + p.Details + "  />"
 	}
 
 	/////////////////////////////////////////////
@@ -298,7 +298,7 @@ type APIKeyResponse struct {
 // GetMIDByApikey Get Merchant ID from API Key
 func GetMIDByApikey(apikey string) (uint, string) {
 
-	fmt.Println("apikey - > ", apikey)
+	//fmt.Println("apikey - > ", apikey)
 
 	aPIKeyResponse := APIKeyResponse{}
 	database.DB.Db.Table("client_api").Select("client_id").Where("apikey = ? AND status = ?", apikey, 1).Find(&aPIKeyResponse)
@@ -308,7 +308,7 @@ func GetMIDByApikey(apikey string) (uint, string) {
 	if aPIKeyResponse.Client_id > 0 {
 		return uid, errorx
 	} else {
-		errorx = "Wrong API Key"
+		errorx = "API Key Not Found"
 		return uid, errorx
 	}
 
@@ -359,6 +359,25 @@ func GetStatusByStatusID(StatusID int) string {
 		status = "Declined"
 	} else if StatusID == 0 {
 		status = "Waiting"
+	} else {
+		status = "Waiting"
+	}
+	return status
+}
+
+func GetSubStatusByStatusID(StatusID int) string {
+
+	status := ""
+	if StatusID == 1 {
+		status = "FullPay"
+	} else if StatusID == 2 {
+		status = "OverPay"
+	} else if StatusID == 3 {
+		status = "UnderPay"
+	} else if StatusID == 8 {
+		status = "Declined"
+	} else if StatusID == 9 {
+		status = "Dispute"
 	} else {
 		status = "Waiting"
 	}

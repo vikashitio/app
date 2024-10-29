@@ -8,6 +8,7 @@ import (
 	"template/database"
 	"template/function"
 	"template/models"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	_ "github.com/jackc/pgx/v4/stdlib"
@@ -26,6 +27,7 @@ type APIResponseFailed struct {
 type APIResponseBalanceSuccess struct {
 	Receivedcurrency string
 	Balance          string
+	Timestamp        time.Time
 }
 
 type CreateLink struct {
@@ -115,7 +117,7 @@ func ApiPaymentLink(c *fiber.Ctx) error {
 
 		return c.JSON(response)
 	}
-	status := "Fail"
+	status := "Error"
 	response := APIResponseFailed{
 		Status: status,
 		Error:  apiError,
@@ -128,11 +130,18 @@ func ApiPaymentLink(c *fiber.Ctx) error {
 func ApiBalanceByCrypto(c *fiber.Ctx) error {
 
 	apiError := ""
+	apikey := ""
+	currency := ""
 	// Retrieve a specific header
-	apikey := c.Get("Apikey")
+	apikey = strings.TrimSpace(c.Get("Apikey"))
+	currency = strings.TrimSpace(strings.ToLower(c.Query("Currency")))
+	//apikey := "76419b7b23017e61"
+	//currency := strings.ToLower("LTC")
+	//fmt.Println("currency")
+	//apikey := "76419b7b23017e61"
 
 	MID, errorx := function.GetMIDByApikey(apikey)
-	fmt.Println(MID)
+	//fmt.Println(MID)
 	if errorx != "" {
 		fmt.Println(errorx)
 		apiError = errorx
@@ -142,12 +151,18 @@ func ApiBalanceByCrypto(c *fiber.Ctx) error {
 		assetList := []APIResponseBalanceSuccess{}
 		var totalWallet int64
 		// fetch query for wallet with balance
-		database.DB.Db.Table("transaction").Select("assetid, receivedcurrency, SUM(receivedamount)  as balance").Where("client_id = ? AND status = ?", MID, "Success").Group("assetid,receivedcurrency").Having("COUNT(assetid) > ?", 0).Order("assetid ASC").Find(&assetList).Count(&totalWallet)
+		if currency != "" {
+			database.DB.Db.Table("transaction").Select("assetid, receivedcurrency, SUM(receivedamount)  as balance , now() as timestamp").Where("client_id = ? AND status = ? AND receivedcurrency = ?", MID, "Success", currency).Group("assetid,receivedcurrency").Having("COUNT(assetid) > ?", 0).Order("assetid ASC").Find(&assetList).Count(&totalWallet)
 
+		} else {
+			database.DB.Db.Table("transaction").Select("assetid, receivedcurrency, SUM(receivedamount)  as balance , now() as timestamp").Where("client_id = ? AND status = ?", MID, "Success").Group("assetid,receivedcurrency").Having("COUNT(assetid) > ?", 0).Order("assetid ASC").Find(&assetList).Count(&totalWallet)
+
+		}
+		//fmt.Println(c.JSON(assetList))
 		return c.JSON(assetList)
 	}
 
-	status := "Fail"
+	status := "Error"
 	response := APIResponseFailed{
 		Status: status,
 		Error:  apiError,
@@ -159,24 +174,47 @@ func ApiBalanceByCrypto(c *fiber.Ctx) error {
 // Function for Get Customer By API
 func ApiCustomer(c *fiber.Ctx) error {
 	apiError := ""
+	dateFrom := ""
+	dateTo := ""
+	searchQuery := ""
+
 	// Retrieve a specific header
-	apikey := c.Get("Apikey")
+	apikey := strings.TrimSpace(c.Get("Apikey"))
+	//apikey := "76419b7b23017e61"
+	dateFrom = strings.TrimSpace(c.Query("DateFrom")) // Get data from url
+	dateTo = strings.TrimSpace(c.Query("DateTo"))     // Get data from url
+
+	//fmt.Println("Get DATAs Are : ", dateFrom, dateTo)
+
+	// convert limit value from string to integer
+	default_limit, err := strconv.Atoi(c.Query("Limit", "100"))
+	if err != nil {
+		fmt.Println("Error:", err)
+	} else {
+		fmt.Println("Converted integer:", default_limit)
+	}
 
 	MID, errorx := function.GetMIDByApikey(apikey)
-	fmt.Println(MID)
+	//fmt.Println(MID)
 	if errorx != "" {
-		fmt.Println(errorx)
+		//fmt.Println(errorx)
 		apiError = errorx
 
 	} else {
 
-		assetList := []models.CustomerList{}
-		database.DB.Db.Table("customer").Select("customer_name", "customer_email", "COUNT(*) AS total_customer").Limit(100).Where(&models.LoginHistory{Client_id: MID}).Group("customer_email, customer_name").Find(&assetList)
+		if default_limit > 500 {
+			default_limit = 500
+		}
 
+		if dateFrom != "" && dateTo != "" {
+			searchQuery = " timestamp BETWEEN '" + dateFrom + "' AND '" + dateTo + "' AND "
+		}
+		assetList := []models.CustomerList{}
+		database.DB.Db.Table("customer").Select("customer_name", "customer_email", "COUNT(*) AS total_customer").Limit(default_limit).Where(searchQuery+"client_id = ?", MID).Group("customer_email, customer_name").Find(&assetList)
 		return c.JSON(assetList)
 	}
 
-	status := "Fail"
+	status := "Error"
 	response := APIResponseFailed{
 		Status: status,
 		Error:  apiError,
@@ -185,16 +223,16 @@ func ApiCustomer(c *fiber.Ctx) error {
 	return c.JSON(response)
 }
 
-// Function for Get Customer By API
+// Function for Get Customer List By API
 func ApiCheckouts(c *fiber.Ctx) error {
 	apiError := ""
 	// Retrieve a specific header
-	apikey := c.Get("Apikey")
+	apikey := strings.TrimSpace(c.Get("Apikey"))
 
 	MID, errorx := function.GetMIDByApikey(apikey)
-	fmt.Println(MID)
+	//fmt.Println(MID)
 	if errorx != "" {
-		fmt.Println(errorx)
+		//fmt.Println(errorx)
 		apiError = errorx
 
 	} else {
@@ -205,7 +243,7 @@ func ApiCheckouts(c *fiber.Ctx) error {
 		return c.JSON(dataList)
 	}
 
-	status := "Fail"
+	status := "Error"
 	response := APIResponseFailed{
 		Status: status,
 		Error:  apiError,
@@ -214,19 +252,19 @@ func ApiCheckouts(c *fiber.Ctx) error {
 	return c.JSON(response)
 }
 
-// API Function for Get Transaction details by ID
+// API Function for Get Transaction details by Transaction ID
 func ApiTransactionByTransID(c *fiber.Ctx) error {
 
 	apiError := ""
 	// Retrieve a specific header
-	apikey := c.Get("Apikey")
-	TransID := c.Params("TransID")
-	fmt.Println("TransID==>", TransID)
+	apikey := strings.TrimSpace(c.Get("Apikey"))
+	TransID := strings.TrimSpace(c.Params("TransID"))
+	//fmt.Println("TransID==>", TransID)
 
 	MID, errorx := function.GetMIDByApikey(apikey)
-	fmt.Println(MID)
+	//fmt.Println(MID)
 	if errorx != "" {
-		fmt.Println(errorx)
+		//fmt.Println(errorx)
 		apiError = errorx
 	} else if TransID == "" {
 		apiError = "TransID Not Found"
@@ -239,7 +277,7 @@ func ApiTransactionByTransID(c *fiber.Ctx) error {
 		return c.JSON(transData)
 	}
 
-	status := "Fail"
+	status := "Error"
 	response := APIResponseFailed{
 		Status: status,
 		Error:  apiError,
@@ -248,19 +286,19 @@ func ApiTransactionByTransID(c *fiber.Ctx) error {
 	return c.JSON(response)
 }
 
-// API Function for Get Transaction details by ID
+// API Function for Get Transaction details by Reference ID
 func ApiTransactionByReferenceID(c *fiber.Ctx) error {
 
 	apiError := ""
 	// Retrieve a specific header
-	apikey := c.Get("Apikey")
-	ReferenceID := c.Params("ReferenceID")
-	fmt.Println("TransID==>", ReferenceID)
+	apikey := strings.TrimSpace(c.Get("Apikey"))
+	ReferenceID := strings.TrimSpace(c.Params("ReferenceID"))
+	//fmt.Println("TransID==>", ReferenceID)
 
 	MID, errorx := function.GetMIDByApikey(apikey)
-	fmt.Println(MID)
+	//fmt.Println(MID)
 	if errorx != "" {
-		fmt.Println(errorx)
+		//fmt.Println(errorx)
 		apiError = errorx
 	} else if ReferenceID == "" {
 		apiError = "ReferenceID Not Found"
@@ -273,7 +311,7 @@ func ApiTransactionByReferenceID(c *fiber.Ctx) error {
 		return c.JSON(transData)
 	}
 
-	status := "Fail"
+	status := "Error"
 	response := APIResponseFailed{
 		Status: status,
 		Error:  apiError,
@@ -282,28 +320,87 @@ func ApiTransactionByReferenceID(c *fiber.Ctx) error {
 	return c.JSON(response)
 }
 
-// API Function for Get Transaction List last 10
-func ApiTransactionList(c *fiber.Ctx) error {
+// API Function for Get Transaction details by Order ID
+func ApiTransactionByOrderID(c *fiber.Ctx) error {
 
 	apiError := ""
 	// Retrieve a specific header
-	apikey := c.Get("Apikey")
+	apikey := strings.TrimSpace(c.Get("Apikey"))
+	OrderID := strings.TrimSpace(c.Params("OrderID"))
+	//fmt.Println("TransID==>", OrderID)
 
 	MID, errorx := function.GetMIDByApikey(apikey)
-	fmt.Println(MID)
+	//fmt.Println(MID)
+	if errorx != "" {
+		fmt.Println(errorx)
+		apiError = errorx
+	} else if OrderID == "" {
+		apiError = "OrderID Not Found"
+
+	} else {
+
+		transData := models.Transaction_Pay{}
+		database.DB.Db.Table("transaction").Where("order_id = ? AND client_id = ? ", OrderID, MID).Omit("client_id", "assetid", "response_json").Find(&transData)
+
+		return c.JSON(transData)
+	}
+
+	status := "Error"
+	response := APIResponseFailed{
+		Status: status,
+		Error:  apiError,
+	}
+
+	return c.JSON(response)
+}
+
+// API Function for Get Transaction List last 100
+func ApiTransactionList(c *fiber.Ctx) error {
+
+	apiError := ""
+	dateFrom := ""
+	dateTo := ""
+	searchQuery := ""
+
+	// Retrieve a specific header
+	apikey := strings.TrimSpace(c.Get("Apikey"))
+	//apikey := "76419b7b23017e61"
+	dateFrom = strings.TrimSpace(c.Query("DateFrom")) // Get data from url
+	dateTo = strings.TrimSpace(c.Query("DateTo"))     // Get data from url
+
+	//fmt.Println("Get DATAs Are : ", dateFrom, dateTo)
+
+	// convert limit value from string to integer
+	default_limit, err := strconv.Atoi(c.Query("Limit", "100"))
+	if err != nil {
+		fmt.Println("Error:", err)
+	} else {
+		fmt.Println("Converted integer:", default_limit)
+	}
+
+	MID, errorx := function.GetMIDByApikey(apikey)
+	//fmt.Println(MID)
 	if errorx != "" {
 		fmt.Println(errorx)
 		apiError = errorx
 
 	} else {
 
+		if default_limit > 1000 {
+			default_limit = 1000
+		}
+
+		if dateFrom != "" && dateTo != "" {
+			searchQuery = " createdate BETWEEN '" + dateFrom + "' AND '" + dateTo + "' AND "
+		}
+
 		transData := []models.Transaction_Pay{}
-		database.DB.Db.Table("transaction").Where("client_id = ? ", MID).Omit("client_id", "assetid", "response_json").Order("id DESC").Limit(10).Find(&transData)
+		database.DB.Db.Table("transaction").Where(searchQuery+"client_id = ? ", MID).Omit("client_id", "assetid", "response_json").Order("id DESC").Limit(default_limit).Find(&transData)
 
 		return c.JSON(transData)
 	}
 
-	status := "Fail"
+	status := "Error"
 	response := APIResponseFailed{
 		Status: status,
 		Error:  apiError,

@@ -3,7 +3,9 @@ package handlers
 import (
 	"encoding/gob"
 	"fmt"
+	"os"
 	"strconv"
+	"strings"
 	"template/database"
 	"template/function"
 	"template/models"
@@ -200,16 +202,8 @@ func AdminLoginHistory(c *fiber.Ctx) error {
 	//fmt.Println(adminMap["AdminID"])
 	LoginAdminID := adminMap["AdminID"].(uint)
 	// Get query parameters for page and limit
-	page, err := strconv.Atoi(c.Query("page", "1"))
-	if err != nil || page < 1 {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid page number")
-	}
-	limit, err := strconv.Atoi(c.Query("limit", "50"))
-	if err != nil || limit < 1 {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid limit number")
-	}
-
-	// Calculate offset
+	page, _ := strconv.Atoi(c.Query("page", "1"))
+	limit, _ := strconv.Atoi(c.Query("limit", os.Getenv("PagingSize")))
 	offset := (page - 1) * limit
 
 	loginHistory := []models.LoginHistory{}
@@ -218,25 +212,15 @@ func AdminLoginHistory(c *fiber.Ctx) error {
 	var total int64
 	database.DB.Db.Table("login_history").Where(&models.LoginHistory{Login_type: 2, Client_id: LoginAdminID}).Count(&total)
 
-	//fmt.Println(total)
-	//fmt.Println(loginHistory)
-	// Prepare pagination data
-	nextPage := page + 1
-	prevPage := page - 1
-	if page == 1 {
-		prevPage = 0
-	}
-
 	//fmt.Println(loginHistory)
 	return c.Render("admin/login-history", fiber.Map{
 		"Title":        "Login History",
 		"Subtitle":     "Login History",
 		"LoginHistory": loginHistory,
 		"AdminData":    adminData,
-		"NextPage":     nextPage,
-		"PrevPage":     prevPage,
+		"Page":         page,
 		"Limit":        limit,
-		"Count":        total,
+		"Total":        total,
 	})
 }
 
@@ -260,7 +244,7 @@ func AdminMembersView(c *fiber.Ctx) error {
 	searchStringFull := ""
 
 	if search != "" && sortBy != "" {
-		searchString = " AND " + sortBy + " ILIKE " + "'%" + search + "%'"
+		searchString = " AND " + sortBy + " ILIKE " + "'%" + strings.TrimSpace(search) + "%'"
 		searchStringFull = searchStringFull + "" + searchString
 	}
 
@@ -274,14 +258,14 @@ func AdminMembersView(c *fiber.Ctx) error {
 	}
 
 	memberList := []models.MemberDetails{}
-	database.DB.Db.Table("client_master as a ").Where(searchStringFull).Select("a.client_id, a.Username, a.Full_name,a.status,a.timestamp, b.title, b.gender, b.country_code, b.mobile, b.address_line1, b.address_line2").Joins("left join client_details as b on b.client_id = a.client_id").Order("a.client_id ASC").Limit(limit).Offset(offset).Find(&memberList)
+	database.DB.Db.Table("client_master as a ").Where(searchStringFull).Select("a.client_id, a.Username, a.Full_name,a.status,a.timestamp, b.title, b.gender, b.country_code, b.mobile, b.address_line1, b.address_line2").Joins("left join client_details as b on b.client_id = a.client_id").Order("a.client_id DESC").Limit(limit).Offset(offset).Find(&memberList)
 
 	var total int64
 	database.DB.Db.Table("client_master").Where(searchStringFull).Count(&total)
 	//fmt.Println(memberList)
 
 	feeList := []models.FeesDetails{}
-	database.DB.Db.Table("client_fees").Order("client_id ASC").Find(&feeList)
+	database.DB.Db.Table("client_fees").Order("client_id DESC").Find(&feeList)
 
 	Alerts := sess.Get("AlertX")
 	if Alerts != "" {
@@ -350,8 +334,8 @@ func AdminMembersDetailsView(c *fiber.Ctx) error {
 		}
 	}
 
-	fmt.Println(memberList)
-	fmt.Println(feeList)
+	//fmt.Println(memberList)
+	//fmt.Println(feeList)
 
 	return c.Render("admin/members-details", fiber.Map{
 		"Title":            "Members Details",
@@ -412,17 +396,8 @@ func SupportTicketListing(c *fiber.Ctx) error {
 	sess, _ := store.Get(c)
 	adminData := sess.Get("AdminData")
 	// Get query parameters for page and limit
-	page, err := strconv.Atoi(c.Query("page", "1"))
-	if err != nil || page < 1 {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid page number")
-	}
-	pageLimit := "10"
-	limit, err := strconv.Atoi(c.Query("limit", pageLimit))
-	if err != nil || limit < 1 {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid limit number")
-	}
-
-	// Calculate offset
+	page, _ := strconv.Atoi(c.Query("page", "1"))
+	limit, _ := strconv.Atoi(c.Query("limit", os.Getenv("PagingSize")))
 	offset := (page - 1) * limit
 
 	ticketList := []models.Support_Ticket{}
@@ -430,21 +405,6 @@ func SupportTicketListing(c *fiber.Ctx) error {
 
 	var total int64
 	database.DB.Db.Table("support-ticket").Count(&total)
-
-	//fmt.Println(ticketList)
-
-	// Prepare pagination data
-	totalPage := total / 10
-	//fmt.Println(totalPage)
-	nextPage := page + 1
-	prevPage := page - 1
-	if page == 1 {
-		prevPage = 0
-	}
-
-	if page >= int(totalPage+1) {
-		nextPage = 0
-	}
 
 	Alerts := sess.Get("AlertX")
 	if Alerts != "" {
@@ -461,10 +421,9 @@ func SupportTicketListing(c *fiber.Ctx) error {
 		"AlertX":     Alerts,
 		"AdminData":  adminData,
 		"TicketList": ticketList,
-		"NextPage":   nextPage,
-		"PrevPage":   prevPage,
+		"Page":       page,
 		"Limit":      limit,
-		"Count":      total,
+		"Total":      total,
 	})
 }
 
@@ -486,7 +445,7 @@ func FeesPost(c *fiber.Ctx) error {
 	checkList := models.FeesDetails{}
 	result := database.DB.Db.Table("client_fees").Where("client_id = ?", client_id).Find(&checkList)
 
-	fmt.Println(checkList.Client_id)
+	//fmt.Println(checkList.Client_id)
 
 	if result.RowsAffected == 1 {
 		fmt.Print("Update")
@@ -599,7 +558,7 @@ func AdminCoinIDView(c *fiber.Ctx) error {
 	// Get query parameters
 	search := c.Query("search", "")
 
-	fmt.Println("search => ", search)
+	//fmt.Println("search => ", search)
 
 	searchStringFull := ""
 
@@ -632,7 +591,7 @@ func AdminCoinIDView(c *fiber.Ctx) error {
 func AdminSupportTicketDetails(c *fiber.Ctx) error {
 
 	ticketID := c.Query("tid")
-	fmt.Println("ticketID => ", ticketID)
+	//fmt.Println("ticketID => ", ticketID)
 
 	AdminSession(c)
 	sess, _ := store.Get(c)

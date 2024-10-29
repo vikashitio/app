@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 	"template/database"
+	"template/function"
 	"template/models"
 
 	"github.com/gofiber/fiber/v2"
@@ -64,6 +65,7 @@ func TransExcel(c *fiber.Ctx) error {
 		RequestedCurrencyFull := strings.ToUpper(p.Requestedcurrency) + " " + fmt.Sprintf("%f", p.Requestedamount)
 		ConvertedAmountFull := strings.ToUpper(p.Convertedcurrency) + " " + fmt.Sprintf("%f", p.Convertedamount)
 		ReceivedAmountFull := strings.ToUpper(p.Convertedcurrency) + " " + fmt.Sprintf("%f", p.Receivedamount)
+		SubStatus := function.GetSubStatusByStatusID(p.Substatus)
 
 		f.SetCellValue("Sheet1", "A"+strconv.Itoa(i), i-1)
 		f.SetCellValue("Sheet1", "B"+strconv.Itoa(i), p.Transaction_id)
@@ -71,7 +73,7 @@ func TransExcel(c *fiber.Ctx) error {
 		f.SetCellValue("Sheet1", "D"+strconv.Itoa(i), RequestedCurrencyFull)
 		f.SetCellValue("Sheet1", "E"+strconv.Itoa(i), ConvertedAmountFull)
 		f.SetCellValue("Sheet1", "F"+strconv.Itoa(i), ReceivedAmountFull)
-		f.SetCellValue("Sheet1", "G"+strconv.Itoa(i), p.Status)
+		f.SetCellValue("Sheet1", "G"+strconv.Itoa(i), SubStatus)
 		f.SetCellValue("Sheet1", "H"+strconv.Itoa(i), p.Transaction_type)
 		f.SetCellValue("Sheet1", "I"+strconv.Itoa(i), p.Response_hash)
 		f.SetCellValue("Sheet1", "J"+strconv.Itoa(i), p.Createdate)

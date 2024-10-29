@@ -6,6 +6,7 @@ import (
 	"log"
 	"strings"
 	"template/database"
+	"template/function"
 	"template/models"
 
 	"github.com/gofiber/fiber/v2"
@@ -74,7 +75,7 @@ func generatePDFG(transactionList []models.Transaction_Pay) []byte {
 		ConvertedamountFull := strings.ToUpper(p.Convertedcurrency) + " " + fmt.Sprintf("%f", p.Convertedamount)
 		ReceivedamountFull := strings.ToUpper(p.Convertedcurrency) + " " + fmt.Sprintf("%f", p.Receivedamount)
 		RequestedcurrencyFull := strings.ToUpper(p.Requestedcurrency) + " " + fmt.Sprintf("%f", p.Requestedamount)
-
+		SubStatus := function.GetSubStatusByStatusID(p.Substatus)
 		pdf.CellFormat(10, 7, fmt.Sprintf("%d", i), "1", 0, "", false, 0, "")
 		pdf.CellFormat(45, 7, p.Transaction_id, "1", 0, "", false, 0, "")
 		pdf.CellFormat(10, 7, strings.ToUpper(p.Receivedcurrency), "1", 0, "", false, 0, "")
@@ -82,7 +83,7 @@ func generatePDFG(transactionList []models.Transaction_Pay) []byte {
 		pdf.CellFormat(20, 7, RequestedcurrencyFull, "1", 0, "", false, 0, "")
 		pdf.CellFormat(20, 7, ConvertedamountFull, "1", 0, "", false, 0, "")
 		pdf.CellFormat(20, 7, ReceivedamountFull, "1", 0, "", false, 0, "")
-		pdf.CellFormat(15, 7, p.Status, "1", 0, "", false, 0, "")
+		pdf.CellFormat(15, 7, SubStatus, "1", 0, "", false, 0, "")
 		pdf.CellFormat(30, 7, p.Createdate, "1", 0, "", false, 0, "")
 		pdf.Ln(-1)
 	}

@@ -117,8 +117,8 @@ func ActivateTwoFA(c *fiber.Ctx) error {
 		//  Email///
 		template_code := "2FA-STATUS"
 		//fmt.Println("qrimg==>", qrimg)
-		emailData := models.EmailData{FullName: getName, Email: getEmail, UserName: getEmail, HashCode: totpSecret, Invoice_url: qrimg}
-
+		emailData := models.EmailData{FullName: getName, Email: getEmail, UserName: getEmail, HashCode: totpSecret, Details: qrimg}
+		fmt.Println("ERROR 10001 => ", emailData)
 		err := function.SendEmail(template_code, emailData)
 		if err != nil {
 			fmt.Println("issue sending verification email")

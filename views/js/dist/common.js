@@ -1,9 +1,9 @@
 $('.hrefModal').click(function(){
-    alert("Modal Box hrefModal")
+    //alert("Modal Box hrefModal")
     var modalUrls=$(this).attr('data-href');
     var tid=$(this).attr('data-tid');
 
-    alert(modalUrls)
+    //alert(modalUrls)
 
     $('#transModal').modal('show');
     $('#transModal').modal('show').find('.modal-body').load(modalUrls);

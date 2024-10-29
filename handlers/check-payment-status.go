@@ -602,7 +602,7 @@ func FetchPaymentStatus(c *fiber.Ctx) error {
 			apiKey = os.Getenv("ETHER_SCAN_API_KEY")
 			url = "https://api.etherscan.io/api?module=account&action=txlist&address=" + status_address + "&startblock=0&endblock=99999999&page=1&offset=1&sort=desc&apikey=" + apiKey
 		}
-		fmt.Println("url => ", url)
+		//fmt.Println("url => ", url)
 		//////////////////////////////////////
 		resp, err := http.Get(url)
 		if err != nil {

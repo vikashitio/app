@@ -53,10 +53,10 @@
                               <div class="mb-20">  
                                 <label for="price_amount" class="fw-semibold mb-8 text-primary-light">Fiat Amount</label>
                                 <div class="input-group input-group-lg border input-form-light radius-8">
-                                    <input type="text" class="form-control bg-base border-0 radius-8" id="price_amount" name="price_amount" placeholder="Fiat Amount" required>
+                                    <input  class="form-control bg-base border-0 radius-8" id="price_amount" name="price_amount" type="number" min="0.01" max="10000000" step="0.01" placeholder="Fiat Amount" required>
                                     <div class="input-group-text bg-neutral-50 border-0 fw-normal text-md ps-1 pe-1">
                                         <select class="form-select form-select-sm w-auto bg-transparent fw-bolder border-0 text-secondary-light" name="price_currency" id="price_currency" title="Fiat Currency" required="">
-                                          <option value="" >Select</option>
+                                          <!-- <option value="" >Select</option> -->
                                           {{range .CurrencyList}}
                                           <option value="{{.Currency_code}}" >{{.Currency_code}}</option>
                                           {{end}}
@@ -66,7 +66,7 @@
                             </div>
                               <div class="mb-20">  
                                   <label class="fw-semibold mb-8 text-primary-light">Description</label>
-                                  <textarea class="form-control bg-base h-80-px radius-8" name="order_description" id="order_description" placeholder="Description" required></textarea>
+                                  <textarea class="form-control bg-base h-80-px radius-8" name="order_description" id="order_description" placeholder="Description"></textarea>
                               </div>
                               <div class="mb-2">  
                                 <button type="submit" id="submit" class="btn btn-primary text-sm btn-sm px-8 py-12 w-100 radius-8"> Send Now</button>

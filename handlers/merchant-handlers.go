@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strconv"
 	"template/database"
@@ -284,7 +285,7 @@ func IndexView(c *fiber.Ctx) error {
 
 	// For display Currency List on List Box
 	currencyList := []models.CurrencyList{}
-	database.DB.Db.Table("currency").Order("currency_code ASC").Where("status = ?", 1).Find(&currencyList)
+	database.DB.Db.Table("currency").Order("currency_id ASC").Where("status = ?", 1).Find(&currencyList)
 
 	// For display Currency List on List Box
 	countTrans := models.CountTransactionByStatus{}
@@ -330,8 +331,8 @@ func WithdrawView(c *fiber.Ctx) error {
 	currencyList := []models.CryptoWalletList{}
 	database.DB.Db.Table("client_wallet").Where("client_id = ?", LoginMerchantID).Find(&currencyList)
 
-	fmt.Println(feeList)
-	fmt.Println(currencyList)
+	//fmt.Println(feeList)
+	//fmt.Println(currencyList)
 
 	return c.Render("withdraw", fiber.Map{
 		"Title":           "Withdraw",
@@ -496,17 +497,8 @@ func LoginHistoryView(c *fiber.Ctx) error {
 	}
 	LoginMerchantID := s.Get("LoginMerchantID")
 
-	// Get query parameters for page and limit
-	page, err := strconv.Atoi(c.Query("page", "1"))
-	if err != nil || page < 1 {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid page number")
-	}
-	limit, err := strconv.Atoi(c.Query("limit", "50"))
-	if err != nil || limit < 1 {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid limit number")
-	}
-
-	// Calculate offset
+	page, _ := strconv.Atoi(c.Query("page", "1"))
+	limit, _ := strconv.Atoi(c.Query("limit", os.Getenv("PagingSize")))
 	offset := (page - 1) * limit
 
 	loginHistory := []models.LoginHistory{}
@@ -515,24 +507,13 @@ func LoginHistoryView(c *fiber.Ctx) error {
 	var total int64
 	database.DB.Db.Table("login_history").Where(&models.LoginHistory{Login_type: 1, Client_id: LoginMerchantID.(uint)}).Count(&total)
 
-	// Prepare pagination data
-	nextPage := page + 1
-	prevPage := page - 1
-	if page == 1 {
-		prevPage = 0
-	}
-	if limit > int(total) {
-		nextPage = 0
-	}
-
 	return c.Render("logged-history", fiber.Map{
 		"Title":        "Login History",
 		"Subtitle":     "Login History",
 		"LoginHistory": loginHistory,
-		"NextPage":     nextPage,
-		"PrevPage":     prevPage,
+		"Page":         page,
 		"Limit":        limit,
-		"Count":        total,
+		"Total":        total,
 		"MerchantData": merchantData,
 	})
 }
@@ -550,16 +531,8 @@ func CustomerView(c *fiber.Ctx) error {
 	LoginMerchantID := s.Get("LoginMerchantID")
 
 	// Get query parameters for page and limit
-	page, err := strconv.Atoi(c.Query("page", "1"))
-	if err != nil || page < 1 {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid page number")
-	}
-	limit, err := strconv.Atoi(c.Query("limit", "50"))
-	if err != nil || limit < 1 {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid limit number")
-	}
-
-	// Calculate offset
+	page, _ := strconv.Atoi(c.Query("page", "1"))
+	limit, _ := strconv.Atoi(c.Query("limit", os.Getenv("PagingSize")))
 	offset := (page - 1) * limit
 
 	customerData := []models.CustomerList{}
@@ -568,25 +541,13 @@ func CustomerView(c *fiber.Ctx) error {
 	var total int64
 	database.DB.Db.Table("customer").Select("customer_name", "customer_email", "COUNT(*) AS total_customer").Where(&models.CustomerList{Client_id: LoginMerchantID.(uint)}).Group("customer_email, customer_name").Count(&total)
 
-	// Prepare pagination data
-	nextPage := page + 1
-	prevPage := page - 1
-	if page == 1 {
-		prevPage = 0
-	}
-
-	if limit > int(total) {
-		nextPage = 0
-	}
-
 	return c.Render("customer", fiber.Map{
 		"Title":        "Customer",
 		"Subtitle":     "Customer",
 		"CustomerData": customerData,
-		"NextPage":     nextPage,
-		"PrevPage":     prevPage,
+		"Page":         page,
 		"Limit":        limit,
-		"Count":        total,
+		"Total":        total,
 		"MerchantData": merchantData,
 	})
 }
@@ -759,41 +720,23 @@ func SupportTicket(c *fiber.Ctx) error {
 	}
 
 	// Get query parameters for page and limit
-	page, err := strconv.Atoi(c.Query("page", "1"))
-	if err != nil || page < 1 {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid page number")
-	}
-	limit, err := strconv.Atoi(c.Query("limit", "50"))
-	if err != nil || limit < 1 {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid limit number")
-	}
-
-	// Calculate offset
+	page, _ := strconv.Atoi(c.Query("page", "1"))
+	limit, _ := strconv.Atoi(c.Query("limit", os.Getenv("PagingSize")))
 	offset := (page - 1) * limit
 
 	ticketList := []models.Support_Ticket{}
 	var total int64
 	database.DB.Db.Table("support-ticket").Where("client_id = ?", LoginMerchantID).Order("ticket_id desc").Limit(limit).Offset(offset).Find(&ticketList).Count(&total)
 
-	// Prepare pagination data
-	nextPage := page + 1
-	prevPage := page - 1
-	if page == 1 {
-		prevPage = 0
-	}
-	if limit > int(total) {
-		nextPage = 0
-	}
 	return c.Render("support-tickets", fiber.Map{
 		"Title":        "Support Ticket",
 		"Subtitle":     "Support Ticket",
 		"Action":       "List",
 		"Alert":        Alerts,
 		"TicketList":   ticketList,
-		"NextPage":     nextPage,
-		"PrevPage":     prevPage,
+		"Page":         page,
 		"Limit":        limit,
-		"Count":        total,
+		"Total":        total,
 		"MerchantData": merchantData,
 	})
 }
@@ -865,7 +808,7 @@ func SupportTicketDetails(c *fiber.Ctx) error {
 	})
 }
 
-// For Post Merchant Support ticket form
+// For Post Merchant Support ticket
 func SubmitSupportTicket(c *fiber.Ctx) error {
 
 	ticket_subject := c.FormValue("ticket_subject")
@@ -907,16 +850,14 @@ func SubmitSupportTicket(c *fiber.Ctx) error {
 	}
 
 	// check session
-
 	s.Set("Alert", Alerts) // Set a session key
 	if err := s.Save(); err != nil {
 		return err
 	}
-
 	return c.Redirect("/support-tickets")
 }
 
-// For Post Merchant Support ticket form
+// For Post Merchant Support ticket Reply
 func SubmitSupportTicketReply(c *fiber.Ctx) error {
 
 	tid := c.FormValue("ticket_id")
@@ -926,7 +867,7 @@ func SubmitSupportTicketReply(c *fiber.Ctx) error {
 	}
 	reply_desc := c.FormValue("reply_desc")
 
-	fmt.Println(ticket_id, reply_desc)
+	//fmt.Println(ticket_id, reply_desc)
 
 	s, _ := store.Get(c)
 	merchantData := s.Get("MerchantData")
@@ -1071,6 +1012,7 @@ func StorePost(c *fiber.Ctx) error {
 	}
 	getTableID := uint(cid)
 	webhookurl := c.FormValue("webhookurl")
+	return_url := c.FormValue("return_url")
 	Alerts := ""
 
 	Client_id := s.Get("LoginMerchantID").(uint) //c.FormValue("tableID")
@@ -1078,7 +1020,7 @@ func StorePost(c *fiber.Ctx) error {
 	//////////
 	// if GET ID than work update else insert
 	// for Full path use- filePath & only file name use file.Filename
-	result := database.DB.Db.Table("client_store").Save(&models.ClientStore{ID: getTableID, Client_id: Client_id, Webhookurl: webhookurl})
+	result := database.DB.Db.Table("client_store").Save(&models.ClientStore{ID: getTableID, Client_id: Client_id, Webhookurl: webhookurl, Return_url: return_url})
 
 	//fmt.Println(loginList.Status)
 	Alerts = "Webhook update successfully"
@@ -1111,10 +1053,10 @@ func ProfileView(c *fiber.Ctx) error {
 	Alerts := s.Get("Alert")
 	s.Delete("Alert")
 	if err := s.Save(); err != nil {
-		panic(err)
+		fmt.Println("Error - 90001")
 	}
 
-	profile := []models.ProfileData{}
+	profile := models.ProfileData{}
 	database.DB.Db.Table("client_details").Where("client_id = ?", LoginMerchantID).Find(&profile)
 
 	return c.Render("profile", fiber.Map{
@@ -1139,13 +1081,49 @@ func ProfilePost(c *fiber.Ctx) error {
 	getState := c.FormValue("state")
 	getCountry := c.FormValue("country")
 	getPincode := c.FormValue("pincode")
+
+	filePath := ""
+	filename := c.FormValue("profileimage")
+
+	// Retrieve the image file from the form
+	file, err := c.FormFile("imageUpload")
+	if err != nil {
+		//fmt.Println("Image Not Found")
+	} else {
+		//fmt.Println("Image Found")
+		// Read the file content
+		fileContent, err := file.Open()
+		if err != nil {
+			fmt.Println("Error reading file")
+		}
+		defer fileContent.Close()
+
+		// Save the file to the server
+		filePath = fmt.Sprintf("./views/img/%s", file.Filename)
+		filename = file.Filename
+		bytes, err := ioutil.ReadAll(fileContent)
+		if err != nil {
+			fmt.Println("Error reading file content")
+		}
+		err = ioutil.WriteFile(filePath, bytes, 0644)
+		if err != nil {
+			fmt.Println("Error saving file")
+		}
+
+		// Respond with success
+		//fmt.Println("Image uploaded successfully")
+	}
+
 	//fmt.Println("LoginMerchantID $$$$$$$$$$$")
 	s, _ := store.Get(c)
 	LoginMerchantID := s.Get("LoginMerchantID").(uint)
 
 	//fmt.Println("LoginMerchantID =>>>>>>>>", LoginMerchantID)
+	//fmt.Println("File Name", filename)
+	//fmt.Println("File Path", filePath)
+	//"Profile_image"
 
-	result := database.DB.Db.Table("client_details").Save(&models.ProfileData{Client_id: LoginMerchantID, Gender: getGender, BirthDate: getBirthDate, CountryCode: getCountryCode, Mobile: getMobile, AddressLine1: getAddressLine1, AddressLine2: getAddressLine2, City: getCity, State: getState, Country: getCountry, Pincode: getPincode})
+	result := database.DB.Db.Table("client_details").Save(&models.ProfileData{Client_id: LoginMerchantID, Gender: getGender, BirthDate: getBirthDate, CountryCode: getCountryCode, Mobile: getMobile, AddressLine1: getAddressLine1, AddressLine2: getAddressLine2, City: getCity, State: getState, Country: getCountry, Pincode: getPincode, Profile_image: filename})
 
 	Alerts := "Profile Updated successfully"
 	if result.Error != nil {
@@ -1183,33 +1161,14 @@ func GetCryptoWalletList(c *fiber.Ctx) error {
 	}
 
 	// Get query parameters for page and limit
-	page, err := strconv.Atoi(c.Query("page", "1"))
-	if err != nil || page < 1 {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid page number")
-	}
-	limit, err := strconv.Atoi(c.Query("limit", "100"))
-	if err != nil || limit < 1 {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid limit number")
-	}
-
-	// Calculate offset
+	page, _ := strconv.Atoi(c.Query("page", "1"))
+	limit, _ := strconv.Atoi(c.Query("limit", os.Getenv("PagingSize")))
 	offset := (page - 1) * limit
 
 	currencyList := []models.CryptoWalletList{}
 
 	var total int64
 	database.DB.Db.Table("client_wallet").Where("client_id = ?", LoginMerchantID).Order("status ASC,crypto_code ASC").Limit(limit).Offset(offset).Find(&currencyList).Count(&total)
-
-	//fmt.Println(total)
-	// Prepare pagination data
-	nextPage := page + 1
-	prevPage := page - 1
-	if page == 1 {
-		prevPage = 0
-	}
-	if limit > int(total) {
-		nextPage = 0
-	}
 
 	//fmt.Println(currencyList)
 	return c.Render("crypto-wallet", fiber.Map{
@@ -1219,10 +1178,9 @@ func GetCryptoWalletList(c *fiber.Ctx) error {
 		"Alert":        Alerts,
 		"CurrencyList": currencyList,
 		"MerchantData": merchantData,
-		"NextPage":     nextPage,
-		"PrevPage":     prevPage,
+		"Page":         page,
 		"Limit":        limit,
-		"Count":        total,
+		"Total":        total,
 	})
 }
 

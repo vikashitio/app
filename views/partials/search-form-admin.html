@@ -20,6 +20,8 @@
 <option value="" selected="selected">Select</option>
 <option value="transaction_id" title="TransID" {{ if eq .SearchBy "transaction_id" }}selected{{ end }}>TransID</option>
 <option value="response_hash" title="Txhash" {{ if eq .SearchBy "response_hash" }}selected{{ end }}>Txhash</option>
+<option value="order_id" title="OrderID" {{ if eq .SearchBy "order_id" }}selected{{ end }}>OrderID</option>
+<option value="customerrefid" title="ReferenceID" {{ if eq .SearchBy "customerrefid" }}selected{{ end }}>ReferenceID</option>
 <option value="status" title="Status" {{ if eq .SearchBy "status" }}selected{{ end }}>Status</option>
 </select>
 </div>    

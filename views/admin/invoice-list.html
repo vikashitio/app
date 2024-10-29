@@ -54,20 +54,21 @@
                   <td>{{.Email}}</td>
                   <td>{{.Description}}</td>
                   <td >{{.Createdate}}</td>
-                  <td><a href="{{$.CommonURL}}/pay?iid={{.Trackid}}" target="_blank" title="Click to pay"><i class="fa-solid fa-square-arrow-up-right"></i></a>&nbsp;&nbsp;<i class="fa-solid fa-copy myCopy" data-link="{{$.CommonURL}}/pay?iid={{.Trackid}}" title="Click to copy"></i> </td>
+                  <td><a href="{{$.CommonURL}}/pay?iid={{.Trackid}}" target="_blank" title="Click to pay"><i class="fa-solid fa-square-arrow-up-right"></i></a><!-- &nbsp;&nbsp;<i class="fa-solid fa-copy myCopy" data-link="{{$.CommonURL}}/pay?iid={{.Trackid}}" title="Click to copy"></i>--> </td> 
                   
                 </tr>
               
                 {{end}}
                 <tr>
                   <td class="text-end fs-6 mx-2" colspan="8"> 
-                    {{if .Count}} Total Record : {{.Count}} {{end}}
-                    {{if .PrevPage}}
-                  <a href="/admin/invoice-list?page={{.PrevPage}}&limit={{.Limit}}" class="mx-2" title="Previous"><i class="fa-solid fa-backward"></i></a>
-              {{end}}
-              {{if .NextPage}}
-                  <a href="/admin/invoice-list?page={{.NextPage}}&limit={{.Limit}}" class="mx-2" title="Next"><i class="fa-solid fa-forward"></i></a>
-              {{end}}
+                    <span class="mt-1 font-monospace mx-2 float-start" > Page [{{ .Page }}] Total {{ .Total }}  </span>
+                    {{ if gt .Page 1 }}
+                  &nbsp;<a href="?page={{ sub .Page 1 }}&limit={{ .Limit }}" class="mx-1 float-start btn btn-outline-primary btn-sm"><i class="fa-solid fa-angles-left"></i></a>
+                   {{ end }}
+                  
+                   {{ if lt (mul .Page .Limit) .Total }}
+                   &nbsp;<a href="?page={{ add .Page 1 }}&limit={{ .Limit }}" class="mx-1 float-start btn btn-outline-primary btn-sm"><i class="fa-solid fa-angles-right"></i></a>
+                  {{ end }}
 
 
                   </td>

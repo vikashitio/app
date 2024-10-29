@@ -63,8 +63,8 @@ $(".process").click(function(){
     var CommonURL = $("#CrypTox").attr('href');
     var iid = getUrlParameter('iid');
     
-    if(cryptoID=="" || price_currency=="" || price_amount=="" || order_description=="" || Client_id=="" || CommonURL=="" || cid==""|| iid==""){
-      location.reload(true);
+    if(cryptoID=="" || price_currency=="" || price_amount=="" || Client_id=="" || CommonURL=="" || cid==""|| iid==""){
+        location.reload(true);
     }
     var data="";
     var formData = {

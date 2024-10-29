@@ -257,17 +257,18 @@ type CreateVaultAccountResponse struct {
 
 // for manage Profile
 type ProfileData struct {
-	Client_id    uint   `gorm:"primaryKey"`
-	Gender       string `json:"gender"`
-	BirthDate    string `json:"birth_date"`
-	CountryCode  string `json:"country_code"`
-	Mobile       string `json:"mobile"`
-	City         string `json:"city"`
-	State        string `json:"state"`
-	Country      string `json:"country"`
-	AddressLine1 string `json:"address_line1"`
-	AddressLine2 string `json:"address_line2"`
-	Pincode      string `json:"pincode"`
+	Client_id     uint   `gorm:"primaryKey"`
+	Gender        string `json:"gender"`
+	BirthDate     string `json:"birth_date"`
+	CountryCode   string `json:"country_code"`
+	Mobile        string `json:"mobile"`
+	City          string `json:"city"`
+	State         string `json:"state"`
+	Country       string `json:"country"`
+	AddressLine1  string `json:"address_line1"`
+	AddressLine2  string `json:"address_line2"`
+	Pincode       string `json:"pincode"`
+	Profile_image string `json:"profile_image"`
 }
 
 type Alert struct {
@@ -694,6 +695,7 @@ type ClientStore struct {
 	ID         uint   `gorm:"primaryKey"`
 	Client_id  uint   `json:"client_id,omitempty"`
 	Webhookurl string `json:"webhookurl,omitempty"`
+	Return_url string `json:"return_url,omitempty"`
 }
 
 type CountTransactionByStatus struct {

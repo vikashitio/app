@@ -21,17 +21,8 @@ func AdminInvoiceListView(c *fiber.Ctx) error {
 	sess, _ := store.Get(c)
 	adminData := sess.Get("AdminData")
 	// Get query parameters for page and limit
-	page, err := strconv.Atoi(c.Query("page", "1"))
-	if err != nil || page < 1 {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid page number")
-	}
-	pageLimit := "10"
-	limit, err := strconv.Atoi(c.Query("limit", pageLimit))
-	if err != nil || limit < 1 {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid limit number")
-	}
-
-	// Calculate offset
+	page, _ := strconv.Atoi(c.Query("page", "1"))
+	limit, _ := strconv.Atoi(c.Query("limit", os.Getenv("PagingSize")))
 	offset := (page - 1) * limit
 
 	transactionList := []models.Invoice_Master{}
@@ -39,21 +30,6 @@ func AdminInvoiceListView(c *fiber.Ctx) error {
 
 	var total int64
 	database.DB.Db.Table("invoice").Count(&total)
-
-	//fmt.Println(total)
-
-	// Prepare pagination data
-	totalPage := total / 10
-	//fmt.Println(totalPage)
-	nextPage := page + 1
-	prevPage := page - 1
-	if page == 1 {
-		prevPage = 0
-	}
-
-	if page >= int(totalPage+1) {
-		nextPage = 0
-	}
 
 	Alerts := sess.Get("AlertX")
 	if Alerts != "" {
@@ -72,10 +48,9 @@ func AdminInvoiceListView(c *fiber.Ctx) error {
 		"AdminData":       adminData,
 		"CommonURL":       commonURL,
 		"TransactionList": transactionList,
-		"NextPage":        nextPage,
-		"PrevPage":        prevPage,
+		"Page":            page,
 		"Limit":           limit,
-		"Count":           total,
+		"Total":           total,
 	})
 }
 
@@ -95,14 +70,14 @@ func AdminTransactionsView(c *fiber.Ctx) error {
 	time_period := c.Query("time_period", "")
 
 	page, _ := strconv.Atoi(c.Query("page", "1"))
-	limit, _ := strconv.Atoi(c.Query("limit", "10"))
+	limit, _ := strconv.Atoi(c.Query("limit", os.Getenv("PagingSize")))
 	offset := (page - 1) * limit
 
 	searchString := ""
 	searchStringFull := ""
 
 	if searchKey != "" && searchBy != "" {
-		searchString = " AND " + searchBy + " ILIKE " + "'%" + searchKey + "%'"
+		searchString = " AND " + searchBy + " ILIKE " + "'%" + strings.TrimSpace(searchKey) + "%'"
 		searchStringFull = searchStringFull + "" + searchString
 	}
 
@@ -285,14 +260,14 @@ func AdminWithdrawsView(c *fiber.Ctx) error {
 	time_period := c.Query("time_period", "")
 
 	page, _ := strconv.Atoi(c.Query("page", "1"))
-	limit, _ := strconv.Atoi(c.Query("limit", "10"))
+	limit, _ := strconv.Atoi(c.Query("limit", os.Getenv("PagingSize")))
 	offset := (page - 1) * limit
 
 	searchString := ""
 	searchStringFull := " AND transaction_type='Withdraw Fee' "
 
 	if searchKey != "" && searchBy != "" {
-		searchString = " AND " + searchBy + " ILIKE " + "'%" + searchKey + "%'"
+		searchString = " AND " + searchBy + " ILIKE " + "'%" + strings.TrimSpace(searchKey) + "%'"
 		searchStringFull = searchStringFull + "" + searchString
 	}
 
@@ -368,7 +343,7 @@ func AdminRevenueView(c *fiber.Ctx) error {
 	time_period := c.Query("time_period", "")
 
 	page, _ := strconv.Atoi(c.Query("page", "1"))
-	limit, _ := strconv.Atoi(c.Query("limit", "10"))
+	limit, _ := strconv.Atoi(c.Query("limit", os.Getenv("PagingSize")))
 	offset := (page - 1) * limit
 
 	searchString := ""

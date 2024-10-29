@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"template/database"
 	"template/function"
@@ -37,35 +38,15 @@ func GetAdminList(c *fiber.Ctx) error {
 	}
 
 	// Get query parameters for page and limit
-	page, err := strconv.Atoi(c.Query("page", "1"))
-	if err != nil || page < 1 {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid page number")
-	}
-	limit, err := strconv.Atoi(c.Query("limit", listSizeA))
-	if err != nil || limit < 1 {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid limit number")
-	}
 
-	// Calculate offset
+	page, _ := strconv.Atoi(c.Query("page", "1"))
+	limit, _ := strconv.Atoi(c.Query("limit", os.Getenv("PagingSize")))
 	offset := (page - 1) * limit
 
 	adminList := []models.AdminList{}
 
 	var total int64
 	database.DB.Db.Table(tableNameA).Order(listOrderByA).Limit(limit).Offset(offset).Find(&adminList).Count(&total)
-
-	// Prepare pagination data
-	totalPage := total / 10
-	//fmt.Println(totalPage)
-	nextPage := page + 1
-	prevPage := page - 1
-	if page == 1 {
-		prevPage = 0
-	}
-
-	if page >= int(totalPage+1) {
-		nextPage = 0
-	}
 
 	return c.Render(pageNameA, fiber.Map{
 		"Title":     pageTitleA,
@@ -74,10 +55,9 @@ func GetAdminList(c *fiber.Ctx) error {
 		"AlertX":    Alerts,
 		"DataList":  adminList,
 		"AdminData": adminData,
-		"NextPage":  nextPage,
-		"PrevPage":  prevPage,
+		"Page":      page,
 		"Limit":     limit,
-		"Count":     total,
+		"Total":     total,
 	})
 }
 

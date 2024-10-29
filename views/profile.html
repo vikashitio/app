@@ -30,7 +30,11 @@
               <img src="/assets/images/user-grid/user-grid-bg1.png" alt="" class="w-100 object-fit-cover">
               <div class="pb-24 ms-16 mb-24 me-16  mt--100">
                   <div class="text-center border border-top-0 border-start-0 border-end-0">
+                    {{if .Profile.Profile_image}}
+                      <img src="/views/img/{{.Profile.Profile_image}}" alt="" class="border br-white border-width-2-px w-200-px h-200-px rounded-circle object-fit-cover">
+                      {{else}}
                       <img src="/assets/images/user-grid/user-grid-img14.png" alt="" class="border br-white border-width-2-px w-200-px h-200-px rounded-circle object-fit-cover">
+                      {{end}}
                       <h6 class="mb-0 mt-16">{{ if .MerchantData }} {{ .MerchantData.MerchantName }} {{end}}</h6>
                       <span class="text-secondary-light mb-16">{{ if .MerchantData.MerchantEmail }}{{ .MerchantData.MerchantEmail }}{{end}}</span>
                   </div>
@@ -46,28 +50,28 @@
                               <span class="w-30 text-md fw-semibold text-primary-light"> Email</span>
                               <span class="w-70 text-secondary-light fw-medium">: {{ if .MerchantData.MerchantEmail }}{{ .MerchantData.MerchantEmail }}{{end}}</span>
                           </li>
-                          {{range .Profile}}
+                          
                           <li class="d-flex align-items-center gap-1 mb-12">
                               <span class="w-30 text-md fw-semibold text-primary-light"> Phone</span>
-                              <span class="w-70 text-secondary-light fw-medium">: ({{if .CountryCode}}{{.CountryCode}}{{end}}) {{if .Mobile}}{{.Mobile}}{{end}}</span>
+                              <span class="w-70 text-secondary-light fw-medium">: ({{if .Profile.CountryCode}}{{.Profile.CountryCode}}{{end}}) {{if .Profile.Mobile}}{{.Profile.Mobile}}{{end}}</span>
                           </li>
                           <li class="d-flex align-items-center gap-1 mb-12">
                               <span class="w-30 text-md fw-semibold text-primary-light"> Birth Date</span>
-                              <span class="w-70 text-secondary-light fw-medium">: {{if .BirthDate}}{{.BirthDate}}{{end}}</span>
+                              <span class="w-70 text-secondary-light fw-medium">: {{if .Profile.BirthDate}}{{.Profile.BirthDate}}{{end}}</span>
                           </li>
                           <li class="d-flex align-items-center gap-1 mb-12">
                               <span class="w-30 text-md fw-semibold text-primary-light"> Gender</span>
-                              <span class="w-70 text-secondary-light fw-medium">: {{if .Gender}}{{.Gender}}{{end}}</span>
+                              <span class="w-70 text-secondary-light fw-medium">: {{if .Profile.Gender}}{{.Profile.Gender}}{{end}}</span>
                           </li>
                           <li class="d-flex align-items-center gap-1 mb-12">
                               <span class="w-30 text-md fw-semibold text-primary-light"> Address</span>
-                              <span class="w-70 text-secondary-light fw-medium">: {{if .AddressLine1}}{{.AddressLine1}}{{end}}</span>
+                              <span class="w-70 text-secondary-light fw-medium">: {{if .Profile.AddressLine1}}{{.Profile.AddressLine1}}{{end}}</span>
                           </li>
                           <li class="d-flex align-items-center gap-1">
                               <span class="w-30 text-md fw-semibold text-primary-light"> &nbsp; </span>
-                              <span class="w-70 text-secondary-light fw-medium">&nbsp; {{if .AddressLine2}}{{.AddressLine2}}{{end}}</span>
+                              <span class="w-70 text-secondary-light fw-medium">&nbsp; {{if .Profile.AddressLine2}}{{.Profile.AddressLine2}}{{end}}</span>
                           </li>
-                          {{end}}
+                         
                       </ul>
                   </div>
               </div>
@@ -96,12 +100,16 @@
 
                   <div class="tab-content" id="pills-tabContent">   
                       <div class="tab-pane fade show active" id="pills-edit-profile" role="tabpanel" aria-labelledby="pills-edit-profile-tab" tabindex="0">
-                          <h6 class="text-md text-primary-light mb-16">Profile Image</h6>
+                          
+                          <form method="POST" action="/profilePost" enctype="multipart/form-data" autocomplete="off">
+                            
+                             <input type="hidden" name="profileimage" id="profileimage" value="{{if .Profile.Profile_image}}{{.Profile.Profile_image}}{{end}}" >
+                            <h6 class="text-md text-primary-light mb-16">Profile Image</h6>
                           <!-- Upload Image Start -->
-                          <!-- <div class="mb-24 mt-16">
+                           <div class="mb-24 mt-16">
                               <div class="avatar-upload">
                                       <div class="avatar-edit position-absolute bottom-0 end-0 me-24 mt-16 z-1 cursor-pointer">
-                                          <input type='file' id="imageUpload" accept=".png, .jpg, .jpeg" hidden>
+                                          <input type='file' id="imageUpload" name="imageUpload" accept=".png, .jpg, .jpeg" hidden>
                                           <label for="imageUpload" class="w-32-px h-32-px d-flex justify-content-center align-items-center bg-primary-50 text-primary-600 border border-primary-600 bg-hover-primary-100 text-lg rounded-circle">
                                               <iconify-icon icon="solar:camera-outline" class="icon"></iconify-icon>
                                           </label>
@@ -111,25 +119,23 @@
                                       </div>
                                   </div>
                               </div>
-                          </div> -->
+                          </div> 
                           <!-- Upload Image End -->
-                          <form method="POST" action="/profilePost" enctype="multipart/form-data" autocomplete="off">
-                            {{range .Profile}} 
                               <div class="row">
                                   <div class="col-sm-6">
                                       <div class="mb-20">
                                           <label for="name" class="form-label fw-semibold text-primary-light text-sm mb-8">Gender <span class="text-danger-600">*</span></label>
                                           <select class="form-control radius-8" name="gender" id="gender" title="Gender" required="">
                                             <option value="" selected="selected">Select</option>
-                                            <option value="M" {{ if eq .Gender "M" }}selected{{end}}>Male</option>
-                                            <option value="F" {{ if eq .Gender "F" }}selected{{end}}>Female</option>
+                                            <option value="M" {{ if eq .Profile.Gender "M" }}selected{{end}}>Male</option>
+                                            <option value="F" {{ if eq .Profile.Gender "F" }}selected{{end}}>Female</option>
                                             </select>
                                       </div>
                                   </div>
                                   <div class="col-sm-6">
                                       <div class="mb-20">
                                           <label for="birth_date" class="form-label fw-semibold text-primary-light text-sm mb-8">Birth Date <span class="text-danger-600">*</span></label>
-                                          <input type="date" id="birth_date" name="birth_date" class="form-control" title="Birth Date" required="" placeholder="Enter Birth Date" value="{{if .BirthDate}}{{.BirthDate}}{{end}}" >
+                                          <input type="date" id="birth_date" name="birth_date" class="form-control" title="Birth Date" required="" placeholder="Enter Birth Date" value="{{if .Profile.BirthDate}}{{.Profile.BirthDate}}{{end}}" >
                                       </div>
                                   </div>
                                   <div class="col-sm-6">
@@ -137,7 +143,7 @@
                                           <label for="country_code" class="form-label fw-semibold text-primary-light text-sm mb-8">Country Code</label>
                                           <select class="form-select" name="country_code" id="country_code" title="Country Code" required="">
                             
-                                            <option value="{{if .CountryCode}}{{.CountryCode}}{{end}}" selected="selected">{{if .CountryCode}}{{.CountryCode}}{{end}}</option>
+                                            <option value="{{if .Profile.CountryCode}}{{.Profile.CountryCode}}{{end}}" selected="selected">{{if .Profile.CountryCode}}{{.Profile.CountryCode}}{{end}}</option>
                                             <option value="93">Afghanistan ( + 93)</option>
                                             <option value="358">Aland Islands ( + 358)</option>
                                             <option value="355">Albania ( + 355)</option>
@@ -393,52 +399,52 @@
                                   <div class="col-sm-6">
                                       <div class="mb-20">
                                           <label for="mobile" class="form-label fw-semibold text-primary-light text-sm mb-8">Phone Number <span class="text-danger-600">*</span> </label>
-                                          <input type="text" id="mobile" name="mobile" class="form-control radius-8" title="Phone Number" required="" value="{{if .Mobile}}{{.Mobile}}{{end}}">
+                                          <input type="number" id="mobile" name="mobile" class="form-control radius-8" title="Phone Number" required="" value="{{if .Profile.Mobile}}{{.Profile.Mobile}}{{end}}">
                                       </div>
                                   </div>
 
                                   <div class="col-sm-6">
                                     <div class="mb-20">
                                         <label for="city" class="form-label fw-semibold text-primary-light text-sm mb-8">City <span class="text-danger-600">*</span> </label>
-                                        <input type="text" id="city" name="city" class="form-control radius-8" title="City" required="" value="{{if .City}}{{.City}}{{end}}">
+                                        <input type="text" id="city" name="city" class="form-control radius-8" title="City" required="" value="{{if .Profile.City}}{{.Profile.City}}{{end}}">
                                     </div>
                                 </div>
 
                                 <div class="col-sm-6">
                                     <div class="mb-20">
                                         <label for="state" class="form-label fw-semibold text-primary-light text-sm mb-8">State <span class="text-danger-600">*</span> </label>
-                                        <input type="text" id="state" name="state" class="form-control radius-8" title="State" required="" value="{{if .State}}{{.State}}{{end}}">
+                                        <input type="text" id="state" name="state" class="form-control radius-8" title="State" required="" value="{{if .Profile.State}}{{.Profile.State}}{{end}}">
                                     </div>
                                 </div>
 
                                 <div class="col-sm-6">
                                     <div class="mb-20">
                                         <label for="country" class="form-label fw-semibold text-primary-light text-sm mb-8">Country <span class="text-danger-600">*</span> </label>
-                                        <input type="text" id="country" name="country" class="form-control radius-8" title="Country" required="" value="{{if .Country}}{{.Country}}{{end}}">
+                                        <input type="text" id="country" name="country" class="form-control radius-8" title="Country" required="" value="{{if .Profile.Country}}{{.Profile.Country}}{{end}}">
                                     </div>
                                 </div>
 
                                 <div class="col-sm-6">
                                     <div class="mb-20">
                                         <label for="pincode" class="form-label fw-semibold text-primary-light text-sm mb-8">Pincode <span class="text-danger-600">*</span> </label>
-                                        <input type="text" id="pincode" name="pincode" class="form-control radius-8" title="Pincode" required="" value="{{if .Pincode}}{{.Pincode}}{{end}}">
+                                        <input type="text" id="pincode" name="pincode" class="form-control radius-8" title="Pincode" required="" value="{{if .Profile.Pincode}}{{.Profile.Pincode}}{{end}}">
                                     </div>
                                 </div>
                                   <div class="col-sm-6">
                                     <div class="mb-20">
                                         <label for="address_line1" class="form-label fw-semibold text-primary-light text-sm mb-8">Address Line 1 <span class="text-danger-600">*</span> </label>
-                                        <input type="text" id="address_line1" name="address_line1" class="form-control radius-8" title="Address Line 1" required="" value="{{if .AddressLine1}}{{.AddressLine1}}{{end}}">
+                                        <input type="text" id="address_line1" name="address_line1" class="form-control radius-8" title="Address Line 1" required="" value="{{if .Profile.AddressLine1}}{{.Profile.AddressLine1}}{{end}}">
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                   <div class="mb-20">
                                       <label for="address_line2" class="form-label fw-semibold text-primary-light text-sm mb-8">Address Line 2 <span class="text-danger-600">*</span> </label>
-                                      <input type="text" id="address_line2" name="address_line2" class="form-control radius-8" title="Address Line 2" required="" value="{{if .AddressLine2}}{{.AddressLine2}}{{end}}">
+                                      <input type="text" id="address_line2" name="address_line2" class="form-control radius-8" title="Address Line 2" required="" value="{{if .Profile.AddressLine2}}{{.Profile.AddressLine2}}{{end}}">
                                   </div>
                               </div>
                                  
                               </div>
-                              {{end}}
+                         
                               <div class="d-flex align-items-center justify-content-center5 gap-3">
                                  
                                   <button type="submit" class="btn btn-primary border border-primary-600 text-md px-56 py-12 radius-8"> 
@@ -465,7 +471,7 @@
                               </div>
                           </div>
                           <div class="mb-20">
-                            <button type="submit" class="btn btn-primary border border-primary-600 text-md px-56 py-12 radius-8"> 
+                            <button type="submit" class="btn btn-primary border border-primary-600 text-md px-56 py-12 radius-8 data-validation"> 
                               Change
                           </button>
                         </div>
@@ -539,4 +545,31 @@
     // Call the function
     initializePasswordToggle('.toggle-password');
   // ========================= Password Show Hide Js End ===========================
+
+$('.data-validation').click(function(){
+
+your_password = $.trim($('#your-password').val());
+confirm_password = $.trim($('#confirm-password').val());
+
+if(your_password==''){
+alert('Please enter New password');
+$( "#your-password" ).focus();
+return false;
+}else if(confirm_password==''){
+alert('Please enter Confirmed Password');
+$( "#confirm-password" ).focus();
+return false;
+}else if(your_password!=confirm_password){
+alert('New password should not be same as Confirmed Password.');
+$( "#your-password" ).focus();
+return false;
+}else if(your_password.length < 6) { 
+alert('Password must be at least 6 characters');
+$( "#your-password" ).focus();
+return false;
+}
+    
+    
+});
+
 </script>

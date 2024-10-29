@@ -115,6 +115,11 @@
                     <div class="accordion-body border border-warning rounded ">
                       <div class="row">
                         <div class="col-sm-6 my-1"><strong>Transaction ID :</strong> {{.Transaction_id}}</div>
+                        {{if .Order_id}}
+                                          <div class="col-sm-6 my-1"><strong>Order ID :</strong> {{.Order_id}}</div>
+                                          {{end}}
+                                          <div class="col-sm-6 my-1"><strong>Reference ID :</strong> {{.Customerrefid}}</div>
+                                          
                         <div class="col-sm-6 my-1"><strong>Timestamp :</strong> {{.Createdate}}</div>
                         <div class="col-sm-6 my-1"><strong>Destination address :</strong> {{.Destinationaddress}}</div>
                         <div class="col-sm-6 my-1"><strong>Assetid :</strong><span class=" text-uppercase">{{.Assetid}}</span></div>

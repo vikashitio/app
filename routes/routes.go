@@ -72,6 +72,7 @@ func InitRoutes(app *fiber.App) {
 	app.Get("/API/CryptoBalance", handlers.ApiBalanceByCrypto)
 	app.Get("/API/Transaction/:TransID", handlers.ApiTransactionByTransID)
 	app.Get("/API/Reference/:ReferenceID", handlers.ApiTransactionByReferenceID)
+	app.Get("/API/Order/:OrderID", handlers.ApiTransactionByOrderID)
 	app.Get("/API/Transaction", handlers.ApiTransactionList)
 
 	// app.Get("/add-crypto-np", handlers.AddCryptoView)
@@ -144,6 +145,13 @@ func InitRoutes(app *fiber.App) {
 	app.Post("/admin/change-password-Post", handlers.ChangePasswordFormPost)
 	// For Admin Support Ticket
 	app.Get("/admin/support-ticket", handlers.SupportTicketListing)
+	// For Developer Guide
+	//app.Get("/admin/developer-guide", handlers.DeveloperGuide)
+	app.Get("/admin/developer-guide/edit/:TID", handlers.EditGuide)
+	app.Get("/admin/developer-guide/delete/:TID", handlers.DeleteGuide)
+	app.Get("/admin/developer-guide", handlers.DeveloperGuide)
+	app.Get("/admin/add-guide", handlers.AddGuideView)
+	app.Post("/admin/guidePost", handlers.GuidePost)
 	// For Admin Acquirer
 	app.Get("/admin/add-acquirer", handlers.AddAcquirerForm)
 	app.Post("/admin/acquirerPost", handlers.AcquirerPost)
@@ -168,4 +176,5 @@ func InitRoutes(app *fiber.App) {
 	app.Get("/test/:address", handlers.TestCode)
 	app.Get("/testapi/:address", handlers.TestAPI)
 	app.Get("/testapi2", handlers.TestAPIS)
+	app.Get("/testapi3", handlers.TestAPIS3)
 }

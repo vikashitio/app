@@ -53,15 +53,14 @@
                 {{end}}
                 <tr>
                   <td class="text-end mx-2 fs-6" colspan="8"> 
-                    {{if .Count}} Total Record : {{.Count}} {{end}}
-                    {{if .PrevPage}}
-                  <a href="/admin/currency?page={{.PrevPage}}&limit={{.Limit}}" class="mx-2" title="Previous"><i class="fa-solid fa-backward"></i></a>
-              {{end}}
-              {{if .NextPage}}
-                  <a href="/admin/currency?page={{.NextPage}}&limit={{.Limit}}" class="mx-2" title="Next"><i class="fa-solid fa-forward"></i></a>
-              {{end}}
-
-
+                    <span class="mt-1 font-monospace mx-2 float-start" > Page [{{ .Page }}] Total {{ .Total }}  </span>
+                    {{ if gt .Page 1 }}
+                  &nbsp;<a href="?page={{ sub .Page 1 }}&limit={{ .Limit }}" class="mx-1 float-start btn btn-outline-primary btn-sm"><i class="fa-solid fa-angles-left"></i></a>
+                   {{ end }}
+                  
+                   {{ if lt (mul .Page .Limit) .Total }}
+                   &nbsp;<a href="?page={{ add .Page 1 }}&limit={{ .Limit }}" class="mx-1 float-start btn btn-outline-primary btn-sm"><i class="fa-solid fa-angles-right"></i></a>
+                  {{ end }}
                   </td>
                   
                 </tr>

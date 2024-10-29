@@ -30,7 +30,7 @@ func PayView(c *fiber.Ctx) error {
 
 	// For display Currency List on List Box
 	currencyList := []models.CurrencyList{}
-	database.DB.Db.Table("currency").Select("currency_code").Order("currency_code ASC").Where("status = ?", 1).Find(&currencyList)
+	database.DB.Db.Table("currency").Select("currency_code").Order("currency_id ASC").Where("status = ?", 1).Find(&currencyList)
 	//fmt.Println(currencyList)
 
 	return c.Render("merchant-payment", fiber.Map{
@@ -56,7 +56,7 @@ func TransactionsView(c *fiber.Ctx) error {
 
 	// Get query parameters
 	// Get query parameters
-	searchKey := c.Query("searchkey", "")
+	searchKey := strings.TrimSpace(c.Query("searchkey", ""))
 	searchBy := c.Query("searchby", "transaction_id")
 	status := c.Query("status", "")
 	date_1st := c.Query("date_1st", "")
@@ -64,7 +64,7 @@ func TransactionsView(c *fiber.Ctx) error {
 	time_period := c.Query("time_period", "")
 
 	page, _ := strconv.Atoi(c.Query("page", "1"))
-	limit, _ := strconv.Atoi(c.Query("limit", "10"))
+	limit, _ := strconv.Atoi(c.Query("limit", os.Getenv("PagingSize")))
 	offset := (page - 1) * limit
 
 	searchString := ""
@@ -140,17 +140,8 @@ func RequestedPaymentViews(c *fiber.Ctx) error {
 	LoginMerchantID := s.Get("LoginMerchantID")
 
 	// Get query parameters for page and limit
-	page, err := strconv.Atoi(c.Query("page", "1"))
-	if err != nil || page < 1 {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid page number")
-	}
-	pageLimit := "10"
-	limit, err := strconv.Atoi(c.Query("limit", pageLimit))
-	if err != nil || limit < 1 {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid limit number")
-	}
-
-	// Calculate offset
+	page, _ := strconv.Atoi(c.Query("page", "1"))
+	limit, _ := strconv.Atoi(c.Query("limit", os.Getenv("PagingSize")))
 	offset := (page - 1) * limit
 
 	transactionList := []models.Invoice_Master{}
@@ -158,21 +149,6 @@ func RequestedPaymentViews(c *fiber.Ctx) error {
 
 	var total int64
 	database.DB.Db.Table("invoice").Where("client_id = ? AND invoice_type = ?", LoginMerchantID, 2).Count(&total)
-
-	//fmt.Println(total)
-
-	// Prepare pagination data
-	totalPage := total / 10
-	//fmt.Println(totalPage)
-	nextPage := page + 1
-	prevPage := page - 1
-	if page == 1 {
-		prevPage = 0
-	}
-
-	if page >= int(totalPage+1) {
-		nextPage = 0
-	}
 
 	Alerts := s.Get("Alerts")
 	s.Delete("Alerts")
@@ -188,10 +164,9 @@ func RequestedPaymentViews(c *fiber.Ctx) error {
 		"TransactionList": transactionList,
 		"MerchantData":    merchantData,
 		"CommonURL":       commonURL,
-		"NextPage":        nextPage,
-		"PrevPage":        prevPage,
+		"Page":            page,
 		"Limit":           limit,
-		"Count":           total,
+		"Total":           total,
 	})
 }
 
@@ -206,7 +181,7 @@ func PaymentViews(c *fiber.Ctx) error {
 
 	// For display Currency List on List Box
 	currencyList := []models.CurrencyList{}
-	database.DB.Db.Table("currency").Order("currency_code ASC").Where("status = ?", 1).Find(&currencyList)
+	database.DB.Db.Table("currency").Order("currency_id ASC").Where("status = ?", 1).Find(&currencyList)
 
 	return c.Render("payment-request", fiber.Map{
 		"Title":        "Payment Request",
@@ -295,17 +270,8 @@ func PayLinksListViews(c *fiber.Ctx) error {
 	LoginMerchantID := s.Get("LoginMerchantID")
 
 	// Get query parameters for page and limit
-	page, err := strconv.Atoi(c.Query("page", "1"))
-	if err != nil || page < 1 {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid page number")
-	}
-	pageLimit := "10"
-	limit, err := strconv.Atoi(c.Query("limit", pageLimit))
-	if err != nil || limit < 1 {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid limit number")
-	}
-
-	// Calculate offset
+	page, _ := strconv.Atoi(c.Query("page", "1"))
+	limit, _ := strconv.Atoi(c.Query("limit", os.Getenv("PagingSize")))
 	offset := (page - 1) * limit
 
 	transactionList := []models.Invoice_Master{}
@@ -313,21 +279,6 @@ func PayLinksListViews(c *fiber.Ctx) error {
 
 	var total int64
 	database.DB.Db.Table("invoice").Where("client_id = ? AND invoice_type = ?", LoginMerchantID, 1).Count(&total)
-
-	//fmt.Println(total)
-
-	// Prepare pagination data
-	totalPage := total / 10
-	//fmt.Println(totalPage)
-	nextPage := page + 1
-	prevPage := page - 1
-	if page == 1 {
-		prevPage = 0
-	}
-
-	if page >= int(totalPage+1) {
-		nextPage = 0
-	}
 
 	Alerts := s.Get("Alerts")
 	s.Delete("Alerts")
@@ -343,10 +294,9 @@ func PayLinksListViews(c *fiber.Ctx) error {
 		"TransactionList": transactionList,
 		"MerchantData":    merchantData,
 		"CommonURL":       commonURL,
-		"NextPage":        nextPage,
-		"PrevPage":        prevPage,
+		"Page":            page,
 		"Limit":           limit,
-		"Count":           total,
+		"Total":           total,
 	})
 }
 
@@ -361,7 +311,7 @@ func PayLinksViews(c *fiber.Ctx) error {
 
 	// For display Currency List on List Box
 	currencyList := []models.CurrencyList{}
-	database.DB.Db.Table("currency").Order("currency_code ASC").Where("status = ?", 1).Find(&currencyList)
+	database.DB.Db.Table("currency").Order("currency_id ASC").Where("status = ?", 1).Find(&currencyList)
 
 	return c.Render("pay-link-form", fiber.Map{
 		"Title":        "Pay Link",
@@ -424,7 +374,7 @@ func PayLinkPost(c *fiber.Ctx) error {
 	fmt.Println(payLink)
 	// For display Currency List on List Box
 	currencyList := []models.CurrencyList{}
-	database.DB.Db.Table("currency").Order("currency_code ASC").Where("status = ?", 1).Find(&currencyList)
+	database.DB.Db.Table("currency").Order("currency_id ASC").Where("status = ?", 1).Find(&currencyList)
 
 	return c.Render("pay-link-form", fiber.Map{
 		"Title":        "Pay Link",
@@ -465,7 +415,7 @@ func PayDataPost(c *fiber.Ctx) error {
 	// Fetch Data for Order List
 	invoiceList := models.Invoice_Data{}
 	database.DB.Db.Table("invoice").Where("trackid = ?", req.Customerrefid).Find(&invoiceList)
-	fmt.Println("invoiceList = ", invoiceList)
+	//fmt.Println("invoiceList = ", invoiceList)
 	price_amount := fmt.Sprintf("%f", invoiceList.Requestedamount)
 	price_currency := strings.ToLower(invoiceList.Requestedcurrency)
 
@@ -515,7 +465,7 @@ func PayDataPost(c *fiber.Ctx) error {
 		fmt.Println(" Error convert string to float value :")
 	}
 
-	fmt.Println("convertedAmount ->", convertedAmount)
+	//fmt.Println("convertedAmount ->", convertedAmount)
 	convertedcurrency := req.Cid
 
 	assetId := int(req.Crypto_id)

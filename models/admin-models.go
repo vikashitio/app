@@ -211,3 +211,18 @@ type CoinIDDetails struct {
 	Symbol  string `json:"symbol,omitempty"`
 	Name    string `json:"name,omitempty"`
 }
+
+// for Developer Guide
+type DeveloperGuide struct {
+	Id        uint   `gorm:"primaryKey"`
+	Title     string `json:"title,omitempty"`
+	Heading   string `json:"heading,omitempty"`
+	Functions string `json:"functions,omitempty"`
+	Used      string `json:"used,omitempty"`
+	Status    int    `json:"status,omitempty"`
+}
+
+type DeveloperGuideDeleted struct {
+	Id     uint `gorm:"primaryKey"`
+	Status int  `json:"status,omitempty"`
+}

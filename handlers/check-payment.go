@@ -1,7 +1,10 @@
 package handlers
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"template/database"
 	"template/function"
@@ -46,10 +49,29 @@ func FailedView(c *fiber.Ctx) error {
 	// Fetch Webhook Url from client store
 	storeData := models.ClientStore{}
 	database.DB.Db.Table("client_store").Where("client_id = ?", mID).Find(&storeData)
-	webhookURL := storeData.Webhookurl
+	return_url := storeData.Return_url
+
 	redirectURL := ""
-	if webhookURL != "" {
-		redirectURL = webhookURL + "?referanceID=" + transData.Customerrefid + "&transactionID=" + transData.Transaction_id + "&orderID=" + transData.Order_id + "&hash=" + transData.Response_hash + "&amount=" + fmt.Sprintf("%f", transData.Receivedamount) + "&currency=" + transData.Receivedcurrency + "&status=" + transData.Status
+	if return_url != "" {
+		redirectURL = return_url + "?referanceID=" + transData.Customerrefid + "&transactionID=" + transData.Transaction_id + "&orderID=" + transData.Order_id + "&hash=" + transData.Response_hash + "&amount=" + fmt.Sprintf("%f", transData.Receivedamount) + "&currency=" + transData.Receivedcurrency + "&status=" + transData.Status
+	}
+
+	// For Post response on webhook URL
+	webhookurl := storeData.Webhookurl //Get Webhook Url
+	if webhookurl != "" {
+
+		// Convert the struct to JSON
+		jsonData, err := json.Marshal(transData)
+		if err != nil {
+			fmt.Println("Error in jsonData")
+		}
+		// Create the POST request
+		resp, err := http.Post(webhookurl, "application/json", bytes.NewBuffer(jsonData))
+		if err != nil {
+			fmt.Println("Error in resp")
+		}
+		defer resp.Body.Close()
+
 	}
 	return c.Render("failed", fiber.Map{
 		"Title":       "Declined Payment",
@@ -95,11 +117,29 @@ func DisputeView(c *fiber.Ctx) error {
 	// Fetch Webhook Url from client store
 	storeData := models.ClientStore{}
 	database.DB.Db.Table("client_store").Where("client_id = ?", mID).Find(&storeData)
-	webhookURL := storeData.Webhookurl
+	return_url := storeData.Return_url
 
 	redirectURL := ""
-	if webhookURL != "" {
-		redirectURL = webhookURL + "?referanceID=" + transData.Customerrefid + "&transactionID=" + transData.Transaction_id + "&orderID=" + transData.Order_id + "&hash=" + transData.Response_hash + "&amount=" + fmt.Sprintf("%f", transData.Receivedamount) + "&currency=" + transData.Receivedcurrency + "&status=" + transData.Status
+	if return_url != "" {
+		redirectURL = return_url + "?referanceID=" + transData.Customerrefid + "&transactionID=" + transData.Transaction_id + "&orderID=" + transData.Order_id + "&hash=" + transData.Response_hash + "&amount=" + fmt.Sprintf("%f", transData.Receivedamount) + "&currency=" + transData.Receivedcurrency + "&status=" + transData.Status
+	}
+
+	// For Post response on webhook URL
+	webhookurl := storeData.Webhookurl //Get Webhook Url
+	if webhookurl != "" {
+
+		// Convert the struct to JSON
+		jsonData, err := json.Marshal(transData)
+		if err != nil {
+			fmt.Println("Error in jsonData")
+		}
+		// Create the POST request
+		resp, err := http.Post(webhookurl, "application/json", bytes.NewBuffer(jsonData))
+		if err != nil {
+			fmt.Println("Error in resp")
+		}
+		defer resp.Body.Close()
+
 	}
 
 	return c.Render("dispute", fiber.Map{
@@ -122,6 +162,12 @@ func SuccessView(c *fiber.Ctx) error {
 	database.DB.Db.Table("transaction").Where("transaction_id = ?", transID).Find(&transData)
 	mID := transData.Client_id
 
+	//fmt.Println(" Payment Status Success = ", transData.Status)
+
+	if transData.Status != "Success" {
+		return c.Redirect("/failed/" + transID)
+	}
+
 	//  Email///
 	template_code := "PAYMENT-STATUS"
 	getName := function.GetNameByMID(mID)
@@ -142,12 +188,30 @@ func SuccessView(c *fiber.Ctx) error {
 	// Fetch Webhook Url from client store
 	storeData := models.ClientStore{}
 	database.DB.Db.Table("client_store").Where("client_id = ?", mID).Find(&storeData)
-	webhookURL := storeData.Webhookurl
+	return_url := storeData.Return_url //Get Return URL
 
 	redirectURL := ""
-	if webhookURL != "" {
-		redirectURL = webhookURL + "?referanceID=" + transData.Customerrefid + "&transactionID=" + transData.Transaction_id + "&orderID=" + transData.Order_id + "&hash=" + transData.Response_hash + "&amount=" + fmt.Sprintf("%f", transData.Receivedamount) + "&currency=" + transData.Receivedcurrency + "&status=" + transData.Status
+	if return_url != "" {
+		redirectURL = return_url + "?referanceID=" + transData.Customerrefid + "&transactionID=" + transData.Transaction_id + "&orderID=" + transData.Order_id + "&hash=" + transData.Response_hash + "&amount=" + fmt.Sprintf("%f", transData.Receivedamount) + "&currency=" + transData.Receivedcurrency + "&status=" + transData.Status
 	}
+	// For Post response on webhook URL
+	webhookurl := storeData.Webhookurl //Get Webhook Url
+	if webhookurl != "" {
+
+		// Convert the struct to JSON
+		jsonData, err := json.Marshal(transData)
+		if err != nil {
+			fmt.Println("Error in jsonData")
+		}
+		// Create the POST request
+		resp, err := http.Post(webhookurl, "application/json", bytes.NewBuffer(jsonData))
+		if err != nil {
+			fmt.Println("Error in resp")
+		}
+		defer resp.Body.Close()
+
+	}
+
 	return c.Render("success", fiber.Map{
 		"Title":       "Success Payment",
 		"Subtitle":    "Success Payment",

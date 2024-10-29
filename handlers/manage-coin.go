@@ -31,16 +31,8 @@ func GetCoinList(c *fiber.Ctx) error {
 	}
 
 	// Get query parameters for page and limit
-	page, err := strconv.Atoi(c.Query("page", "1"))
-	if err != nil || page < 1 {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid page number")
-	}
-	limit, err := strconv.Atoi(c.Query("limit", "10"))
-	if err != nil || limit < 1 {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid limit number")
-	}
-
-	// Calculate offset
+	page, _ := strconv.Atoi(c.Query("page", "1"))
+	limit, _ := strconv.Atoi(c.Query("limit", os.Getenv("PagingSize")))
 	offset := (page - 1) * limit
 
 	coinList := []models.CoinList{}
@@ -50,20 +42,6 @@ func GetCoinList(c *fiber.Ctx) error {
 	// For Address
 	coinAddress := []models.CoinAddress{}
 	database.DB.Db.Table("coin_address").Where("status = ?", 1).Order("coin ASC").Find(&coinAddress)
-
-	// Prepare pagination data
-	totalPage := total / 10
-	//fmt.Println(totalPage)
-	nextPage := page + 1
-	prevPage := page - 1
-	if page == 1 {
-		prevPage = 0
-	}
-
-	if page >= int(totalPage+1) {
-		nextPage = 0
-	}
-
 	//fmt.Println(coinList)
 	return c.Render("admin/coin-list", fiber.Map{
 		"Title":       "Coin List",
@@ -73,10 +51,9 @@ func GetCoinList(c *fiber.Ctx) error {
 		"CoinList":    coinList,
 		"CoinAddress": coinAddress,
 		"AdminData":   adminData,
-		"NextPage":    nextPage,
-		"PrevPage":    prevPage,
+		"Page":        page,
 		"Limit":       limit,
-		"Count":       total,
+		"Total":       total,
 	})
 }
 

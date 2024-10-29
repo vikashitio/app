@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"fmt"
-	"os"
 	"strconv"
+	"strings"
 	"template/database"
 	"template/models"
 
@@ -11,16 +11,10 @@ import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
-var tableNameT = "email_template"
-var pageNameT = "admin/email-template"
-var pageTitleT = "Email Template"
-var listSizeT = "10"
-var listOrderByT = "status ASC,template_code ASC"
+// For Add / Edit / Delete Developer Guide from Admin Section
 
-// For Add Edit Delete Email Template from admin section for send email with related template
-
-// function for Display Email Template List
-func GetTemplateList(c *fiber.Ctx) error {
+// function for Display Developer Guide List
+func DeveloperGuide(c *fiber.Ctx) error {
 
 	AdminSession(c)
 	// Session Check
@@ -37,20 +31,21 @@ func GetTemplateList(c *fiber.Ctx) error {
 
 	// Get query parameters for page and limit
 	page, _ := strconv.Atoi(c.Query("page", "1"))
-	limit, _ := strconv.Atoi(c.Query("limit", os.Getenv("PagingSize")))
+	limit, _ := strconv.Atoi(c.Query("limit", "1000")) //os.Getenv("PagingSize")
 	offset := (page - 1) * limit
 
-	dataList := []models.EmailTemplate{}
+	guideList := []models.DeveloperGuide{}
 
 	var total int64
-	database.DB.Db.Table(tableNameT).Order(listOrderByT).Limit(limit).Offset(offset).Find(&dataList).Count(&total)
+	database.DB.Db.Table("developer_guide").Order("title ASC,heading ASC").Limit(limit).Offset(offset).Find(&guideList).Count(&total)
 
-	return c.Render(pageNameT, fiber.Map{
-		"Title":     pageTitleT,
-		"Subtitle":  pageTitleT,
+	//fmt.Println(currencyList)
+	return c.Render("admin/developer-guide", fiber.Map{
+		"Title":     "Developer Guide",
+		"Subtitle":  "Developer Guide",
 		"Action":    "List",
 		"AlertX":    Alerts,
-		"DataList":  dataList,
+		"GuideList": guideList,
 		"AdminData": adminData,
 		"Page":      page,
 		"Limit":     limit,
@@ -58,30 +53,31 @@ func GetTemplateList(c *fiber.Ctx) error {
 	})
 }
 
-// function for Display Email Template Form
-func AddTemplateView(c *fiber.Ctx) error {
+// function for Display Developer Guide Form
+func AddGuideView(c *fiber.Ctx) error {
 
 	AdminSession(c)
 	// Session Check
 	sess, _ := store.Get(c)
 	adminData := sess.Get("AdminData")
 
-	return c.Render(pageNameT, fiber.Map{
-		"Title":     pageTitleT,
-		"Subtitle":  pageTitleT,
+	return c.Render("admin/developer-guide", fiber.Map{
+		"Title":     "Developer Guide",
+		"Subtitle":  "Developer Guide",
 		"Action":    "Add",
 		"AdminData": adminData,
 	})
 }
 
-// function for Post Add / Edit Email Template Form
-func TemplatePost(c *fiber.Ctx) error {
+// function for Post Add / Edit Developer Guide Form
+func GuidePost(c *fiber.Ctx) error {
 
 	AdminSession(c)
 	// Parses the request body
-	template_code := c.FormValue("template_code")
-	template_subject := c.FormValue("template_subject")
-	template_desc := c.FormValue("template_desc")
+	title := strings.TrimSpace(c.FormValue("title"))
+	heading := strings.TrimSpace(c.FormValue("heading"))
+	functions := strings.TrimSpace(c.FormValue("functions"))
+	used := strings.TrimSpace(c.FormValue("used"))
 	status1, err := strconv.ParseInt(c.FormValue("status"), 10, 32)
 	if err != nil {
 		fmt.Println("Error 104")
@@ -94,17 +90,17 @@ func TemplatePost(c *fiber.Ctx) error {
 		fmt.Println("Error 105")
 	}
 	getTableID := uint(cid)
-
 	//////////
+
 	// if GET ID than work update else insert
 	// for Full path use- filePath & only file name use file.Filename
-	result := database.DB.Db.Table(tableNameT).Save(&models.EmailTemplate{Template_id: getTableID, Template_code: template_code, Template_subject: template_subject, Template_desc: template_desc, Status: status})
+	result := database.DB.Db.Table("developer_guide").Save(&models.DeveloperGuide{Id: getTableID, Title: title, Heading: heading, Functions: functions, Used: used, Status: status})
 
 	//fmt.Println(loginList.Status)
-	Alerts := pageTitleT + " Processed successfully"
+	Alerts := "Developer Guide Processed successfully"
 	if result.Error != nil {
 		//fmt.Println("ERROR in QUERY")
-		Alerts = pageTitleT + " Not Updated"
+		Alerts = "Developer Guide Not Updated"
 	}
 
 	// check session
@@ -114,11 +110,11 @@ func TemplatePost(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.Redirect("/" + pageNameT)
+	return c.Redirect("/admin/add-guide")
 }
 
-// function for Display Email Template Form for Edit
-func EditTemplate(c *fiber.Ctx) error {
+// function for Post Add / Edit Developer Guide Form
+func EditGuide(c *fiber.Ctx) error {
 
 	AdminSession(c)
 	tableID := c.Params("TID")
@@ -127,20 +123,20 @@ func EditTemplate(c *fiber.Ctx) error {
 	sess, _ := store.Get(c)
 	adminData := sess.Get("AdminData")
 
-	data := models.EmailTemplate{}
-	database.DB.Db.Table(tableNameT).Where("template_id = ?", tableID).Find(&data)
+	data := models.DeveloperGuide{}
+	database.DB.Db.Table("developer_guide").Where("id = ?", tableID).Find(&data)
 
-	return c.Render(pageNameT, fiber.Map{
-		"Title":     pageTitleT,
-		"Subtitle":  pageTitleT,
+	return c.Render("admin/developer-guide", fiber.Map{
+		"Title":     "Developer Guide",
+		"Subtitle":  "Developer Guide",
 		"Action":    "Edit",
 		"AdminData": adminData,
 		"EditData":  data,
 	})
 }
 
-// function for Delete Email Template
-func DeleteTemplate(c *fiber.Ctx) error {
+// function for Developer Guide
+func DeleteGuide(c *fiber.Ctx) error {
 	AdminSession(c)
 	id := c.Params("TID")
 
@@ -153,13 +149,12 @@ func DeleteTemplate(c *fiber.Ctx) error {
 	getTableID := uint(tableID)
 
 	status := 2
-	// fetch data from db
-	result := database.DB.Db.Table(tableNameT).Save(&models.TemplateDeleted{Template_id: getTableID, Status: status})
+	result := database.DB.Db.Table("developer_guide").Save(&models.DeveloperGuideDeleted{Id: getTableID, Status: status})
 
-	Alerts := pageTitleT + " Deleted successfully"
+	Alerts := "Developer Guide Deleted successfully"
 	if result.Error != nil {
 		//fmt.Println("ERROR in QUERY")
-		Alerts = pageTitleT + " Not Deleted"
+		Alerts = "Developer Guide Not Deleted"
 	}
 
 	// check session
@@ -169,5 +164,6 @@ func DeleteTemplate(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.Redirect("/" + pageNameT)
+	return c.Redirect("/admin/developer-guide")
+
 }

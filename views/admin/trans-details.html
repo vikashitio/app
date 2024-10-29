@@ -62,7 +62,7 @@
             </div>
           </div>
 
-          {{if ne .TransData.Transaction_type "Withdraw Fee"}}
+          {{if and (ne .TransData.Transaction_type "Withdraw Fee") (ne .TransData.Transaction_type "Withdraw")}}
 
           <div class="col-md-3 my-2">
             <div class="form-floating">

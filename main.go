@@ -95,6 +95,7 @@ func main() {
 		c.Locals("LogoLight", os.Getenv("LogoLight"))     // Set Logo Path
 		c.Locals("LogoDark", os.Getenv("LogoDark"))       // Set Logo Path
 		c.Locals("FaviconIcon", os.Getenv("FaviconIcon")) // Set FaviconIcon Path
+		c.Locals("HostName", os.Getenv("HostName"))       // Set FaviconIcon Path
 
 		GetURL := c.BaseURL() // Get Base Url
 		if GetURL == "http://localhost:"+os.Getenv("PORT") {

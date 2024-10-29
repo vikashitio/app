@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"template/database"
 	"template/models"
@@ -29,30 +30,14 @@ func GetCryptoCurrencyList(c *fiber.Ctx) error {
 	}
 
 	// Get query parameters for page and limit
-	page, err := strconv.Atoi(c.Query("page", "1"))
-	if err != nil || page < 1 {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid page number")
-	}
-	limit, err := strconv.Atoi(c.Query("limit", "100"))
-	if err != nil || limit < 1 {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid limit number")
-	}
-
-	// Calculate offset
+	page, _ := strconv.Atoi(c.Query("page", "1"))
+	limit, _ := strconv.Atoi(c.Query("limit", os.Getenv("PagingSize")))
 	offset := (page - 1) * limit
 
 	currencyList := []models.CryptoCurrencyList{}
 
 	var total int64
 	database.DB.Db.Table("crypto_currency").Order("crypto_network_short ASC,crypto_code ASC").Limit(limit).Offset(offset).Find(&currencyList).Count(&total)
-
-	//fmt.Println(total)
-	// Prepare pagination data
-	nextPage := page + 1
-	prevPage := page - 1
-	if page == 1 {
-		prevPage = 0
-	}
 
 	//fmt.Println(currencyList)
 	return c.Render("admin/crypto-currency", fiber.Map{
@@ -62,10 +47,9 @@ func GetCryptoCurrencyList(c *fiber.Ctx) error {
 		"AlertX":       Alerts,
 		"CurrencyList": currencyList,
 		"AdminData":    adminData,
-		"NextPage":     nextPage,
-		"PrevPage":     prevPage,
+		"Page":         page,
 		"Limit":        limit,
-		"Count":        total,
+		"Total":        total,
 	})
 }
 

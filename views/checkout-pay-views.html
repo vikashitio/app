@@ -37,7 +37,7 @@
               <table class="table bordered-table mb-0">
                 <thead>
                   <tr>
-                    <th>1x {{.InvoiceData.Product_name}}</th>
+                    <th>{{.InvoiceData.Product_name}}</th>
                     <th class="text-end">{{.InvoiceData.Requestedcurrency}} {{.InvoiceData.Requestedamount}}</th>
                   </tr>
                 </thead>
@@ -197,7 +197,7 @@
                     <div class="card-body">
                                       
                         <div id="statusbtn" class="text-end my-2" style="display: none;"><a id="failedlink" href="/success" class="btn btn-sm rounded-pill btn-outline-danger mx-1">Failed Transaction</a> <a id="successlink" href="/success-transaction" class="btn btn-sm rounded-pill btn-outline-success mx-1">Success Transaction</a></div>
-                      <div id="replyButton" class="text-end my-2"><button type="button" class="btn btn-sm rounded-pill btn-outline-primary returnsecond"><i class="fa-solid fa-reply fa-fw mx-2"></i> Return</button></div> 
+                      <div id="replyButton" class="text-end my-2 float-end" style="width: 80px;"><button type="button" class="btn btn-sm rounded-pill btn-outline-primary returnsecond"><i class="fa-solid fa-reply fa-fw mx-2"></i> Return</button></div> 
                     
                   </div>
                   </div>
@@ -215,7 +215,7 @@
 <script src="/views/js/dist/jquery-qrcode.js"></script>
 <script src="/views/js/dist/checkout.js"></script>
 
- <script>
+<script>
  
  const invoiceEmail="{{.InvoiceData.Email}}";
  const invoiceName="{{.InvoiceData.Name}}";
@@ -227,8 +227,8 @@
                 $('#customeremail').val(get_sender_email);
                 $('.savecontact').trigger("click");
             }else if (invoiceEmail && invoiceName) {
-                $('#customername').val(invoiceEmail);
-                $('#customeremail').val(invoiceName);
+                $('#customername').val(invoiceName);
+                $('#customeremail').val(invoiceEmail);
                 $('.savecontact').trigger("click");
             }
 

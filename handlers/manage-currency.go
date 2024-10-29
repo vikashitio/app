@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"template/database"
 	"template/models"
@@ -13,8 +14,8 @@ import (
 var tableName = "currency"
 var pageName = "admin/currency"
 var pageTitle = "Currency"
-var listSize = "10"
-var listOrderBy = "status ASC,currency_code ASC"
+var listSize = "50"
+var listOrderBy = "currency_id ASC"
 
 // For Add / Edit / Delete  Currency from Admin Section
 
@@ -35,30 +36,14 @@ func GetCurrencyList(c *fiber.Ctx) error {
 	}
 
 	// Get query parameters for page and limit
-	page, err := strconv.Atoi(c.Query("page", "1"))
-	if err != nil || page < 1 {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid page number")
-	}
-	limit, err := strconv.Atoi(c.Query("limit", listSize))
-	if err != nil || limit < 1 {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid limit number")
-	}
-
-	// Calculate offset
+	page, _ := strconv.Atoi(c.Query("page", "1"))
+	limit, _ := strconv.Atoi(c.Query("limit", os.Getenv("PagingSize")))
 	offset := (page - 1) * limit
 
 	currencyList := []models.CurrencyList{}
 
 	var total int64
 	database.DB.Db.Table(tableName).Order(listOrderBy).Limit(limit).Offset(offset).Find(&currencyList).Count(&total)
-
-	//fmt.Println(total)
-	// Prepare pagination data
-	nextPage := page + 1
-	prevPage := page - 1
-	if page == 1 {
-		prevPage = 0
-	}
 
 	//fmt.Println(currencyList)
 	return c.Render(pageName, fiber.Map{
@@ -68,10 +53,9 @@ func GetCurrencyList(c *fiber.Ctx) error {
 		"AlertX":       Alerts,
 		"CurrencyList": currencyList,
 		"AdminData":    adminData,
-		"NextPage":     nextPage,
-		"PrevPage":     prevPage,
+		"Page":         page,
 		"Limit":        limit,
-		"Count":        total,
+		"Total":        total,
 	})
 }
 

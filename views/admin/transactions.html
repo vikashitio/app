@@ -77,6 +77,11 @@
                       <div class="accordion-body border border-warning rounded ">
                         <div class="row">
                           <div class="col-sm-6 my-1"><strong>Transaction ID :</strong> {{.Transaction_id}}</div>
+                          {{if .Order_id}}
+                                          <div class="col-sm-6 my-1"><strong>Order ID :</strong> {{.Order_id}}</div>
+                                          {{end}}
+                                          <div class="col-sm-6 my-1"><strong>Reference ID :</strong> {{.Customerrefid}}</div>
+                                          
                           <div class="col-sm-6 my-1"><strong>Timestamp :</strong> {{.Createdate}}</div>
                           <div class="col-sm-6 my-1"><strong>Destination address :</strong> {{.Destinationaddress}}</div>
                           <div class="col-sm-6 my-1"><strong>Assetid :</strong><span class=" text-uppercase">{{.Assetid}}</span></div>
@@ -97,13 +102,15 @@
                 {{end}}
                 <tr>
                   <td class="text-end fs-6 mx-2" colspan="10"> 
+
+                  <span class="mt-1 font-monospace mx-2 float-start" > Page [{{ .Page }}] Total {{ .Total }}   </span>
                     {{ if gt .Page 1 }}
-                   <a href="?page={{ sub .Page 1 }}&searchKey={{ .SearchKey }}&searchBy={{ .SearchBy }}&status={{ .Status }}&date_1st={{ .Date_1st }}&date_2nd={{ .Date_2nd }}&limit={{ .Limit }}"><i class="fa-solid fa-backward" title="Previous Page"></i></a>
-                    {{ end }}
-                    <span class="font-monospace" > Page {{ .Page }} Total {{ .Total }}  </span>
-                    {{ if lt (mul .Page .Limit) .Total }}
-                    <a href="?page={{ add .Page 1 }}&searchKey={{ .SearchKey }}&searchBy={{ .SearchBy }}&status={{ .Status }}&date_1st={{ .Date_1st }}&date_2nd={{ .Date_2nd }}&limit={{ .Limit }}"><i class="fa-solid fa-forward" title="Next Page"></i></a>
-                    {{ end }}
+                  &nbsp;<a href="?page={{ sub .Page 1 }}&searchKey={{ .SearchKey }}&searchBy={{ .SearchBy }}&status={{ .Status }}&date_1st={{ .Date_1st }}&date_2nd={{ .Date_2nd }}&limit={{ .Limit }}" class="mx-1 float-start btn btn-outline-primary btn-sm"><i class="fa-solid fa-angles-left"></i></a>
+                   {{ end }}
+                  
+                   {{ if lt (mul .Page .Limit) .Total }}
+                   &nbsp;<a href="?page={{ add .Page 1 }}&searchKey={{ .SearchKey }}&searchBy={{ .SearchBy }}&status={{ .Status }}&date_1st={{ .Date_1st }}&date_2nd={{ .Date_2nd }}&limit={{ .Limit }}" class="mx-1 float-start btn btn-outline-primary btn-sm"><i class="fa-solid fa-angles-right"></i></a>
+                  {{ end }}
 
                   </td>
                   

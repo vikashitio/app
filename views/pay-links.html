@@ -33,7 +33,7 @@
             </div>
             
             {{end}}
-            {{if ge  .Count 1}}
+            {{if ge  .Total 1}}
             <div class="accordion m-2" id="accordionExample">
           <div class="table-responsive scroll-sm">
             <table class="table table-centered table-nowrap mb-0 bordered-table xsm-table">
@@ -65,13 +65,14 @@
                 {{end}}
                 <tr>
                   <td class="text-end fs-6 mx-2" colspan="8"> 
-                    {{if .NextPage}}
-                    <a href="?page={{.NextPage}}&limit={{.Limit}}" class="mx-4 float-end" title="Next"><iconify-icon icon="zondicons:forward" width="32" height="32"></iconify-icon></a>
-                {{end}}
-                {{if .Count}} <span class="mt-1 float-end mx-4 my-4"> Record : {{.Count}} </span>{{end}}
-                {{if .PrevPage}}
-                <a href="?page={{.PrevPage}}&limit={{.Limit}}" class="mx-4 float-end" title="Previous"><iconify-icon icon="zondicons:backward" width="32" height="32"></iconify-icon></a>
-                {{end}}
+                    <span class="mt-1 font-monospace mx-4 float-start" > Page [{{ .Page }}] Total {{ .Total }}  </span>
+                    {{ if gt .Page 1 }}
+                  &nbsp;<a href="?page={{ sub .Page 1 }}&limit={{ .Limit }}" class="mx-4 float-start"><iconify-icon icon="zondicons:backward" width="32" height="32" title="Previous Page"></iconify-icon></a>
+                   {{ end }}
+                  
+                   {{ if lt (mul .Page .Limit) .Total }}
+                   &nbsp;<a href="?page={{ add .Page 1 }}&limit={{ .Limit }}" class="mx-4 float-start"><iconify-icon icon="zondicons:forward" width="32" height="32" title="Next Page"></iconify-icon></a>
+                  {{ end }}
 
 
                   </td>

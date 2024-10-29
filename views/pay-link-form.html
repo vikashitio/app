@@ -52,10 +52,10 @@
                               <div class="mb-20">  
                                 <label for="price_amount" class="fw-semibold mb-8 text-primary-light">Fiat Amount</label>
                                 <div class="input-group input-group-lg border input-form-light radius-8">
-                                    <input type="text" class="form-control bg-base border-0 radius-8" id="price_amount" name="price_amount" placeholder="Fiat Amount" required>
+                                    <input type="number" min="0.01" max="10000000" step="0.01" class="form-control bg-base border-0 radius-8" id="price_amount" name="price_amount" placeholder="Fiat Amount" required>
                                     <div class="input-group-text bg-neutral-50 border-0 fw-normal text-md ps-1 pe-1">
                                         <select class="form-select form-select-sm w-auto bg-transparent fw-bolder border-0 text-secondary-light" name="price_currency" id="price_currency" title="Fiat Currency" required="">
-                                          <option value="" >Select</option>
+                                          <!-- <option value="" >Select</option> -->
                                           {{range .CurrencyList}}
                                           <option value="{{.Currency_code}}" >{{.Currency_code}}</option>
                                           {{end}}
@@ -89,8 +89,8 @@
                           <p class="my-2"></p>
                             <h6 class="mb-2 fw-bold text-lg mb-0"> <i class="ri-checkbox-circle-line text-success" ></i> You're all set</h6>
                             <p class="my-2">You can start accepting payments for this product</p>
-                            <div class="col-sm-10"><span class="btn btn-sm btn-outline-warning float-start my-4 py-4" title="Pay Link : " id="copyAPI">{{.PayLink}}</span></div>
-                            <div class="col-sm-2"><iconify-icon icon="solar:copy-bold" class="float-start text-warning  mt-4" width="32" height="32" title="Click to copy" onclick="CopyToClipboard('#copyAPI')"></iconify-icon></div>
+                            <div class="col-sm-10"><span class="btn btn-sm btn-outline-primary float-start my-4 py-4" title="Pay Link : " id="copyAPI">{{.PayLink}}</span></div>
+                            <div class="col-sm-2"><iconify-icon icon="solar:copy-bold" class="float-start text-primary  mt-4" width="32" height="32" title="Click to copy" onclick="CopyToClipboard('#copyAPI')"></iconify-icon></div>
                             <p class="my-2">Share a link to our pre-built checkout page</p> 
                           </div>
                           {{else}}
