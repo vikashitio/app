@@ -14,7 +14,6 @@ import (
 var tableName = "currency"
 var pageName = "admin/currency"
 var pageTitle = "Currency"
-var listSize = "50"
 var listOrderBy = "currency_id ASC"
 
 // For Add / Edit / Delete  Currency from Admin Section

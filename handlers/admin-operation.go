@@ -35,9 +35,13 @@ func AdminLoginView(c *fiber.Ctx) error {
 	if Alerts != "" {
 		sess.Delete("AlertX")
 		if err := sess.Save(); err != nil {
-			panic(err)
+			fmt.Println("Error Log1002 => ", err)
 		}
 	}
+	//adminData := sess.Get("AdminData")
+	//if adminData != nil {
+	//return c.Redirect("/admin/") // if login redirect to dashboard
+	//}
 
 	return c.Render("admin/login", fiber.Map{
 		"Title":  "Web Admin - Sign in",
@@ -73,8 +77,11 @@ func AdminLoginPost(c *fiber.Ctx) error {
 			err := bcrypt.CompareHashAndPassword([]byte(loginList.Password), []byte(getAdminPassword))
 			if err == nil {
 				loginIp := c.Context().RemoteIP().String()
-				qry := models.LoginHistory{Client_id: loginList.Admin_id, Login_ip: loginIp, Login_type: 2}
-				result := database.DB.Db.Table("login_history").Select("client_id", "login_ip", "login_type").Create(&qry)
+				// Format the current time as a string
+				login_time := time.Now().Format("2006-01-02 15:04:05")
+				qry := models.LoginHistory{Client_id: loginList.Admin_id, Login_ip: loginIp, Login_type: 2, Login_time: login_time}
+				result := database.DB.Db.Table("login_history").Select("client_id", "login_ip", "login_type", "login_time").Create(&qry)
+				fmt.Println("Token_id    ", qry.Token_id)
 				if result.Error != nil {
 					fmt.Println(result.Error)
 				}
@@ -84,12 +91,16 @@ func AdminLoginPost(c *fiber.Ctx) error {
 				if err != nil {
 					return err
 				}
+
 				sess.Set("AdminData", map[string]interface{}{
 					"AdminName":  loginList.Full_name,
 					"AdminEmail": getAdminUserName,
 					"AdminID":    loginList.Admin_id,
 					"AdminRole":  loginList.Role,
 				})
+
+				sess.Set("AdminLoginToken_id", qry.Token_id)
+
 				if err := sess.Save(); err != nil {
 					return err
 				}
@@ -154,6 +165,20 @@ func AdminLogOut(c *fiber.Ctx) error {
 	if err != nil {
 		panic(err)
 	}
+
+	if sess.Get("AdminLoginToken_id") != nil {
+		AdminLoginToken_id := sess.Get("AdminLoginToken_id").(uint)
+		//fmt.Println("Logout ID = >", AdminLoginToken_id)
+		// Format the current time as a string
+		logout_time := time.Now().Format("2006-01-02 15:04:05")
+		result := database.DB.Db.Table("login_history").Save(&models.LoginHistoryUpdate{Token_id: AdminLoginToken_id, Logout_time: logout_time})
+		if result.Error != nil {
+			fmt.Println("ERROR in QUERY")
+
+		}
+		sess.Delete("LoginToken_id")
+	}
+
 	sess.Delete("AdminData")
 
 	// Destroy session
@@ -458,7 +483,7 @@ func FeesPost(c *fiber.Ctx) error {
 	}
 	//////////
 
-	Alerts := " Fees Processed successfully"
+	Alerts := " Fee imposed Successfully"
 	if result.Error != nil {
 		fmt.Println("ERROR in QUERY", result.Error)
 		Alerts = "Fees Not Updated"

@@ -1,4 +1,24 @@
 {{template "partials/header" .}}
+<style>
+  /* Optional styling */
+  select {
+    width: 250px;
+    padding: 5px;
+    font-size: 16px;
+  }
+
+  option {
+    padding: 5px;
+    display: flex;
+    align-items: center;
+  }
+
+  .currency-option img {
+    margin-right: 8px;
+    width: 20px;
+    height: 20px;
+  }
+</style>
 <div class="dashboard-main-body">
 
   <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
@@ -57,7 +77,7 @@
                                         <select class="form-select form-select-sm w-auto bg-transparent fw-bolder border-0 text-secondary-light" name="price_currency" id="price_currency" title="Fiat Currency" required="">
                                           <!-- <option value="" >Select</option> -->
                                           {{range .CurrencyList}}
-                                          <option value="{{.Currency_code}}" >{{.Currency_code}}</option>
+                                          <option class="currency-option" value="{{.Currency_code}}" ><img src="http://localhost:3000/views/images/btc.png" alt="AUD"> {{.Currency_code}}</option>
                                           {{end}}
                                         </select>
                                     </div>

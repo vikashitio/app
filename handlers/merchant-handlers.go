@@ -25,14 +25,22 @@ func init() {
 
 // For Display Login form
 func LoginView(c *fiber.Ctx) error {
-	c.Set("Cache-Control", "no-store")
+	//c.Set("Cache-Control", "no-store")
 	s, _ := store.Get(c)
 	Alerts := s.Get("Alert")
 	if Alerts != "" {
 		s.Delete("Alert")
 		if err := s.Save(); err != nil {
-			panic(err)
+			//panic(err)
+			fmt.Println("Error Log1001 => ", err)
 		}
+	}
+
+	s, _ = store.Get(c)
+	merchantData := s.Get("MerchantData")
+	if merchantData != nil {
+		//fmt.Println("Logged User")
+		return c.Redirect("/")
 	}
 
 	return c.Render("login", fiber.Map{})
@@ -45,11 +53,12 @@ func LoginPost(c *fiber.Ctx) error {
 	getPassword := c.FormValue("password")
 
 	//fmt.Println(getUserName, getPassword)
+
 	Alerts := ""
 	loginList := models.LoginList{}
 	result := database.DB.Db.Table("client_master").Where("status = ? AND username = ?", 1, getUserName).Find(&loginList)
 
-	fmt.Println("Login Details", loginList)
+	//fmt.Println("Login Details", loginList)
 
 	if result.Error != nil {
 		//fmt.Println("ERROR in QUERY")
@@ -97,15 +106,18 @@ func LoginPost(c *fiber.Ctx) error {
 					"MerchantLoginIP":      loginIp,
 				})
 
+				// Format the current time as a string
+				login_time := time.Now().Format("2006-01-02 15:04:05")
+				qry := models.LoginHistory{Client_id: loginList.Client_id, Login_ip: loginIp, Login_time: login_time}
+				result := database.DB.Db.Table("login_history").Select("client_id", "login_ip", "login_time").Create(&qry)
+				fmt.Println("Token_id    ", qry.Token_id)
+				if result.Error != nil {
+					fmt.Println(result.Error)
+				}
+				s.Set("LoginToken_id", qry.Token_id)
 				//Save sessions
 				if err := s.Save(); err != nil {
 					panic(err)
-				}
-
-				qry := models.LoginHistory{Client_id: loginList.Client_id, Login_ip: loginIp}
-				result := database.DB.Db.Table("login_history").Select("client_id", "login_ip").Create(&qry)
-				if result.Error != nil {
-					fmt.Println(result.Error)
 				}
 
 				return c.Redirect("/")
@@ -132,6 +144,19 @@ func LogOut(c *fiber.Ctx) error {
 	s, err := store.Get(c)
 	if err != nil {
 		panic(err)
+	}
+
+	if s.Get("LoginToken_id") != nil {
+		LoginToken_id := s.Get("LoginToken_id").(uint)
+		fmt.Println("Logout ID = >", LoginToken_id)
+		// Format the current time as a string
+		logout_time := time.Now().Format("2006-01-02 15:04:05")
+		result := database.DB.Db.Table("login_history").Save(&models.LoginHistoryUpdate{Token_id: LoginToken_id, Logout_time: logout_time})
+		if result.Error != nil {
+			fmt.Println("ERROR in QUERY")
+
+		}
+		s.Delete("LoginToken_id")
 	}
 
 	s.Delete("LoginMerchantID")
@@ -668,6 +693,11 @@ func ResetPasswordPost(c *fiber.Ctx) error {
 		if result.Error != nil {
 			//fmt.Println("ERROR in QUERY")
 			Alerts = "Password Not Updated"
+		} else {
+			qrs := " Change Password request : New Password :" + password
+			updateIp := c.Context().RemoteIP().String()
+			function.UpdateMerchantHistory("RequestPass", qrs, updateIp, loginList.Client_id)
+
 		}
 		//  Email///
 		template_code := "RESTORE-PASSWORD"
@@ -973,12 +1003,16 @@ func ChangePasswordPost(c *fiber.Ctx) error {
 		// if GET ID than work update else insert
 		// for Full path use- filePath & only file name use file.Filename
 		result := database.DB.Db.Table("client_master").Save(&models.ClientPassword{Client_id: getTableID, Password: string(hash)})
-
+		qrs := "Change Password"
 		//fmt.Println(loginList.Status)
 		Alerts = "Password update successfully"
 		if result.Error != nil {
 			//fmt.Println("ERROR in QUERY")
 			Alerts = "Password Not Updated"
+		} else {
+
+			updateIp := c.Context().RemoteIP().String()
+			function.UpdateMerchantHistory("Password", qrs, updateIp, getTableID)
 		}
 	} else {
 		Alerts = "Password and confirm password not matched"
@@ -1013,6 +1047,14 @@ func StorePost(c *fiber.Ctx) error {
 	getTableID := uint(cid)
 	webhookurl := c.FormValue("webhookurl")
 	return_url := c.FormValue("return_url")
+	successmargin := c.FormValue("success_margin")
+
+	//convert value from string to float
+	success_margin, err := strconv.ParseFloat(successmargin, 64)
+	if err != nil {
+		fmt.Printf("Error converting form value to float: %v", err)
+	}
+
 	Alerts := ""
 
 	Client_id := s.Get("LoginMerchantID").(uint) //c.FormValue("tableID")
@@ -1020,13 +1062,16 @@ func StorePost(c *fiber.Ctx) error {
 	//////////
 	// if GET ID than work update else insert
 	// for Full path use- filePath & only file name use file.Filename
-	result := database.DB.Db.Table("client_store").Save(&models.ClientStore{ID: getTableID, Client_id: Client_id, Webhookurl: webhookurl, Return_url: return_url})
-
+	result := database.DB.Db.Table("client_store").Save(&models.ClientStore{ID: getTableID, Client_id: Client_id, Webhookurl: webhookurl, Return_url: return_url, Success_margin: success_margin})
+	qrs := " Webhookurl: " + webhookurl + " Return_url: " + return_url + " Success_margin: " + strconv.FormatFloat(success_margin, 'f', 2, 64)
 	//fmt.Println(loginList.Status)
-	Alerts = "Webhook update successfully"
+	Alerts = "Store data update successfully"
 	if result.Error != nil {
 		//fmt.Println("ERROR in QUERY")
-		Alerts = "Webhook Not Updated"
+		Alerts = "Store data Not Updated"
+	} else {
+		updateIp := c.Context().RemoteIP().String()
+		function.UpdateMerchantHistory("Store", qrs, updateIp, Client_id)
 	}
 
 	// check session
@@ -1124,11 +1169,14 @@ func ProfilePost(c *fiber.Ctx) error {
 	//"Profile_image"
 
 	result := database.DB.Db.Table("client_details").Save(&models.ProfileData{Client_id: LoginMerchantID, Gender: getGender, BirthDate: getBirthDate, CountryCode: getCountryCode, Mobile: getMobile, AddressLine1: getAddressLine1, AddressLine2: getAddressLine2, City: getCity, State: getState, Country: getCountry, Pincode: getPincode, Profile_image: filename})
-
+	qrs := " Gender: " + getGender + " BirthDate: " + getBirthDate + " CountryCode: " + getCountryCode + " Mobile: " + getMobile + " AddressLine1: " + getAddressLine1 + " AddressLine2: " + getAddressLine2 + " City: " + getCity + " State: " + getState + " Country: " + getCountry + " Pincode: " + getPincode + " Profile_image:" + filename
 	Alerts := "Profile Updated successfully"
 	if result.Error != nil {
 		//fmt.Println("ERROR in QUERY")
 		Alerts = "Profile Not Updated"
+	} else {
+		updateIp := c.Context().RemoteIP().String()
+		function.UpdateMerchantHistory("Profile", qrs, updateIp, LoginMerchantID)
 	}
 
 	s.Set("Alert", Alerts)
@@ -1344,4 +1392,165 @@ func GetNetwork(c *fiber.Ctx) error {
 		return c.JSON(networks)
 	}
 
+}
+
+func MerchantSocialLogin(c *fiber.Ctx) error {
+
+	s, _ := store.Get(c)
+
+	Alerts := ""
+	getEmail := s.Get("SocialMerchantEmail").(string)
+	getName := s.Get("SocialMerchantName").(string)
+	resource := s.Get("SocialType").(string)
+
+	loginList := models.LoginList{}
+	result := database.DB.Db.Table("client_master").Where("username = ?", getEmail).Find(&loginList)
+	if result.Error != nil {
+		fmt.Println(result.Error)
+	}
+
+	receivedId := loginList.Client_id
+
+	if receivedId == 0 {
+		// END Find Duplicate Email in DB
+
+		var password = function.PasswordGenerator(8)
+		//fmt.Println(password)
+
+		var hash []byte
+		// func GenerateFromPassword(password []byte, cost int) ([]byte, error)
+		hash, _ = bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+
+		qry := models.Client_Master{Username: getEmail, Password: string(hash), Full_name: getName, Status: 1, Resource: resource}
+		result = database.DB.Db.Table("client_master").Select("username", "full_name", "password", "status", "resource").Create(&qry)
+
+		if result.Error != nil {
+			fmt.Println(result.Error)
+		} else {
+			//fmt.Println(result.RowsAffected)
+			//fmt.Println(qry.Client_id)
+			ClientID := qry.Client_id
+
+			MyData := struct {
+				Client_id uint `json:"name"`
+			}{
+				Client_id: ClientID,
+			}
+			result = database.DB.Db.Table("client_details").Select("client_id").Create(&MyData)
+			if result.Error != nil {
+				fmt.Println(result.Error)
+			}
+			//  Email///
+			template_code := "SIGNUP-TO-MEMBER"
+
+			emailData := models.EmailData{FullName: getName, Email: getEmail, UserName: getEmail, Password: password}
+
+			err := function.SendEmail(template_code, emailData)
+			if err != nil {
+				fmt.Println("issue sending verification email")
+			}
+			fmt.Print("Email Error 3")
+			s, _ := store.Get(c)
+
+			loginIp := c.Context().RemoteIP().String()
+			// Set key/value
+			s.Set("LoginMerchantName", getName)
+			s.Set("LoginMerchantID", ClientID)
+			s.Set("LoginMerchantEmail", getEmail)
+			s.Set("LoginVoltID", "")
+			s.Set("LoginMerchantStatus", 1)
+
+			s.Set("MerchantData", map[string]interface{}{
+				"MerchantName":    getName,
+				"MerchantEmail":   getEmail,
+				"MerchantID":      ClientID,
+				"MerchantStatus":  1,
+				"MerchantLoginIP": loginIp,
+			})
+
+			// check session
+			Alerts = "Your login details have been sent to your registered email. Please check your inbox and complete your profile to enjoy full access to our features. Completing your profile helps us serve you better!"
+			s.Set("Alert", Alerts) // Set a session key
+			if err := s.Save(); err != nil {
+				return err
+			}
+
+			return c.Redirect("/profile")
+
+		}
+
+	} else {
+		//Login Process
+		loginList := models.LoginList{}
+		result := database.DB.Db.Table("client_master").Where("status = ? AND username = ?", 1, getEmail).Find(&loginList)
+
+		//fmt.Println("Login Details", loginList)
+
+		if result.Error != nil {
+			//fmt.Println("ERROR in QUERY")
+			Alerts = "ERROR in QUERY"
+		}
+
+		if result.RowsAffected == 1 {
+
+			if loginList.Status != 1 {
+				//fmt.Println("Account Not Activate / Deleted")
+			} else {
+
+				s, _ := store.Get(c)
+				if loginList.Totp_status == 1 {
+					s.Set("LoginMerchantName", loginList.Full_name)
+					s.Set("LoginMerchantEmail", getEmail)
+					s.Set("LoginMerchantID", loginList.Client_id)
+					//Save sessions
+					if err := s.Save(); err != nil {
+						panic(err)
+					}
+					return c.Redirect("/verify-2fa")
+				}
+
+				// Set key/value
+				loginIp := c.Context().RemoteIP().String()
+				s.Set("LoginMerchantName", loginList.Full_name)
+				s.Set("LoginMerchantID", loginList.Client_id)
+
+				s.Set("LoginMerchantEmail", getEmail)
+				s.Set("LoginMerchantStatus", loginList.Status)
+				s.Set("LoginMerchantSecret", loginList.Totp_secret)
+				s.Set("LoginMerchantGoogleStatus", loginList.Totp_status)
+				s.Set("LoginMerchantUserAgent", loginList.User_agent)
+
+				s.Set("MerchantData", map[string]interface{}{
+					"MerchantName":         loginList.Full_name,
+					"MerchantEmail":        getEmail,
+					"MerchantID":           loginList.Client_id,
+					"MerchantStatus":       loginList.Status,
+					"MerchantSecret":       loginList.Totp_secret,
+					"MerchantGoogleStatus": loginList.Totp_status,
+					"MerchantUserAgent":    loginList.User_agent,
+					"MerchantLoginIP":      loginIp,
+				})
+
+				//Save sessions
+				if err := s.Save(); err != nil {
+					panic(err)
+				}
+
+				qry := models.LoginHistory{Client_id: loginList.Client_id, Login_ip: loginIp, Resource: resource}
+				result := database.DB.Db.Table("login_history").Select("client_id", "login_ip", "resource").Create(&qry)
+				if result.Error != nil {
+					fmt.Println(result.Error)
+				}
+
+				return c.Redirect("/")
+
+			}
+
+		} else {
+			Alerts = "Account Not Found / Deactivated"
+
+		}
+	}
+
+	return nil
 }
