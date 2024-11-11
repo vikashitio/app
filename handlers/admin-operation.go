@@ -35,9 +35,13 @@ func AdminLoginView(c *fiber.Ctx) error {
 	if Alerts != "" {
 		sess.Delete("AlertX")
 		if err := sess.Save(); err != nil {
-			panic(err)
+			fmt.Println("Error Log1002 => ", err)
 		}
 	}
+	//adminData := sess.Get("AdminData")
+	//if adminData != nil {
+	//return c.Redirect("/admin/") // if login redirect to dashboard
+	//}
 
 	return c.Render("admin/login", fiber.Map{
 		"Title":  "Web Admin - Sign in",
@@ -73,8 +77,11 @@ func AdminLoginPost(c *fiber.Ctx) error {
 			err := bcrypt.CompareHashAndPassword([]byte(loginList.Password), []byte(getAdminPassword))
 			if err == nil {
 				loginIp := c.Context().RemoteIP().String()
-				qry := models.LoginHistory{Client_id: loginList.Admin_id, Login_ip: loginIp, Login_type: 2}
-				result := database.DB.Db.Table("login_history").Select("client_id", "login_ip", "login_type").Create(&qry)
+				// Format the current time as a string
+				login_time := time.Now().Format("2006-01-02 15:04:05")
+				qry := models.LoginHistory{Client_id: loginList.Admin_id, Login_ip: loginIp, Login_type: 2, Login_time: login_time}
+				result := database.DB.Db.Table("login_history").Select("client_id", "login_ip", "login_type", "login_time").Create(&qry)
+				fmt.Println("Token_id    ", qry.Token_id)
 				if result.Error != nil {
 					fmt.Println(result.Error)
 				}
@@ -84,12 +91,16 @@ func AdminLoginPost(c *fiber.Ctx) error {
 				if err != nil {
 					return err
 				}
+
 				sess.Set("AdminData", map[string]interface{}{
 					"AdminName":  loginList.Full_name,
 					"AdminEmail": getAdminUserName,
 					"AdminID":    loginList.Admin_id,
 					"AdminRole":  loginList.Role,
 				})
+
+				sess.Set("AdminLoginToken_id", qry.Token_id)
+
 				if err := sess.Save(); err != nil {
 					return err
 				}
@@ -154,6 +165,20 @@ func AdminLogOut(c *fiber.Ctx) error {
 	if err != nil {
 		panic(err)
 	}
+
+	if sess.Get("AdminLoginToken_id") != nil {
+		AdminLoginToken_id := sess.Get("AdminLoginToken_id").(uint)
+		//fmt.Println("Logout ID = >", AdminLoginToken_id)
+		// Format the current time as a string
+		logout_time := time.Now().Format("2006-01-02 15:04:05")
+		result := database.DB.Db.Table("login_history").Save(&models.LoginHistoryUpdate{Token_id: AdminLoginToken_id, Logout_time: logout_time})
+		if result.Error != nil {
+			fmt.Println("ERROR in QUERY")
+
+		}
+		sess.Delete("LoginToken_id")
+	}
+
 	sess.Delete("AdminData")
 
 	// Destroy session
@@ -302,8 +327,8 @@ func AdminMembersDetailsView(c *fiber.Ctx) error {
 	MID := c.Params("MID")
 
 	memberList := models.MemberDetails{}
-	database.DB.Db.Table("client_master as a ").Select("a.client_id, a.Username, a.Full_name,a.status,a.timestamp, b.title, b.gender, b.country_code, b.mobile, b.address_line1, b.address_line2").Joins("join client_details as b on b.client_id = a.client_id AND b.client_id=?", MID).Find(&memberList)
-
+	database.DB.Db.Table("client_master as a ").Select("a.client_id, a.Username, a.Full_name,a.status,a.timestamp, b.title, b.gender, b.country_code, b.mobile, b.birth_date, b.address_line1, b.address_line2").Joins("join client_details as b on b.client_id = a.client_id AND b.client_id=?", MID).Find(&memberList)
+	//fmt.Println("=======>", memberList)
 	feeList := models.FeesDetails{}
 	database.DB.Db.Table("client_fees").Where("client_id = ? ", MID).Find(&feeList)
 
@@ -427,6 +452,51 @@ func SupportTicketListing(c *fiber.Ctx) error {
 	})
 }
 
+// Function for Support Ticket Listing - Admin
+func AdminMemberLogs(c *fiber.Ctx) error {
+
+	AdminSession(c)
+	sess, _ := store.Get(c)
+	adminData := sess.Get("AdminData")
+	// Get query parameters for page and limit
+	page, _ := strconv.Atoi(c.Query("page", "1"))
+	mid, _ := strconv.Atoi(c.Query("mid"))
+	//fmt.Println("Mid => ", mid)
+	limit, _ := strconv.Atoi(c.Query("limit", os.Getenv("PagingSize")))
+	offset := (page - 1) * limit
+
+	logsList := []models.UpdateHistory{}
+	if mid == 0 {
+		database.DB.Db.Table("update_history").Order("update_id DESC").Limit(limit).Offset(offset).Find(&logsList)
+	} else {
+		database.DB.Db.Table("update_history").Where("client_id = ?", mid).Order("update_id DESC").Limit(limit).Offset(offset).Find(&logsList)
+	}
+
+	var total int64
+	database.DB.Db.Table("update_history").Count(&total)
+
+	Alerts := sess.Get("AlertX")
+	if Alerts != "" {
+		sess.Delete("AlertX")
+		if err := sess.Save(); err != nil {
+			panic(err)
+		}
+	}
+
+	//fmt.Println(transactionList)
+	return c.Render("admin/merchant-logs", fiber.Map{
+		"Title":     "Merchant Logs",
+		"Subtitle":  "Merchant Logs",
+		"AlertX":    Alerts,
+		"AdminData": adminData,
+		"LogsList":  logsList,
+		"Page":      page,
+		"Limit":     limit,
+		"Total":     total,
+		"Mid":       mid,
+	})
+}
+
 // function for Post Add / Edit Fees
 func FeesPost(c *fiber.Ctx) error {
 
@@ -458,7 +528,7 @@ func FeesPost(c *fiber.Ctx) error {
 	}
 	//////////
 
-	Alerts := " Fees Processed successfully"
+	Alerts := " Fee imposed Successfully"
 	if result.Error != nil {
 		fmt.Println("ERROR in QUERY", result.Error)
 		Alerts = "Fees Not Updated"

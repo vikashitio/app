@@ -15,7 +15,7 @@
                 <h4 class="mb-12">Sign In to your Account</h4>
                 <p class="mb-32 text-secondary-light text-lg">Welcome back! please enter your detail</p>
                 {{if .Alert}}
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
           <iconify-icon icon="mdi:alert-circle-outline" class="icon text-xl float-start mx-2 mt-2"></iconify-icon>
           <strong class="float-start mx-2"></iconify-icon> {{.Alert}}</strong>
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -57,7 +57,13 @@
 
              
                 <div class="mt-32 text-center text-sm">
-                    <p class="mb-0">Don’t have an account? <a href="/registration" class="text-primary-600 fw-semibold">Sign Up</a></p>
+                    <div class="float-start w-50" style="margin-top: 10px;">Don’t have an account? <a href="/registration" class="text-primary-600 fw-semibold">Sign Up</a></div>
+                    <div class="float-end w-50"><span class="mx-1" title="Facebook"> sign in with : </span>
+                        <span class="mx-1" title="Facebook"><a class="fb-btn pt-2" href="/auth/facebook?provider=facebook"><iconify-icon icon="mage:facebook-circle" width="24" height="24"  style="color:#0a66c2"></iconify-icon></a></span>
+                        <span class="mx-1" title="Google"><a class="text-danger pt-2" href="/auth/google"><iconify-icon icon="mage:google" width="24" height="24"  style="color: #a2361a"></iconify-icon></a></span>
+                        <span class="mx-1" title="LinkedIn"><a class="ld-btn pt-2" href="/auth/linkedin?provider=linkedin"><iconify-icon icon="mage:linkedin" width="24" height="24"  style="color: #0a66c2"></iconify-icon></a></span>
+                        </div>
+
                 </div>
                 
             </form>

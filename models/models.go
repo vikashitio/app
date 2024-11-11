@@ -17,7 +17,22 @@ type LoginHistory struct {
 	Logout_time string `json:"logout_time,omitempty"`
 	Login_ip    string `json:"login_ip,omitempty"`
 	Login_type  int    `json:"login_type,omitempty"`
+	Resource    string `json:"resource,omitempty"`
 	//Count       int64  `json:"count"`
+}
+
+type LoginHistoryUpdate struct {
+	//gorm.Model
+	Token_id    uint   `gorm:"primaryKey"`
+	Logout_time string `json:"logout_time,omitempty"`
+}
+
+type PasswordChangeRequest struct {
+	//gorm.Model
+	Id             uint   `gorm:"primaryKey"`
+	Mid            uint   `json:"mid,omitempty"`
+	Password_hash  string `json:"password_hash,omitempty"`
+	Password_email string `json:"password_email,omitempty"`
 }
 
 // for fetch Email template details use for send email
@@ -28,6 +43,16 @@ type EmailTemplate struct {
 	Template_subject string `json:"template_subject,omitempty"`
 	Template_desc    string `json:"template_desc,omitempty"`
 	Status           int    `json:"status,omitempty"`
+}
+
+type UpdateHistory struct {
+	//gorm.Model
+	Update_id   uint   `gorm:"primaryKey"`
+	Client_id   uint   `json:"client_id,omitempty"`
+	Update_type string `json:"update_type,omitempty"`
+	Update_desc string `json:"update_desc,omitempty"`
+	Update_ip   string `json:"c_ip,omitempty"`
+	Updated_on  string `json:"updated_on,omitempty"`
 }
 
 // For Display Transaction List
@@ -133,6 +158,7 @@ type Client_Master struct {
 	Full_name string
 	Password  string
 	Status    int
+	Resource  string
 }
 
 // for change merchant password
@@ -603,6 +629,7 @@ type Invoice_Master struct {
 	Invoice_type        int     `json:"invoice_type,omitempty"`
 	Order_id            string  `json:"order_id,omitempty"`
 	Is_fee_paid_by_user bool    `json:"is_fee_paid_by_user,omitempty"`
+	Return_url          string  `json:"return_url"`
 }
 
 // for manage Invoice
@@ -655,6 +682,7 @@ type SettlementSetting struct {
 	Coin_id        int    `json:"coin_id,omitempty"`
 	Coin           string `json:"coin,omitempty"`
 	Coin_title     string `json:"coin_title,omitempty"`
+	Coin_network   string `json:"coin_network,omitempty"`
 	Crypto_address string `json:"crypto_address,omitempty"`
 	Assetid        int    `json:"assetid,omitempty"`
 	Status         int    `json:"status,omitempty"`
@@ -692,10 +720,11 @@ type ClientAPI struct {
 // For Display Transaction List
 type ClientStore struct {
 	//gorm.Model
-	ID         uint   `gorm:"primaryKey"`
-	Client_id  uint   `json:"client_id,omitempty"`
-	Webhookurl string `json:"webhookurl,omitempty"`
-	Return_url string `json:"return_url,omitempty"`
+	ID             uint    `gorm:"primaryKey"`
+	Client_id      uint    `json:"client_id,omitempty"`
+	Webhookurl     string  `json:"webhookurl,omitempty"`
+	Return_url     string  `json:"return_url,omitempty"`
+	Success_margin float64 `json:"success_margin,omitempty"`
 }
 
 type CountTransactionByStatus struct {
@@ -740,4 +769,9 @@ type SettlementCoin struct {
 }
 type SettlementStatus struct {
 	Status string `json:"status" form:"sender_name"`
+}
+
+// Get Merchant Email  By Reset Password Hash ID
+type EmailByHash struct {
+	Password_email string
 }

@@ -135,7 +135,7 @@
                                   <div class="col-sm-6">
                                       <div class="mb-20">
                                           <label for="birth_date" class="form-label fw-semibold text-primary-light text-sm mb-8">Birth Date <span class="text-danger-600">*</span></label>
-                                          <input type="date" id="birth_date" name="birth_date" class="form-control" title="Birth Date" required="" placeholder="Enter Birth Date" value="{{if .Profile.BirthDate}}{{.Profile.BirthDate}}{{end}}" >
+                                          <input type="date" id="birth_date" name="birth_date" max="" class="form-control" title="Birth Date" required="" placeholder="Enter Birth Date" value="{{if .Profile.BirthDate}}{{.Profile.BirthDate}}{{end}}" >
                                       </div>
                                   </div>
                                   <div class="col-sm-6">
@@ -399,7 +399,7 @@
                                   <div class="col-sm-6">
                                       <div class="mb-20">
                                           <label for="mobile" class="form-label fw-semibold text-primary-light text-sm mb-8">Phone Number <span class="text-danger-600">*</span> </label>
-                                          <input type="number" id="mobile" name="mobile" class="form-control radius-8" title="Phone Number" required="" value="{{if .Profile.Mobile}}{{.Profile.Mobile}}{{end}}">
+                                          <input type="number" id="mobile" name="mobile" class="form-control radius-8" title="Phone Number" min="1000000000" max="99999999999" required="" value="{{if .Profile.Mobile}}{{.Profile.Mobile}}{{end}}">
                                       </div>
                                   </div>
 
@@ -513,6 +513,21 @@
   {{template "partials/footer" .}}
 
   <script>
+
+    // Get the current date
+    const currentDate = new Date();
+            
+            
+            // Calculate the date 10 years ago
+            const pastDate = new Date();
+            pastDate.setFullYear(currentDate.getFullYear() - 10);
+
+            // Format the past date (YYYY-MM-DD)
+            const formattedPastDate = pastDate.toISOString().split("T")[0];
+
+           
+            $("#birth_date").attr("max", formattedPastDate);
+
     // ======================== Upload Image Start =====================
     function readURL(input) {
         if (input.files && input.files[0]) {
@@ -560,7 +575,7 @@ alert('Please enter Confirmed Password');
 $( "#confirm-password" ).focus();
 return false;
 }else if(your_password!=confirm_password){
-alert('New password should not be same as Confirmed Password.');
+alert('New Password and confirmed password must be same');
 $( "#your-password" ).focus();
 return false;
 }else if(your_password.length < 6) { 

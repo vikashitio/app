@@ -157,7 +157,8 @@ func PasswordGenerator(passwordLength int) string {
 	lowerCase := "abcdefghijklmnopqrstuvwxyz" // lowercase
 	upperCase := "ABCDEFGHIJKLMNOPQRSTUVWXYZ" // uppercase
 	numbers := "0123456789"                   // numbers
-	specialChar := "!@#$%^&*()_-+={}[/?]"     // special characters
+	specialChar := "-"                        // special characters
+	//specialChar := "!@#$%^&*()_-+={}[/?]"     // special characters
 
 	// Variable for storing password
 	password := ""
@@ -213,7 +214,7 @@ func ConvertCurrencyToCrypto(amount, fromCurrency, toCrypto string) (float64, er
 	}
 	apiURL := "https://api.coingecko.com/api/v3/simple/price?ids=" + toCrypto + "&vs_currencies=" + fromCurrency
 
-	fmt.Print(apiURL)
+	//fmt.Print(apiURL)
 
 	var apiResponse CurrencyResponse
 	_, err := client.R().SetResult(&apiResponse).Get(apiURL)
@@ -338,6 +339,43 @@ func GetEmailByMID(MID uint) string {
 	return username
 }
 
+type MidByHash struct {
+	Mid uint
+}
+
+// Get Merchant Email  By Reset Password Hash ID
+func GetMidByHashID(Hash string) uint {
+	midByHash := MidByHash{}
+	database.DB.Db.Table("password_change_request").Select("mid").Where("password_hash = ?", Hash).Find(&midByHash)
+	mid := midByHash.Mid
+	return mid
+}
+
+type ReturnURLInvoice struct {
+	Return_url string
+}
+
+// Get WP GetRedirecURL
+func GetRedirecURL(Customerrefid string) string {
+	data := ReturnURLInvoice{}
+	database.DB.Db.Table("invoice").Select("return_url").Where("trackid = ?", Customerrefid).Find(&data)
+	return_url := string(data.Return_url)
+	return return_url
+}
+
+type CustomerEmailData struct {
+	Customer_name  string
+	Customer_email string
+}
+
+// Get Customer EMAIL for send Email
+func GetCustomerEmail(TransID string) string {
+	data := CustomerEmailData{}
+	database.DB.Db.Table("customer").Select("customer_name", "customer_email").Where("customer_tid = ?", TransID).Find(&data)
+	return_data := string(data.Customer_name + "||" + data.Customer_email)
+	return return_data
+}
+
 // Get Get Converted Amount By TransID
 type ConvertedAmount struct {
 	Convertedamount float64
@@ -385,13 +423,36 @@ func GetSubStatusByStatusID(StatusID int) string {
 }
 
 // Function to check if the received amount is within 2% of the invoice amount
-func IsPaymentSuccess(invoice, received float64) bool {
+func IsPaymentSuccess(invoice, received float64, mid int64) bool {
 	// Calculate the absolute difference
 	diff := math.Abs(invoice - received)
 
 	// Calculate the percentage difference
 	percentageDiff := (diff / invoice) * 100
 
+	// Get Merchant Success Margin Ratio
+	// Fetch Webhook Url from client store
+	storeData := models.ClientStore{}
+	database.DB.Db.Table("client_store").Where("client_id = ?", mid).Find(&storeData)
+	success_margin := storeData.Success_margin
+
+	//fmt.Println("success_margin ==>", success_margin)
+
+	if success_margin == 0 {
+		success_margin = 2.0
+	}
+	//fmt.Println("success_margin set  ==>", success_margin)
 	// Check if the percentage difference is less than or equal to 2%
-	return percentageDiff <= 2.0
+	return percentageDiff <= success_margin
+}
+
+// Function to check if the received amount is within 2% of the invoice amount
+func UpdateMerchantHistory(updatetype, uptadedesc, ip string, Client_id uint) bool {
+
+	// Format the current time as a string
+	update_time := time.Now().Format("2006-01-02 15:04:05")
+	qry := models.UpdateHistory{Client_id: Client_id, Update_ip: ip, Update_type: updatetype, Update_desc: uptadedesc, Updated_on: update_time}
+	database.DB.Db.Table("update_history").Select("client_id", "Update_ip", "Update_type", "Update_desc", "Updated_on").Create(&qry)
+
+	return true
 }

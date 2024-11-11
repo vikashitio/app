@@ -67,8 +67,15 @@
                     <input type="text" class="form-control bg-base border-0 radius-8" id="webhookurl" name="webhookurl" placeholder="Webhook URL" value="{{if .ClientStore.Webhookurl}}{{.ClientStore.Webhookurl}}{{end}}">
                 </div>
             </div>
+
+            <div class="mb-20">  
+              <label for="webhookurl" class="fw-semibold mb-8 text-primary-light">Success Margin in % Between (0.01 - 10.00)</label>
+              <div class="input-group input-group-lg border input-form-light radius-8">
+                  <input type="number" min="0.01" max="10" step="0.01"class="form-control bg-base border-0 radius-8" id="success_margin" name="success_margin" placeholder="" value="{{if .ClientStore.Success_margin}}{{.ClientStore.Success_margin}}{{end}}">
+              </div>
+          </div>
               <div class="mb-2">  
-                <button type="submit" id="submit" class="btn btn-primary text-sm btn-sm px-8 py-12 radius-8 api-validationxx"> Submit</button>
+                <button type="submit" id="submit" class="btn btn-primary text-sm btn-sm px-8 radius-8 api-validationxx"> Submit</button>
             </div>
           </form>
            

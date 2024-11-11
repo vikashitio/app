@@ -33,7 +33,7 @@
                 <tr>
                   <!-- <td>{{.Client_id}}</td> -->
                   <td class="date-cell">{{.Login_time}}</td>
-                  <td class="date-cell">{{.Logout_time}}</td>
+                  <td {{ if ne .Logout_time  "" }} class="date-cell" {{end}}>{{.Logout_time}}</td>
                   <td>{{.Login_ip}}</td>
                 </tr>
                 {{end}}

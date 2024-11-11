@@ -25,7 +25,7 @@ var DB Dbinstance
 func ConnectDb() {
 
 	dsn := fmt.Sprintf(
-		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable TimeZone=Asia/Shanghai",
+		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable TimeZone=Asia/Kolkata", //Asia/Shanghai
 		"localhost",
 		5432,
 		os.Getenv("DB_USER"),

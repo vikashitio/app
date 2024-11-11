@@ -1,14 +1,19 @@
 {{template "partials/support-files" .}}
 <style>
 .img-icon { width: 25px;margin-right: 10px;}
-.img-icon-box { max-width: 30px;}
+.img-icon-box { max-width: 45px;}
 .width-box {width: 100%;}
 .display-box-m{ display: none !important;}
 .display-box{ display: block !important;}
 .auth-left { padding-top: 50px !important; padding-left: 10px;}
 .auth {min-height: calc(100vh - 60px)  !important;}
 .process{    background: linear-gradient(#ffffff, #d7dae0) !important;border: solid 0.15em #7c7f853d !important;}
-
+.crypto-pairx {
+    margin-left: -20px !important;
+    height: 15px !important;
+    width: 15px !important;
+    margin-bottom: 15px !important;
+}
 @media (max-width: 992px) {
     .auth-left { padding-top: 5px !important; width: 100% !important; padding-left: 0px; margin-left: 10px !important;margin-top: 10px !important;}
     .desktop {margin-top: 24px !important;}
@@ -27,7 +32,7 @@
         <div class="d-flex6 align-items-center flex-column h-100 justify-content-center ">
           <!-- ///////////////////////////////////////// -->
           <div class="desktop w-100 px-48">
-          <h6 class="mb-24  text-center width-box text-start text-secondary-light text-sm">{{.InvoiceData.Product_name}}</h6>
+          <h6 class="mb-24  text-center width-box text-start text-secondary-light text-sm">Amount to pay</h6><!-- {{.InvoiceData.Product_name}} -->
           <h6 class="text-center width-box text-start border-bottom pb-12"><span id="Requestedcurrency">{{.InvoiceData.Requestedcurrency}}</span> <span id="Requestedamount">{{.InvoiceData.Requestedamount}}</span></h6>
           
           <h6 class="mb-24  text-center width-box text-start text-secondary-light pt-3 text-sm display-box"><span id="Description">{{.InvoiceData.Description}}</span></h6>
@@ -154,8 +159,13 @@
                 <div class="card-body">
                     {{range .CoinList}}
                     <div class="row my-2 p-2 rounded-pill border border-dark pointer coin process" data-cid="{{.Coin}}" data-tid="{{.Coin_id}}" title="Create {{.Coin_title}} Payment" >
-                      <div class="col img-icon-box text-start px-0"><img class="img-icon" src="/views/images/{{.Icon}}"></div>
-                      <div class="col text-xs text-secondary-light pt-4"><strong>{{.Coin_title}}</strong> ({{.Coin_network}})</div>
+                      <div class="col img-icon-box text-start px-0">
+                        <img class="img-icon" src="/views/images/{{.Icon}}">
+                        {{if ne .Coin .Coin_network}}
+                        <img src="/views/images/{{.Coin_network}}.png" alt="{{.Coin_network}}" title="{{.Coin_network}}" class="w-40-px h-40-px rounded-circle flex-shrink-0 crypto-pairx">
+                        {{end}}
+                      </div>
+                      <div class="col text-xs text-secondary-light pt-4"><strong>{{.Coin_title}}</strong> (<span class="text-uppercase">{{.Coin_network}}</span>)</div>
                       <div class="col text-end text-xs text-secondary text-uppercase pt-4 coinLoader-{{.Coin_id}}">{{.Coin}}</div>
                   </div>
                     {{end}}

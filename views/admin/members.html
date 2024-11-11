@@ -37,7 +37,7 @@
                     <input type="text" name="search" id="search" class="form-control form-control-sm" placeholder="Search Keywords" value="{{ .Search }}" title="Search Keywords">
                     
                 </div>
-                <div class="col-md-2 my-2">
+                <div class="col-md-4 my-2">
                  
                     <select name="sort_by" id="sort_by" class="form-select form-select-sm" title="Search By">
                   <option value="full_name" {{ if eq .SortBy "full_name" }}selected{{ end }}>	Name</option>
@@ -47,24 +47,24 @@
                     
                 </div>
 
-                <div class="col-md-2 my-2">
-                  <select name="status" id="status" class="form-select form-select-sm" title="Search By">
+                <div class="col-md-3 my-2" >
+                  <select name="status" id="status" class="form-select form-select-sm float-start" style="width:calc(100% - 90px);" title="Search By">
                     <option value="">Select Status</option>
                     <option value="1" {{ if eq .Order "1" }}selected{{ end }}>Active</option>
                     <option value="0" {{ if eq .Order "0" }}selected{{ end }}>De Acitve</option>
                       </select>
-                  </select>
+                      <button type="submit" class="btn btn-primary btn-sm ms-2 float-start" style="width:36px;" title="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
+                      <a href="/admin/members" class=" btn btn-danger btn-sm ms-2 float-start" style="width:36px;" ><i class="fa-regular fa-circle-xmark" title="Remove search data"></i></a>
               </div>
-                <div class="col-md-3 my-2">
+                <!-- <div class="col-md-3 my-2">
                   
                     <select name="order" id="order" class="form-select form-select-sm float-start" style="width:calc(100% - 90px);" title="Select Order By">
                   <option value="asc" {{ if eq .Order "asc" }}selected{{ end }}>Ascending</option>
                   <option value="desc" {{ if eq .Order "desc" }}selected{{ end }}>Descending</option>
                     </select>
-                    <button type="submit" class="btn btn-primary btn-sm ms-2 float-start" style="width:36px;" title="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
-                    <a href="/admin/members" class=" btn btn-danger btn-sm ms-2 float-start" style="width:36px;" ><i class="fa-regular fa-circle-xmark" title="Remove search data"></i></a>
+                    
 
-                </div>
+                </div> -->
                
               </div>
           </form>

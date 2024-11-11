@@ -14,7 +14,8 @@ import (
 var tableNameAcq = "acquirer"
 var pageNameAcq = "admin/acquirer"
 var pageTitleAcq = "Acquirer"
-var listSizeAcq = "10"
+
+// var listSizeAcq = "10"
 var listOrderByAcq = "status ASC,acquirer_title ASC"
 
 // For Add / Edit / Delete  Acquirer from Admin Section

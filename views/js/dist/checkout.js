@@ -80,7 +80,7 @@ $(".process").click(function(){
     };
     //loader coinLoader
     $(".coinLoader-"+cryptoID).html('<iconify-icon icon="svg-spinners:wind-toy" width="15" height="15"  style="color: #16A34A"></iconify-icon>');
-    //alert(JSON.stringify(formData));
+   // alert(JSON.stringify(formData));
     $.ajax({
     url: "/pay-data",
     data: $.param(formData),
@@ -102,7 +102,38 @@ $(".process").click(function(){
             $("#coinicon").attr("src","/views/images/" + data.coinicon);
             $("#getnetworkid").html(data.coinnetwork);
             $("#transid").html(data.transid);
-           
+            ////////////////Mobile Intent/////////////////////////////
+            const deviceType = detectDevice();
+	        //alert(deviceType);
+           // Payment parameters
+           // alert(data.address);
+           // alert(data.amount);
+           // alert(cid);
+            if(cid=="btc"){
+             cid="bitcoin"
+            }
+
+            if(deviceType !=  "Web"){
+                
+   
+           // Universal payment deep link (example)
+           const paymentLink = `${cid}://${data.address}?amount=${encodeURIComponent(data.amount)}`;
+           alert(paymentLink);
+   
+           // Fallback store link if the app is not installed
+           if(deviceType ==  "Android"){
+           const fallbackLink = "https://play.google.com/store/search?q=crypto-app&hl=en"; // Replace with the wallet download page
+           }else{
+           const fallbackLink = "https://apps.apple.com/app/trust-crypto-bitcoin-wallet/id1288339409"; // Replace with the wallet download page
+           }
+           // Attempt to open the wallet app
+           window.location.href = paymentLink;
+   
+           // Fallback to the wallet download page after a delay
+           setTimeout(function () {
+             window.location.href = fallbackLink;
+           }, 5000); // 2-second delay before redirecting to the fallback
+         }
     
             ///////////////////////////////////////////
            // var timeLeft = 600;
@@ -127,9 +158,10 @@ $(".process").click(function(){
             status_coin: status_coin,
             status_address: status_address,
             status_transid: status_transid,
-            status_coinid: data.coin_id
+            status_coinid: data.coin_id,
+            client_id: Client_id
         };
-    
+        //alert(JSON.stringify(formDataStatus));
         
             $.ajax({
                 url: "/check-payment-status",

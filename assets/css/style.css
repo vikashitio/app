@@ -13896,4 +13896,8 @@ td.fc-header-center {
     margin-bottom: 15px !important;
 }
 
+.alert-dismissible .btn-close {
+  z-index: 1 !important;
+}
+
 /* === footer css end === */

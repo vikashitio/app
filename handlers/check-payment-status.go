@@ -27,6 +27,7 @@ type StatusRequest struct {
 	Status_address string `json:"status_address"`
 	Status_transid string `json:"status_transid"`
 	Status_coinid  string `json:"status_coinid"`
+	Client_id      int64  `json:"client_id"`
 }
 
 // Function for generate random password
@@ -70,6 +71,7 @@ func FetchPaymentStatus(c *fiber.Ctx) error {
 	//fmt.Println("status_transid ==========>", status_transid)
 	status_coinid := req.Status_coinid
 	//fmt.Println("Coin ID ==========>", status_coinid)
+	client_id := req.Client_id
 
 	// For Address
 	coinAddress := models.AddressListing{}
@@ -166,7 +168,7 @@ func FetchPaymentStatus(c *fiber.Ctx) error {
 		//fetchTimestamp = "2024-08-23 16:00:09"
 		fetchTimestamp = coinAddress.Lastupdate.Format("2006-01-02 15:04:05")
 		responseTimestamp = time.Unix(receivedBlockTimestamp/1000, 0).Format("2006-01-02 15:04:05")
-	} else if status_coinid == "5" { // For ETH Ethereum Mainnet
+	} else if status_coinid == "5" || status_coinid == "12" { // For ETH Ethereum Mainnet
 		// URL of the external site to fetch JSON from
 		apiKey := os.Getenv("ETHER_SCAN_API_KEY")
 		url := "https://api.etherscan.io/api?module=account&action=txlist&address=" + status_address + "&startblock=0&endblock=99999999&page=1&offset=1&sort=desc&apikey=" + apiKey
@@ -584,15 +586,15 @@ func FetchPaymentStatus(c *fiber.Ctx) error {
 		t := time.Unix(responseD.Txs[0].Time, 0)
 		// Format the time to "2006-01-02 15:04:05"
 		responseTimestamp = t.Format("2006-01-02 15:04:05")
-	} else if status_coinid == "8" || status_coinid == "9" || status_coinid == "10" { // For Polygon
+	} else if status_coinid == "8" || status_coinid == "9" || status_coinid == "10" || status_coinid == "11" || status_coinid == "13" { // For Polygon
 		// URL of the external site to fetch JSON from
 
 		apiKey := ""
 		url := ""
-		if status_coin == "arb" {
+		if status_coin == "arb" || status_coin == "usdt" {
 			apiKey = os.Getenv("ARBITRUM_API_KEY")
 			url = "https://api.arbiscan.io/api?module=account&action=txlist&address=" + status_address + "&startblock=0&endblock=99999999&page=1&offset=1&sort=desc&apikey=" + apiKey
-		} else if status_coin == "bnb" {
+		} else if status_coin == "bnb" || status_coin == "usdt" {
 			apiKey = os.Getenv("BNB_API_KEY")
 			url = "https://api.bscscan.com/api?module=account&action=txlist&address=" + status_address + "&startblock=0&endblock=99999999&page=1&offset=1&sort=desc&apikey=" + apiKey
 		} else if status_coin == "matic" {
@@ -715,9 +717,9 @@ func FetchPaymentStatus(c *fiber.Ctx) error {
 
 	invoiceAmount := function.GetConvertedAmountByTransID(status_transid)
 	receivedAmount := float64(receivedAmountNew)
-
+	//fmt.Println("Client ID ==========>", client_id)
 	// Check if the amounts are within 2% tolerance
-	if function.IsPaymentSuccess(invoiceAmount, receivedAmount) {
+	if function.IsPaymentSuccess(invoiceAmount, receivedAmount, client_id) {
 		if invoiceAmount == receivedAmount {
 			//fmt.Println("Success Pay")
 			receivedSubStatus = 1

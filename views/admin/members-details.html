@@ -51,7 +51,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-lg-6">
-                    <h4 class="header-title mb-4"> <span data-toggle="tooltip" data-placement="right"><i class="fa-solid fa-user-tie fa-fw"></i> {{.Title}} :: {{.MemberList.Full_name}}</span></h4>
+                    <h4 class="header-title mb-4"> <span data-toggle="tooltip" data-placement="right"><i class="fa-solid fa-user-tie fa-fw"></i> {{.Title}} :: {{.MemberList.Full_name}}<a href="/admin/merchant-logs?mid={{.MemberList.Client_id}}" title="view Logs" target="_blank"><i class="fa-solid fa-circle-info fa-fw text-info"></i></a> </span></h4>
                 </div>
                 <div class="col-lg-6 text-end my-2"> </div>
           </div>
@@ -103,11 +103,11 @@
                                                 <div class="col-sm-3 text-start">Email</div>
                                                 <div class="col-sm-3 text-start">: {{.MemberList.Username}}</div> 
                                                 <div class="col-sm-3 text-start">Contact Number</div>
-                                                <div class="col-sm-3 text-start">: {{.MemberList.Country_code}} {{.MemberList.Mobile}}</div>
+                                                <div class="col-sm-3 text-start">: {{.MemberList.Country_code}}  {{.MemberList.Mobile}}</div>
                                                 <div class="col-sm-3 text-start">Gender</div>
-                                                <div class="col-sm-3 text-start">: {{.MemberList.Full_name}} </div>
+                                                <div class="col-sm-3 text-start">: {{.MemberList.Gender}} </div>
                                                 <div class="col-sm-3 text-start">Date of Birth </div>
-                                                <div class="col-sm-3 text-start">: {{.MemberList.Full_name}} </div>
+                                                <div class="col-sm-3 text-start">: {{.MemberList.Birth_date}} </div>
                                                 <div class="col-sm-3 text-start">Date of Joining </div>
                                                 <div class="col-sm-3 text-start">: {{.MemberList.Timestamp}} </div>
                                                 <div class="col-sm-3 text-start">Address Line - 1 </div>

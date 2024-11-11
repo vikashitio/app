@@ -39,14 +39,17 @@ type CreateLink struct {
 	CustomerEmail       string  `json:"CustomerEmail"`
 	OrderID             string  `json:"OrderID"`
 	Is_fee_paid_by_user bool    `json:"is_fee_paid_by_user"`
+	Return_url          string  `json:"return_url"`
 }
 
 // Function for Generate Pay Link By API
 func ApiPaymentLink(c *fiber.Ctx) error {
 	apiError := ""
+
+	//fmt.Println("Calling")
 	// Retrieve a specific header
 	apikey := c.Get("Apikey")
-
+	//fmt.Println("apikey", apikey)
 	link := new(CreateLink)
 
 	// Parse the request body into the User struct
@@ -55,7 +58,7 @@ func ApiPaymentLink(c *fiber.Ctx) error {
 			"error": "Cannot parse JSON !!",
 		})
 	}
-
+	//fmt.Println("BODY", link)
 	MID, errorx := function.GetMIDByApikey(apikey)
 	// Retrieve data from header
 	price_currency := strings.TrimSpace(link.Currency)
@@ -69,6 +72,7 @@ func ApiPaymentLink(c *fiber.Ctx) error {
 	customerName := strings.TrimSpace(link.CustomerName)
 	customerEmail := strings.TrimSpace(link.CustomerEmail)
 	orderID := strings.TrimSpace(link.OrderID)
+	return_url := strings.TrimSpace(link.Return_url)
 	is_fee_paid_by_user := link.Is_fee_paid_by_user
 
 	//fmt.Println(customerName, customerEmail, orderID, is_fee_paid_by_user)
@@ -97,8 +101,8 @@ func ApiPaymentLink(c *fiber.Ctx) error {
 		}
 
 		Ip := c.Context().RemoteIP().String()
-		qry := models.Invoice_Master{Client_id: MID, Requestedamount: requestedamount, Requestedcurrency: price_currency, Product_name: productName, Description: description, Ip: Ip, Trackid: trackID, Name: customerName, Email: customerEmail, Order_id: orderID, Is_fee_paid_by_user: is_fee_paid_by_user}
-		result := database.DB.Db.Table("invoice").Select("client_id", "requestedamount", "requestedcurrency", "product_name", "description", "ip", "trackid", "name", "email", "order_id", "is_fee_paid_by_user").Create(&qry)
+		qry := models.Invoice_Master{Client_id: MID, Requestedamount: requestedamount, Requestedcurrency: price_currency, Product_name: productName, Description: description, Ip: Ip, Trackid: trackID, Name: customerName, Email: customerEmail, Order_id: orderID, Is_fee_paid_by_user: is_fee_paid_by_user, Return_url: return_url}
+		result := database.DB.Db.Table("invoice").Select("client_id", "requestedamount", "requestedcurrency", "product_name", "description", "ip", "trackid", "name", "email", "order_id", "is_fee_paid_by_user", "return_url").Create(&qry)
 		invoice_id := strconv.FormatUint(uint64(qry.Invoice_id), 10)
 		fmt.Println(invoice_id)
 		if result.Error != nil {

@@ -15,6 +15,8 @@ func InitRoutes(app *fiber.App) {
 	app.Get("/registration", handlers.RegistrationView)
 	app.Post("/registrationPost", handlers.RegistrationPost)
 	app.Get("/logout", handlers.LogOut)
+	app.Get("/reset-password/:HID", handlers.ResetPasswordView)
+	app.Post("/ResetPasswordSubmit", handlers.ResetPasswordSubmit)
 	app.Get("/reset-password", handlers.ResetPasswordView)
 	app.Post("/resetPasswordPost", handlers.ResetPasswordPost)
 	//with session
@@ -55,6 +57,10 @@ func InitRoutes(app *fiber.App) {
 
 	app.Get("/settlement-settings", handlers.SettlementSettingsView)
 	app.Post("/settlement-settings-post", handlers.SettlementSettingsPost)
+
+	app.Get("/crypto-exchange", handlers.CryptoExchangeView)
+	app.Post("/crypto-exchange-rate", handlers.CryptoExchangeRate)
+	app.Post("/crypto-exchange-post", handlers.CryptoExchangePost)
 	//app.Post("/cryptoWalletPost", handlers.CryptoWalletPost)
 
 	app.Get("/get-network", handlers.GetNetwork)
@@ -83,6 +89,8 @@ func InitRoutes(app *fiber.App) {
 	// app.Get("/pdf-np", handlers.TransNPPdf)
 
 	/////////////////////////////////////////////////
+
+	app.Get("/admin/merchant-logs", handlers.AdminMemberLogs)
 	app.Get("/admin/login", handlers.AdminLoginView)
 	app.Post("/admin/adminLoginPost", handlers.AdminLoginPost)
 	app.Get("/admin/logout", handlers.AdminLogOut)
@@ -167,6 +175,7 @@ func InitRoutes(app *fiber.App) {
 	app.Get("/admin/wallet/:VID/:WID", handlers.WalletView)
 	// //END Fireblocks API
 	app.Get("/admin/", handlers.AdminIndexView)
+	app.Get("/admin/country-graph", handlers.AdminCountryGraph)
 	app.Get("/balance/:address", handlers.GetBalanceHandler)
 	app.Get("/enable-2fa", handlers.EnableTwoFA)
 	app.Post("/activate-2fa", handlers.ActivateTwoFA)
@@ -177,4 +186,10 @@ func InitRoutes(app *fiber.App) {
 	app.Get("/testapi/:address", handlers.TestAPI)
 	app.Get("/testapi2", handlers.TestAPIS)
 	app.Get("/testapi3", handlers.TestAPIS3)
+	app.Get("/auth/google", handlers.GoogleLogin)
+	app.Get("/auth/google/callback", handlers.GoogleCallback)
+	app.Get("/auth/linkedin", handlers.LinkedInLogin)
+	app.Get("/auth/linkedin/callback", handlers.LinkedInCallback)
+	app.Get("/auth/facebook", handlers.FacebookLogin)
+	app.Get("/auth/facebook/callback", handlers.FacebookCallback)
 }

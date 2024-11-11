@@ -16,7 +16,6 @@ import (
 var tableNameA = "admin_master"
 var pageNameA = "admin/admin-manager"
 var pageTitleA = "Admin"
-var listSizeA = "10"
 var listOrderByA = "status ASC,full_name ASC"
 
 // Page for manage admin user and profile

@@ -114,4 +114,6 @@ func main() {
 	})
 
 	log.Fatal(app.Listen(":" + os.Getenv("PORT") + ""))
+	//log.Fatal(app.Listen("192.168.1.31:" + os.Getenv("PORT") + ""))
+
 }
