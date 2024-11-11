@@ -80,7 +80,7 @@ $(".process").click(function(){
     };
     //loader coinLoader
     $(".coinLoader-"+cryptoID).html('<iconify-icon icon="svg-spinners:wind-toy" width="15" height="15"  style="color: #16A34A"></iconify-icon>');
-    //alert(JSON.stringify(formData));
+   // alert(JSON.stringify(formData));
     $.ajax({
     url: "/pay-data",
     data: $.param(formData),
@@ -127,9 +127,10 @@ $(".process").click(function(){
             status_coin: status_coin,
             status_address: status_address,
             status_transid: status_transid,
-            status_coinid: data.coin_id
+            status_coinid: data.coin_id,
+            client_id: Client_id
         };
-    
+        //alert(JSON.stringify(formDataStatus));
         
             $.ajax({
                 url: "/check-payment-status",

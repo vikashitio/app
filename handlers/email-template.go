@@ -14,7 +14,8 @@ import (
 var tableNameT = "email_template"
 var pageNameT = "admin/email-template"
 var pageTitleT = "Email Template"
-var listSizeT = "10"
+
+// var listSizeT = "10"
 var listOrderByT = "status ASC,template_code ASC"
 
 // For Add Edit Delete Email Template from admin section for send email with related template

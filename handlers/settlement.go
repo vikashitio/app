@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"template/database"
 	"template/function"
@@ -24,7 +25,7 @@ func SettlementSettingsPost(c *fiber.Ctx) error {
 	//println("req=>", req)
 
 	alerts := ""
-
+	qrs := ""
 	if req.Action == "Update" && req.CoinAddress != "" && req.Coin_id != 0 {
 
 		settlementCoin := models.SettlementCoin{}
@@ -56,6 +57,9 @@ func SettlementSettingsPost(c *fiber.Ctx) error {
 		client_id := s.Get("LoginMerchantID").(uint)
 		database.DB.Db.Table("client_wallet").Save(&models.CryptoWalletList{Wallet_id: getTableID, Client_id: client_id, Assetid: req.Coin_id, Crypto_address: req.CoinAddress, Crypto_code: crypto_code, Crypto_title: crypto_title, Crypto_network: crypto_network, Status: 1})
 		alerts = "Settlement Addresses Updated"
+		qrs = " Wallet_id: " + strconv.FormatUint(uint64(getTableID), 10) + " Assetid: " + strconv.Itoa(req.Coin_id) + "Crypto_address:" + req.CoinAddress + " Crypto_code:" + crypto_code + " Crypto_title: " + crypto_title + " Crypto_network: " + crypto_network
+		updateIp := c.Context().RemoteIP().String()
+		function.UpdateMerchantHistory("Settlement", qrs, updateIp, client_id)
 
 	}
 
@@ -68,7 +72,10 @@ func SettlementSettingsPost(c *fiber.Ctx) error {
 		}
 
 		database.DB.Db.Table("client_wallet").Where("assetid = ?", req.Coin_id).UpdateColumns(&models.SettlementStatus{Status: coinStatus})
-
+		qrs = " Change Status of Coin ID : " + strconv.Itoa(req.Coin_id) + " change Status to: " + coinStatus
+		updateIp := c.Context().RemoteIP().String()
+		client_id := s.Get("LoginMerchantID").(uint)
+		function.UpdateMerchantHistory("Settlement", qrs, updateIp, client_id)
 	}
 
 	response := models.SettlementResponse{
@@ -92,7 +99,7 @@ func SettlementSettingsView(c *fiber.Ctx) error {
 
 	//fmt.Print("LoginMerchantID =>", LoginMerchantID)
 	settlementSetting := []models.SettlementSetting{}
-	database.DB.Db.Table("coin_list A ").Select("a.coin_id, a.coin, a.coin_title, b.crypto_address, b.assetid, b.status, b.wallet_id").Joins("LEFT JOIN client_wallet B ON A.coin_id = B.assetid AND B.client_id = ?", LoginMerchantID).Order("a.coin_title asc").Find(&settlementSetting)
+	database.DB.Db.Table("coin_list A ").Select("a.coin_id, a.coin, a.coin_title, LOWER(a.coin_network) AS coin_network, b.crypto_address, b.assetid, b.status, b.wallet_id").Joins("LEFT JOIN client_wallet B ON A.coin_id = B.assetid AND B.client_id = ?", LoginMerchantID).Order("a.coin_title asc").Find(&settlementSetting)
 	// .Where(" a.status = ?", 1)
 	//fmt.Println("settlementSetting => ", settlementSetting)
 	return c.Render("settlement-settings", fiber.Map{

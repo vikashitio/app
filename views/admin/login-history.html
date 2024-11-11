@@ -19,8 +19,8 @@
               <tbody id="none">
                   {{range .LoginHistory}}
                 <tr>
-                  <td>{{.Login_time}}</td>
-                  <td>{{.Logout_time}}</td>
+                  <td class="date-cell">{{.Login_time}}</td>
+                  <td {{ if ne .Logout_time  "" }} class="date-cell" {{end}}>{{.Logout_time}}</td>
                   <td>{{.Login_ip}}</td>
                 </tr>
                 {{end}}

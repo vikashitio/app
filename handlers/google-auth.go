@@ -118,7 +118,7 @@ func ActivateTwoFA(c *fiber.Ctx) error {
 		template_code := "2FA-STATUS"
 		//fmt.Println("qrimg==>", qrimg)
 		emailData := models.EmailData{FullName: getName, Email: getEmail, UserName: getEmail, HashCode: totpSecret, Details: qrimg}
-		fmt.Println("ERROR 10001 => ", emailData)
+		//fmt.Println("ERROR 10001 => ", emailData)
 		err := function.SendEmail(template_code, emailData)
 		if err != nil {
 			fmt.Println("issue sending verification email")
@@ -194,7 +194,7 @@ func VerifyTwoFA(c *fiber.Ctx) error {
 
 	s, _ := store.Get(c)
 	if s.Get("LoginMerchantID") == nil {
-		//fmt.Println("Session Expired101")
+		fmt.Println("Session Expired101")
 		//return c.Redirect("/login", 301)
 	}
 	LoginMerchantName := s.Get("LoginMerchantName")
@@ -216,12 +216,12 @@ func VerifyTwoFA(c *fiber.Ctx) error {
 	})
 }
 
-// For Display Login form
+// For Matched 2FA Code
 func VerifyTwoFAPost(c *fiber.Ctx) error {
 
 	s, _ := store.Get(c)
 	if s.Get("LoginMerchantID") == nil {
-		//fmt.Println("Session Expired101")
+		fmt.Println("Session Expired101")
 		//return c.Redirect("/login", 301)
 	}
 	loginMerchantEmail := s.Get("LoginMerchantEmail")

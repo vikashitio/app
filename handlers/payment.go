@@ -410,8 +410,13 @@ func PayDataPost(c *fiber.Ctx) error {
 	///////////////////////////
 	// Fetch Coin Data With Address
 	coinList := models.PayCoinAddress{}
-	database.DB.Db.Table("coin_list as a ").Select("b.address, b.lastupdate, a.coin_title, a.coin_id, a.icon, a.coin_network,a.coin_pay_url, b.address_id").Joins("left join coin_address as b on b.coin_id = a.coin_id").Where(" b.lastupdate < NOW() - INTERVAL '1 hour' AND b.status = ? AND b.coin_id = ? ", 1, req.Crypto_id).Limit(1).Find(&coinList)
+	database.DB.Db.Table("coin_list as a ").Select("b.address, b.lastupdate, a.coin_title, a.coin_id, a.icon, a.coin_network,a.coin_pay_url, b.address_id").Joins("left join coin_address as b on b.coin_id = a.coin_id").Where(" b.lastupdate < NOW() - INTERVAL '5 minutes' AND b.status = ? AND b.coin_id = ? ", 1, req.Crypto_id).Limit(1).Find(&coinList) //INTERVAL '1 hour' change for 1 hour
+	//fmt.Println("coinList => ", coinList)
+	if coinList.Address == "" {
+		//fmt.Println("Try AGAIN")
+		database.DB.Db.Table("coin_list as a ").Select("b.address, b.lastupdate, a.coin_title, a.coin_id, a.icon, a.coin_network,a.coin_pay_url, b.address_id").Joins("left join coin_address as b on b.coin_id = a.coin_id").Where(" b.status = ? AND b.coin_id = ? ", 1, req.Crypto_id).Limit(1).Find(&coinList) //INTERVAL '1 hour' change for 1 hour
 
+	}
 	// Fetch Data for Order List
 	invoiceList := models.Invoice_Data{}
 	database.DB.Db.Table("invoice").Where("trackid = ?", req.Customerrefid).Find(&invoiceList)
@@ -427,7 +432,7 @@ func PayDataPost(c *fiber.Ctx) error {
 	}
 
 	cryptoAmount, err := function.ConvertCurrencyToCrypto(price_amount, price_currency, strings.ToLower(coinList.Coin_title))
-
+	fmt.Println("Get Convert Currency => ", cryptoAmount)
 	if err != nil {
 		fmt.Println("Static Crypto Value")
 		cryptoAmount = 0.00012
@@ -514,9 +519,11 @@ func PayDataPost(c *fiber.Ctx) error {
 		Coin_id:     coin_id,
 	}
 
+	fmt.Println("Response => ", response)
+
 	aid, err := strconv.ParseUint(coinList.Address_id, 10, 32)
 	if err != nil {
-		fmt.Println("Error 105")
+		fmt.Println("Error 105 XXX")
 	}
 	address_id := uint(aid)
 

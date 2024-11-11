@@ -42,8 +42,8 @@ func AdminInvoiceListView(c *fiber.Ctx) error {
 
 	//fmt.Println(transactionList)
 	return c.Render("admin/invoice-list", fiber.Map{
-		"Title":           "Invoices",
-		"Subtitle":        "Invoices",
+		"Title":           "Requested Payment",
+		"Subtitle":        "Requested Payment",
 		"AlertX":          Alerts,
 		"AdminData":       adminData,
 		"CommonURL":       commonURL,
