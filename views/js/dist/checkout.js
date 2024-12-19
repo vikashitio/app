@@ -109,7 +109,7 @@ $(".process").click(function(){
            // alert(data.address);
            // alert(data.amount);
 
-            alert(data.coin_pay_url);
+           //alert(data.coin_pay_url);
             
 
             if(deviceType !=  "Web"){

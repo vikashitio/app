@@ -28,9 +28,9 @@ func ConnectDb() {
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable TimeZone=Asia/Kolkata", //Asia/Shanghai
 		"localhost",
 		5432,
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASSWORD"),
-		os.Getenv("DB_NAME"),
+		os.Getenv("DB_USER"),     // Get Data from ENV File
+		os.Getenv("DB_PASSWORD"), // Get Data from ENV File
+		os.Getenv("DB_NAME"),     // Get Data from ENV File
 	)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
@@ -39,11 +39,11 @@ func ConnectDb() {
 	})
 
 	if err != nil {
-		log.Fatal("Failed to connect to database. \n", err)
+		log.Fatal("Failed to connect to database. \n", err) // Display Connection Error
 		//os.Exit(2)
 	}
 
-	log.Println("connected")
+	//log.Println("connected")
 	//db.Logger = logger.Default.LogMode(logger.Info)
 
 	//log.Println("running migrations")

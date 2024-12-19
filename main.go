@@ -52,8 +52,11 @@ func main() {
 	engine.AddFunc("toupper", strings.ToUpper)
 
 	app := fiber.New(fiber.Config{
-		Views:             engine,
-		ViewsLayout:       "layouts/main",
+		// Sets the view engine for rendering templates (e.g., HTML).
+		Views: engine,
+		// Specifies the default layout template to be used for views.
+		ViewsLayout: "layouts/main",
+		// Passes local variables defined in Fiber handlers to the view templates automatically.
 		PassLocalsToViews: true,
 	})
 	// Apply CORS middleware globally
@@ -101,7 +104,7 @@ func main() {
 		c.Locals("HostName", os.Getenv("HostName"))       // Set FaviconIcon Path
 
 		GetURL := c.BaseURL() // Get Base Url
-		if GetURL == "http://192.168.1.19:"+os.Getenv("PORT") {
+		if GetURL == "http://localhost:"+os.Getenv("PORT") {
 			c.Locals("CssURLS", os.Getenv("GitUrl")) // Set Logo Path
 		} else {
 			c.Locals("CssURLS", os.Getenv("FileURL")) // Set Logo Path
@@ -116,7 +119,8 @@ func main() {
 		return c.Status(404).Render("404", fiber.Map{})
 	})
 
+	// Starts the Fiber application and listens on the port specified in the "PORT" environment variable.
+	// Logs a fatal error if the application fails to start.
 	log.Fatal(app.Listen(":" + os.Getenv("PORT") + ""))
-	//log.Fatal(app.Listen("192.168.1.31:" + os.Getenv("PORT") + ""))
 
 }

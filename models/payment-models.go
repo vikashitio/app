@@ -2,6 +2,8 @@ package models
 
 import "time"
 
+// Define struct for payment related
+
 // Structs to represent the JSON data
 type OnlineResponse struct {
 	ContractMap map[string]bool  `json:"contractMap"`
@@ -11,6 +13,7 @@ type OnlineResponse struct {
 	Data        []OnlineDataItem `json:"data"`
 }
 
+// Structs for get Online Token info
 type OnlineTokenInfo struct {
 	TokenId      string `json:"tokenId"`
 	TokenAbbr    string `json:"tokenAbbr"`
@@ -24,6 +27,7 @@ type OnlineTokenInfo struct {
 	VIP          bool   `json:"vip"`
 }
 
+// Structs for get Online Data
 type OnlineDataItem struct {
 	Amount          string `json:"amount"`
 	Status          int    `json:"status"`
@@ -57,6 +61,7 @@ type OnlineTokenData struct {
 	TokenType    string `json:"tokenType"`
 }
 
+// Structs for get ETH Response
 type ETHResponse struct {
 	Status  string `json:"status"`
 	Message string `json:"message"`
@@ -84,7 +89,7 @@ type ETHResponse struct {
 	} `json:"result"`
 }
 
-// Struct for transactions
+// Struct for update Transaction Online
 type TransactionUpdateOnline struct {
 	//gorm.Model
 	Id                 uint      `gorm:"primaryKey"`
@@ -99,6 +104,7 @@ type TransactionUpdateOnline struct {
 	Response_json      string    `json:"response_json,omitempty"`
 }
 
+// Struct for generate pay request
 type PayRequest struct {
 	Cid            string `json:"cid" form:"cid"`
 	Price_currency string `json:"price_currency" form:"price_currency"`
@@ -110,6 +116,8 @@ type PayRequest struct {
 	Crypto_id      int    `json:"crypto_id" form:"crypto_id"`
 	Customerrefid  string `json:"customerrefid" form:"customerrefid"`
 }
+
+// Struct for gate pay response
 type PayResponse struct {
 	Qr_code      string  `json:"qr_code"`
 	Address      string  `json:"address"`
@@ -157,7 +165,7 @@ type CardanoTTL struct {
 	Timestamp time.Time `json:"timestamp"`
 }
 
-//Struct fo BTC
+//Struct fo BTC Response
 type BTCAddressInfo struct {
 	Txs []BTCTransaction `json:"txs"`
 }
@@ -183,7 +191,7 @@ type BTCOutput struct {
 	Addr  string `json:"addr"`
 }
 
-// Main struct for the address data
+// Main struct for the doge address data
 type DogeAddressData struct {
 	Address string      `json:"address"`
 	TxRefs  []DogeTxRef `json:"txrefs"`
@@ -199,7 +207,7 @@ type DogeTxRef struct {
 	DoubleSpend bool      `json:"double_spend"`
 }
 
-// Main struct for the address data
+// Main struct for the Lite address data
 type LiteAddressData struct {
 	Address string      `json:"address"`
 	TxRefs  []LiteTxRef `json:"txrefs"`
@@ -215,7 +223,7 @@ type LiteTxRef struct {
 	DoubleSpend bool      `json:"double_spend"`
 }
 
-// Main struct for the address data
+// Main struct for the DASH address data
 type DashAddressData struct {
 	Address string      `json:"address"`
 	TxRefs  []DashTxRef `json:"txrefs"`
@@ -231,7 +239,7 @@ type DashTxRef struct {
 	DoubleSpend bool      `json:"double_spend"`
 }
 
-// Response is the root structure
+// Response is the MATIC - Polygon
 type CoinXAddressData struct {
 	Status  string          `json:"status"`
 	Message string          `json:"message"`

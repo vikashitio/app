@@ -20,7 +20,7 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
-// Function for send email
+// Function for send email by Email Template
 func SendEmail(template_code string, p models.EmailData) error {
 	//////////////////////////////////////////
 
@@ -296,7 +296,7 @@ type APIKeyResponse struct {
 	Client_id int
 }
 
-// GetMIDByApikey Get Merchant ID from API Key
+// Get Merchant ID from API Key
 func GetMIDByApikey(apikey string) (uint, string) {
 
 	//fmt.Println("apikey - > ", apikey)
@@ -319,7 +319,7 @@ type NameByMID struct {
 	Full_name string
 }
 
-// Get Merchant Name ID  By Merchant ID
+// Get Merchant Name  By Merchant ID
 func GetNameByMID(MID uint) string {
 	nameByMID := NameByMID{}
 	database.DB.Db.Table("client_master").Select("full_name").Where("client_id = ? AND status = ?", MID, 1).Find(&nameByMID)
@@ -331,7 +331,7 @@ type EmailByMID struct {
 	Username string
 }
 
-// Get Merchant Name ID  By Merchant ID
+// Get Merchant Email  By Merchant ID
 func GetEmailByMID(MID uint) string {
 	emailByMID := EmailByMID{}
 	database.DB.Db.Table("client_master").Select("username").Where("client_id = ? AND status = ?", MID, 1).Find(&emailByMID)
@@ -343,7 +343,7 @@ type MidByHash struct {
 	Mid uint
 }
 
-// Get Merchant Email  By Reset Password Hash ID
+// Get Merchant ID  By hashcode
 func GetMidByHashID(Hash string) uint {
 	midByHash := MidByHash{}
 	database.DB.Db.Table("password_change_request").Select("mid").Where("password_hash = ?", Hash).Find(&midByHash)
@@ -355,7 +355,7 @@ type ReturnURLInvoice struct {
 	Return_url string
 }
 
-// Get WP GetRedirecURL
+// Get WP Get Redirec URL
 func GetRedirecURL(Customerrefid string) string {
 	data := ReturnURLInvoice{}
 	database.DB.Db.Table("invoice").Select("return_url").Where("trackid = ?", Customerrefid).Find(&data)
@@ -368,7 +368,7 @@ type CustomerEmailData struct {
 	Customer_email string
 }
 
-// Get Customer EMAIL for send Email
+// Get Customer EMAIL from transaction id
 func GetCustomerEmail(TransID string) string {
 	data := CustomerEmailData{}
 	database.DB.Db.Table("customer").Select("customer_name", "customer_email").Where("customer_tid = ?", TransID).Find(&data)
@@ -376,17 +376,20 @@ func GetCustomerEmail(TransID string) string {
 	return return_data
 }
 
-// Get Get Converted Amount By TransID
+// Struct for Get Get Converted Amount By TransID
 type ConvertedAmount struct {
 	Convertedamount float64
 }
 
+// Function for Get Converted Amount By Transaction ID
 func GetConvertedAmountByTransID(TransID string) float64 {
 	convertedAmount := ConvertedAmount{}
 	database.DB.Db.Table("transaction").Select("convertedamount").Where("transaction_id = ? ", TransID).Find(&convertedAmount)
 	getamt := convertedAmount.Convertedamount
 	return getamt
 }
+
+// Function for Get status by id
 
 func GetStatusByStatusID(StatusID int) string {
 
@@ -403,6 +406,7 @@ func GetStatusByStatusID(StatusID int) string {
 	return status
 }
 
+// Function for Get sub status by id
 func GetSubStatusByStatusID(StatusID int) string {
 
 	status := ""
@@ -439,18 +443,19 @@ func IsPaymentSuccess(invoice, received float64, mid int64) bool {
 	//fmt.Println("success_margin ==>", success_margin)
 
 	if success_margin == 0 {
-		success_margin = 2.0
+		success_margin = 2.0 // Set Default Value
 	}
 	//fmt.Println("success_margin set  ==>", success_margin)
 	// Check if the percentage difference is less than or equal to 2%
 	return percentageDiff <= success_margin
 }
 
-// Function to check if the received amount is within 2% of the invoice amount
+// Function for Update Merchant History
 func UpdateMerchantHistory(updatetype, uptadedesc, ip string, Client_id uint) bool {
 
 	// Format the current time as a string
 	update_time := time.Now().Format("2006-01-02 15:04:05")
+	// Create Query and Insert into DB
 	qry := models.UpdateHistory{Client_id: Client_id, Update_ip: ip, Update_type: updatetype, Update_desc: uptadedesc, Updated_on: update_time}
 	database.DB.Db.Table("update_history").Select("client_id", "Update_ip", "Update_type", "Update_desc", "Updated_on").Create(&qry)
 
