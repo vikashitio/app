@@ -7,8 +7,9 @@ type Datas struct {
 	MName string
 }
 
-// For display Merchant login history listing
+// Here create struct for all functions and methods calls in projects
 
+// Struct For display Merchant login history listing
 type LoginHistory struct {
 	//gorm.Model
 	Token_id    uint   `gorm:"primaryKey"`
@@ -21,12 +22,14 @@ type LoginHistory struct {
 	//Count       int64  `json:"count"`
 }
 
+// Struct For Update login history
 type LoginHistoryUpdate struct {
 	//gorm.Model
 	Token_id    uint   `gorm:"primaryKey"`
 	Logout_time string `json:"logout_time,omitempty"`
 }
 
+// Struct For Change Password request
 type PasswordChangeRequest struct {
 	//gorm.Model
 	Id             uint   `gorm:"primaryKey"`
@@ -35,7 +38,7 @@ type PasswordChangeRequest struct {
 	Password_email string `json:"password_email,omitempty"`
 }
 
-// for fetch Email template details use for send email
+// Struct For Email Template Listing
 type EmailTemplate struct {
 	//gorm.Model
 	Template_id      uint   `gorm:"primaryKey"`
@@ -45,6 +48,7 @@ type EmailTemplate struct {
 	Status           int    `json:"status,omitempty"`
 }
 
+// Struct For Update login history
 type UpdateHistory struct {
 	//gorm.Model
 	Update_id   uint   `gorm:"primaryKey"`
@@ -55,7 +59,7 @@ type UpdateHistory struct {
 	Updated_on  string `json:"updated_on,omitempty"`
 }
 
-// For Display Transaction List
+// Struct For Display Transaction List
 type TransactionList struct {
 	//gorm.Model
 	Transactionid    uint   `gorm:"primaryKey"`
@@ -68,7 +72,7 @@ type TransactionList struct {
 	Timestamp        string `json:"timestamp,omitempty"`
 }
 
-// For Display Wallet  List
+// Struct For Display Wallet  List
 type WalletList struct {
 	//gorm.Model
 	Wallet_id     uint   `gorm:"primaryKey"`
@@ -86,7 +90,7 @@ type WalletList struct {
 	Lockedamount  string `json:"lockedamount,omitempty"`
 }
 
-// For Fetch Wallet Balance
+// Struct For Fetch Wallet Balance
 type WalletListBalance struct {
 	//gorm.Model
 	Wallet_id    uint   `gorm:"primaryKey"`
@@ -97,7 +101,7 @@ type WalletListBalance struct {
 	Available    string `json:"available,omitempty"`
 }
 
-// For Fetch Merchant Details
+// Struct For Login Details
 type LoginList struct {
 	//gorm.Model
 	Client_id   uint `gorm:"primaryKey"`
@@ -109,7 +113,7 @@ type LoginList struct {
 	User_agent  string
 }
 
-// For Merchant Details
+// Struct For Merchant Details
 type MemberDetails struct {
 	//gorm.Model
 	Client_id     uint   `gorm:"primaryKey"`
@@ -130,20 +134,21 @@ type MemberDetails struct {
 	//Pincode       string `json:"pincode,omitempty"`
 }
 
-// For Update Member Status
+// Struct For Update Member Status
 type MemberStatusUpdate struct {
 	//gorm.Model
 	Client_id uint `gorm:"primaryKey"`
 	Status    int  `json:"status,omitempty"`
 }
 
-// For Update Volt
+// Struct For Update Fireblock Volt
 type UpdateVolt struct {
 	//gorm.Model
 	Client_id uint `gorm:"primaryKey"`
 	Volt_id   string
 }
 
+// Struct For Update Google 2FA
 type Update2FA struct {
 	//gorm.Model
 	Client_id   uint `gorm:"primaryKey"`
@@ -151,6 +156,7 @@ type Update2FA struct {
 	Totp_status int
 }
 
+// Struct For Manage Merchant Details
 type Client_Master struct {
 	//gorm.Model
 	Client_id uint `gorm:"primaryKey"`
@@ -171,7 +177,7 @@ type ApiBody struct {
 	BodyData string
 }
 
-// for Display Vault List
+// for Display Vault List Fireblock
 type VaultList struct {
 	Id         int           `json:"id,omitempty"`
 	Name       string        `json:"name,omitempty"`
@@ -180,7 +186,7 @@ type VaultList struct {
 	Assets     []AddressList `json:"assets"`
 }
 
-// For Manage Address List
+// For Manage Address List Fireblock
 type AddressList struct {
 	Id           string `json:"id,omitempty"`
 	Total        string `json:"total,omitempty"`
@@ -192,6 +198,8 @@ type AddressList struct {
 	Staked       string `json:"staked,omitempty"`
 	BlockHeight  string `json:"blockHeight,omitempty"`
 }
+
+// For Manage User API Fireblock
 type UserApi struct {
 	ID        string `json:"id,omitempty"`
 	FirstName string `json:"firstName,omitempty"`
@@ -229,7 +237,7 @@ type FireblocksResponse struct {
 	Assets     []Asset `json:"assets"`
 }
 
-// For Get Fireblock Responce
+// For Get Fireblock Response
 type FireblocksVoltResponse struct {
 	Accounts []FireblocksResponse `json:"accounts"`
 	Paging   Paging               `json:"paging"`
@@ -281,7 +289,7 @@ type CreateVaultAccountResponse struct {
 	Name string `json:"name"`
 }
 
-// for manage Profile
+// for manage merchant Profile
 type ProfileData struct {
 	Client_id     uint   `gorm:"primaryKey"`
 	Gender        string `json:"gender"`
@@ -297,11 +305,12 @@ type ProfileData struct {
 	Profile_image string `json:"profile_image"`
 }
 
+// Struct for alerts
 type Alert struct {
 	Alert string
 }
 
-// For Add Wallet
+// Struct For Add Wallet
 type AddWallet struct {
 	//Wallet_id     uint   `json:"wallet_id"`
 	Volt_id       string `json:"volt_id"`
@@ -311,7 +320,7 @@ type AddWallet struct {
 	Tag           string `json:"tag,omitempty"`
 }
 
-// for display wallet List
+// Struct for display wallet List
 type GetWallet struct {
 	Wallet_id     uint   `json:"wallet_id"`
 	Volt_id       string `json:"volt_id"`
@@ -321,7 +330,7 @@ type GetWallet struct {
 	Tag           string `json:"tag,omitempty"`
 }
 
-// For send Envoice Data
+// Struct For send Envoice Data
 type EmailData struct {
 	Email       string
 	FullName    string
@@ -504,6 +513,7 @@ type Source struct {
 	ID   string `json:"id"`
 }
 
+// Struct for transfer Request
 type TransferRequest struct {
 	AssetId       string      `json:"assetId"`
 	Source        Source      `json:"source"`
@@ -515,6 +525,7 @@ type TransferRequest struct {
 	CustomerRefId string      `json:"customerRefId"`
 }
 
+// Struct for get transactions response
 type TransResponce struct {
 	ID      string `json:"id"`
 	Status  string `json:"status"`
@@ -522,6 +533,7 @@ type TransResponce struct {
 	Code    int    `json:"code"`
 }
 
+// Struct for get transactions response
 type TransGetResponce struct {
 	Id              uint    `gorm:"primaryKey"`
 	Requestedamount float64 `json:"requestedAmount"`
@@ -585,7 +597,7 @@ type Transaction_Update struct {
 	Approved_date    string  `json:"approved_date,omitempty"`
 }
 
-// Struct for transactions
+// Struct for update transactions withdraw
 type Transaction_Withdraw_Update struct {
 	//gorm.Model
 	Id               uint   `gorm:"primaryKey"`
@@ -611,7 +623,7 @@ type CoinWithBalance struct {
 	Balance string `json:"balance,omitempty"`
 }
 
-// for manage Invoice
+// for manage Pay Reques
 type Invoice_Master struct {
 	//gorm.Model
 	Invoice_id          uint    `gorm:"primaryKey"`
@@ -632,7 +644,7 @@ type Invoice_Master struct {
 	Return_url          string  `json:"return_url"`
 }
 
-// for manage Invoice
+// for manage Pay Reques
 type Invoice_Data struct {
 	//gorm.Model
 	Invoice_id          uint    `gorm:"primaryKey"`
@@ -643,7 +655,7 @@ type Invoice_Data struct {
 	Is_fee_paid_by_user bool    `json:"is_fee_paid_by_user,omitempty"`
 }
 
-// for manage support ticket
+// Struct for manage support ticket
 type Support_Ticket struct {
 	//gorm.Model
 	Ticket_id      uint   `gorm:"primaryKey"`
@@ -654,7 +666,7 @@ type Support_Ticket struct {
 	Timestamp      string `json:"timestamp,omitempty"`
 }
 
-// for manage support ticket reply
+// Struct for manage support ticket reply
 type Support_Ticket_Reply struct {
 	//gorm.Model
 	Reply_id   uint   `gorm:"primaryKey"`
@@ -665,7 +677,7 @@ type Support_Ticket_Reply struct {
 	Timestamp  string `json:"timestamp,omitempty"`
 }
 
-// for manage Currency
+// Struct for manage crypto wallet
 type CryptoWalletList struct {
 	Wallet_id      uint   `gorm:"primaryKey"`
 	Client_id      uint   `json:"client_id,omitempty"`
@@ -689,25 +701,27 @@ type SettlementSetting struct {
 	Wallet_id      int    `json:"wallet_id,omitempty"`
 }
 
-// for manage coin
+// for Delete crypto wallet
 type CryptoWalletDeleted struct {
 	Wallet_id uint `gorm:"primaryKey"`
 	Status    int  `json:"status,omitempty"`
 }
 
+// For Network List
 type Network struct {
 	Crypto_code          string `db:"crypto_code"`
 	Crypto_network_short string `db:"Crypto_network_short"`
 	Crypto_id            string `db:"crypto_id"`
 }
 
+// For Coin By Network Details
 type NetworkCoin struct {
 	Coin         string `db:"coin"`
 	Coin_network string `db:"coin_network"`
 	Coin_id      string `db:"coin_id"`
 }
 
-// For Display Transaction List
+// For Client API
 type ClientAPI struct {
 	//gorm.Model
 	ID        uint   `gorm:"primaryKey"`
@@ -717,7 +731,7 @@ type ClientAPI struct {
 	Timestamp string `json:"timestamp,omitempty"`
 }
 
-// For Display Transaction List
+// For Manage Client Store
 type ClientStore struct {
 	//gorm.Model
 	ID             uint    `gorm:"primaryKey"`
@@ -727,6 +741,7 @@ type ClientStore struct {
 	Success_margin float64 `json:"success_margin,omitempty"`
 }
 
+// for Count Transaction By Status
 type CountTransactionByStatus struct {
 	Total_transactions int `db:"total_transactions"`
 	Total_success      int `db:"total_success"`
@@ -743,7 +758,7 @@ type CustomerData struct {
 	Customer_tid   string `json:"customer_tid,omitempty"`
 }
 
-// for Customer Data
+// for Customer Listing
 type CustomerList struct {
 	Customer_name  string `json:"customer_name,omitempty"`
 	Customer_email string `json:"customer_email,omitempty"`
@@ -751,22 +766,28 @@ type CustomerList struct {
 	Client_id      uint   `json:"client_id,omitempty"`
 }
 
+// for Settlement Request
 type SettlementRequest struct {
 	Coin_id     int    `json:"coin_id,omitempty"`
 	Wallet_id   int    `json:"wallet_id,omitempty"`
 	CoinAddress string `json:"coinAddress,omitempty"`
 	Action      string `json:"action,omitempty"`
 }
+
+// Get get Settlement Response
 type SettlementResponse struct {
 	Status  int    `json:"status" form:"sender_name"`
 	Message string `json:"message" form:"sender_email"`
 }
 
+// Get Settlement Coin Details
 type SettlementCoin struct {
 	Coin         string `json:"coin,omitempty"`
 	Coin_title   string `json:"coin_title,omitempty"`
 	Coin_network string `json:"coin_network,omitempty"`
 }
+
+// Get Settlement Status
 type SettlementStatus struct {
 	Status string `json:"status" form:"sender_name"`
 }

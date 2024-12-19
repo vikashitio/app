@@ -398,7 +398,7 @@ func PayDataPost(c *fiber.Ctx) error {
 		})
 	}
 
-	fmt.Println("req=>", req)
+	//fmt.Println("req=>", req)
 
 	// Generate randomly Transaction ID
 	transID, err := function.GenerateRandomID(16) // 16 bytes will give us a 32 character hex string

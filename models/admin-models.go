@@ -4,8 +4,10 @@ import (
 	"time"
 )
 
-// For display login history listing
+// Struct for Admin Section
+// Here create struct for used in admin functions and methods
 
+// For display login history listing
 type AdminLoginHistory struct {
 	//gorm.Model
 	Token_id    uint   `gorm:"primaryKey"`
@@ -16,6 +18,7 @@ type AdminLoginHistory struct {
 	//Count       int64  `json:"count"`
 }
 
+// For display Admin User listing
 type AdminLoginList struct {
 	//gorm.Model
 	Admin_id  uint   `gorm:"primaryKey"`
@@ -26,7 +29,7 @@ type AdminLoginList struct {
 	Role      string `json:"role,omitempty"`
 }
 
-// for manage coin
+// for manage coin List
 type CoinList struct {
 	Coin_id         uint   `gorm:"primaryKey"`
 	Coin            string `json:"coin,omitempty"`
@@ -38,7 +41,7 @@ type CoinList struct {
 	Coin_status_url string `json:"coin_status_url,omitempty"`
 }
 
-// for manage coin
+// for manage coin address
 type PayCoinAddress struct {
 	Coin_title   string `json:"coin_title,omitempty"`
 	Coin_id      int    `json:"coin_id,omitempty"`
@@ -50,20 +53,20 @@ type PayCoinAddress struct {
 	Coin_network string `json:"coin_network,omitempty"`
 }
 
-// for manage coin
+// for update coin address
 type CoinAddress struct {
 	Coin    string `json:"coin,omitempty"`
 	Address string `json:"address,omitempty"`
 	Coin_id int    `json:"coin_id,omitempty"`
 }
 
-// for manage coin
+// for fet coin address url
 type CoinAddressUrl struct {
 	Coin            string `json:"coin,omitempty"`
 	Coin_status_url string `json:"coin_status_url,omitempty"`
 }
 
-// for manage coin
+// for delete coin
 type CoinDeleted struct {
 	Coin_id uint `gorm:"primaryKey"`
 	Status  int  `json:"status,omitempty"`
@@ -80,13 +83,13 @@ type AddressListing struct {
 	Token_details string    `json:"token_details"`
 }
 
-// for manage Address
+// for delete Address
 type AddressDeleted struct {
 	Address_id uint `gorm:"primaryKey"`
 	Status     int  `json:"status,omitempty"`
 }
 
-// for manage coin
+// for update address date
 type AddressDateUpdate struct {
 	Address_id uint      `gorm:"primaryKey"`
 	Lastupdate time.Time `json:"lastupdate"`
@@ -102,13 +105,13 @@ type CurrencyList struct {
 	Status                  int    `json:"status,omitempty"`
 }
 
-// for manage coin
+// for delete currency
 type CurrencyDeleted struct {
 	Currency_id uint `gorm:"primaryKey"`
 	Status      int  `json:"status,omitempty"`
 }
 
-// for manage Currency
+// for display Crypto Currency List
 type CryptoCurrencyList struct {
 	Crypto_id            uint   `gorm:"primaryKey"`
 	Crypto_code          string `json:"crypto_code,omitempty"`
@@ -118,14 +121,14 @@ type CryptoCurrencyList struct {
 	Status               int    `json:"status,omitempty"`
 }
 
-// for manage Currency
+// for manage Crypto Currency Data
 type CryptoCurrencyData struct {
 	Crypto_code    string `json:"crypto_code,omitempty"`
 	Crypto_title   string `json:"crypto_title,omitempty"`
 	Crypto_network string `json:"crypto_network,omitempty"`
 }
 
-// for manage coin
+// for Delete Crypto Currency
 type CryptoCurrencyDeleted struct {
 	Crypto_id uint `gorm:"primaryKey"`
 	Status    int  `json:"status,omitempty"`
@@ -145,7 +148,7 @@ type AcquirerList struct {
 	Status         int    `json:"status,omitempty"`
 }
 
-// for manage coin
+// for delete acquirer
 type AcquirerDeleted struct {
 	Acquirer_id uint `gorm:"primaryKey"`
 	Status      int  `json:"status,omitempty"`
@@ -177,19 +180,19 @@ type AdminList struct {
 	Status int `json:"status,omitempty"`
 }
 
-// for manage Admin
+// for delete Admin
 type AdminDeleted struct {
 	Admin_id uint `gorm:"primaryKey"`
 	Status   int  `json:"status,omitempty"`
 }
 
-// for manage Admin
+// for manage Admin password
 type AdminPassword struct {
 	Admin_id uint   `gorm:"primaryKey"`
 	Password string `json:"password,omitempty"`
 }
 
-// for manage Admin
+// for update Admin details
 type AdminUpdate struct {
 	Admin_id  uint   `gorm:"primaryKey"`
 	Full_name string `json:"full_name,omitempty"`
@@ -197,7 +200,7 @@ type AdminUpdate struct {
 	Status    int    `json:"status,omitempty"`
 }
 
-// for manage Email Template
+// for delete Email Template
 type TemplateDeleted struct {
 	Template_id uint `gorm:"primaryKey"`
 	Status      int  `json:"status,omitempty"`
@@ -212,7 +215,7 @@ type CoinIDDetails struct {
 	Name    string `json:"name,omitempty"`
 }
 
-// for Developer Guide
+// for  manage Developer Guide
 type DeveloperGuide struct {
 	Id        uint   `gorm:"primaryKey"`
 	Title     string `json:"title,omitempty"`
@@ -222,6 +225,7 @@ type DeveloperGuide struct {
 	Status    int    `json:"status,omitempty"`
 }
 
+// for delete Developer Guide data
 type DeveloperGuideDeleted struct {
 	Id     uint `gorm:"primaryKey"`
 	Status int  `json:"status,omitempty"`
