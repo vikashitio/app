@@ -432,7 +432,7 @@ func PayDataPost(c *fiber.Ctx) error {
 	}
 
 	cryptoAmount, err := function.ConvertCurrencyToCrypto(price_amount, price_currency, strings.ToLower(coinList.Coin_title))
-	fmt.Println("Get Convert Currency => ", cryptoAmount)
+	//fmt.Println("Get Convert Currency => ", cryptoAmount)
 	if err != nil {
 		fmt.Println("Static Crypto Value")
 		cryptoAmount = 0.00012
@@ -509,14 +509,17 @@ func PayDataPost(c *fiber.Ctx) error {
 	coinicon := coinList.Icon
 	coinnetwork := coinList.Coin_network
 	coin_id := coinList.Coin_id
+	coin_pay_url := coinList.Coin_pay_url
+
 	response := models.PayResponse{
-		Qr_code:     qr_code,
-		Address:     address,
-		Amount:      convertedAmount,
-		Transid:     transID,
-		Coinicon:    coinicon,
-		Coinnetwork: coinnetwork,
-		Coin_id:     coin_id,
+		Qr_code:      qr_code,
+		Address:      address,
+		Amount:       convertedAmount,
+		Transid:      transID,
+		Coinicon:     coinicon,
+		Coinnetwork:  coinnetwork,
+		Coin_id:      coin_id,
+		Coin_pay_url: coin_pay_url,
 	}
 
 	fmt.Println("Response => ", response)

@@ -111,13 +111,14 @@ type PayRequest struct {
 	Customerrefid  string `json:"customerrefid" form:"customerrefid"`
 }
 type PayResponse struct {
-	Qr_code     string  `json:"qr_code"`
-	Address     string  `json:"address"`
-	Amount      float64 `json:"amount"`
-	Transid     string  `json:"transid"`
-	Coinicon    string  `json:"coinicon"`
-	Coinnetwork string  `json:"coinnetwork"`
-	Coin_id     int     `json:"coin_id"`
+	Qr_code      string  `json:"qr_code"`
+	Address      string  `json:"address"`
+	Amount       float64 `json:"amount"`
+	Transid      string  `json:"transid"`
+	Coinicon     string  `json:"coinicon"`
+	Coinnetwork  string  `json:"coinnetwork"`
+	Coin_id      int     `json:"coin_id"`
+	Coin_pay_url string  `json:"coin_pay_url"`
 }
 
 // CardanoTransaction represents the structure of the response from CardanoScan API.

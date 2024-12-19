@@ -1,5 +1,11 @@
 
-<link rel="icon" type="image/png" href="{{.FaviconIcon}}" sizes="16x16">
+<script>
+  //const button = document.querySelector("[data-theme-toggle]");
+  const localStorageTheme = localStorage.getItem("theme");
+  document.querySelector("html").setAttribute("data-theme", localStorageTheme);
+  //alert(localStorageTheme)
+   </script>
+<link rel="icon" href="{{.FaviconIcon}}" type="image/x-icon">
   <!-- remix icon font css  -->
   <link rel="stylesheet" type="text/css" href="{{.CssURLS}}/assets/css/remixicon.css">
   <!-- BootStrap css -->
@@ -26,12 +32,7 @@
   <!-- Bootstrap js -->
  <script src="{{.CssURLS}}/assets/js/lib/bootstrap.bundle.min.js"></script>
 
- <script>
-const button = document.querySelector("[data-theme-toggle]");
-const localStorageTheme = localStorage.getItem("theme");
-document.querySelector("html").setAttribute("data-theme", localStorageTheme);
-//alert(localStorageTheme)
- </script>
+ 
  <style>
    body::-webkit-scrollbar {
   width: 8px;               /* width of the entire scrollbar */

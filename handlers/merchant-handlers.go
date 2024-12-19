@@ -85,7 +85,8 @@ func LoginPost(c *fiber.Ctx) error {
 					s.Set("LoginMerchantID", loginList.Client_id)
 					//Save sessions
 					if err := s.Save(); err != nil {
-						panic(err)
+						//panic(err)
+						fmt.Println(err)
 					}
 					return c.Redirect("/verify-2fa")
 				}
@@ -123,7 +124,8 @@ func LoginPost(c *fiber.Ctx) error {
 				s.Set("LoginToken_id", qry.Token_id)
 				//Save sessions
 				if err := s.Save(); err != nil {
-					panic(err)
+					//panic(err)
+					fmt.Println(err)
 				}
 
 				return c.Redirect("/")
@@ -149,7 +151,8 @@ func LoginPost(c *fiber.Ctx) error {
 func LogOut(c *fiber.Ctx) error {
 	s, err := store.Get(c)
 	if err != nil {
-		panic(err)
+		//panic(err)
+		fmt.Println(err)
 	}
 
 	if s.Get("LoginToken_id") != nil {
@@ -173,7 +176,8 @@ func LogOut(c *fiber.Ctx) error {
 
 	// Destroy session
 	if err := s.Destroy(); err != nil {
-		panic(err)
+		//panic(err)
+		fmt.Println(err)
 	}
 	// Clear session or cookies
 	cookie := new(fiber.Cookie)
@@ -609,7 +613,8 @@ func ApiKeyView(c *fiber.Ctx) error {
 	if Alerts != "" {
 		s.Delete("Alert")
 		if err := s.Save(); err != nil {
-			panic(err)
+			//panic(err)
+			fmt.Println(err)
 		}
 	}
 
@@ -664,7 +669,8 @@ func ResetPasswordView(c *fiber.Ctx) error {
 	if Alerts != "" {
 		s.Delete("Alert")
 		if err := s.Save(); err != nil {
-			panic(err)
+			//panic(err)
+			fmt.Println(err)
 		}
 	}
 	hashcode := ""
@@ -836,7 +842,8 @@ func SupportTicket(c *fiber.Ctx) error {
 	if Alerts != "" {
 		s.Delete("Alert")
 		if err := s.Save(); err != nil {
-			panic(err)
+			//panic(err)
+			fmt.Println(err)
 		}
 	}
 
@@ -876,7 +883,8 @@ func AddSupportTicket(c *fiber.Ctx) error {
 	if Alerts != "" {
 		s.Delete("Alert")
 		if err := s.Save(); err != nil {
-			panic(err)
+			//panic(err)
+			fmt.Println(err)
 		}
 	}
 
@@ -907,7 +915,8 @@ func SupportTicketDetails(c *fiber.Ctx) error {
 	if Alerts != "" {
 		s.Delete("Alert")
 		if err := s.Save(); err != nil {
-			panic(err)
+			//panic(err)
+			fmt.Println(err)
 		}
 	}
 	// fetch data from support ticket
@@ -1050,7 +1059,8 @@ func ChangePasswordView(c *fiber.Ctx) error {
 	if Alerts != "" {
 		s.Delete("Alert")
 		if err := s.Save(); err != nil {
-			panic(err)
+			//panic(err)
+			fmt.Println(err)
 		}
 	}
 
@@ -1272,7 +1282,8 @@ func ProfilePost(c *fiber.Ctx) error {
 
 	s.Set("Alert", Alerts)
 	if err := s.Save(); err != nil {
-		panic(err)
+		//panic(err)
+		fmt.Println(err)
 	}
 
 	return c.Redirect("/profile")
@@ -1295,7 +1306,8 @@ func GetCryptoWalletList(c *fiber.Ctx) error {
 	if Alerts != "" {
 		s.Delete("Alert")
 		if err := s.Save(); err != nil {
-			panic(err)
+			//panic(err)
+			fmt.Println(err)
 		}
 	}
 
@@ -1595,7 +1607,8 @@ func MerchantSocialLogin(c *fiber.Ctx) error {
 					s.Set("LoginMerchantID", loginList.Client_id)
 					//Save sessions
 					if err := s.Save(); err != nil {
-						panic(err)
+						//panic(err)
+						fmt.Println(err)
 					}
 					return c.Redirect("/verify-2fa")
 				}
@@ -1624,7 +1637,8 @@ func MerchantSocialLogin(c *fiber.Ctx) error {
 
 				//Save sessions
 				if err := s.Save(); err != nil {
-					panic(err)
+					//panic(err)
+					fmt.Println(err)
 				}
 
 				qry := models.LoginHistory{Client_id: loginList.Client_id, Login_ip: loginIp, Resource: resource}

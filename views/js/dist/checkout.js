@@ -108,31 +108,33 @@ $(".process").click(function(){
            // Payment parameters
            // alert(data.address);
            // alert(data.amount);
-           // alert(cid);
-            if(cid=="btc"){
-             cid="bitcoin"
-            }
+
+            alert(data.coin_pay_url);
+            
 
             if(deviceType !=  "Web"){
                 
    
            // Universal payment deep link (example)
-           const paymentLink = `${cid}://${data.address}?amount=${encodeURIComponent(data.amount)}`;
-           alert(paymentLink);
+           const paymentLink = 'https://link.trustwallet.com/send?asset=' + data.coin_pay_url + '&address=' + data.address + '&amount=' + data.amount + '&memo=pay';
+           
+          // alert(deviceType);
+          // alert(paymentLink);
+           const userConfirmed = confirm("Are you want to pay with Trust Wallet?");
+            if (userConfirmed && data.coin_pay_url !="") {
+                window.location.href = paymentLink;
+            }
    
            // Fallback store link if the app is not installed
-           if(deviceType ==  "Android"){
-           const fallbackLink = "https://play.google.com/store/search?q=crypto-app&hl=en"; // Replace with the wallet download page
-           }else{
-           const fallbackLink = "https://apps.apple.com/app/trust-crypto-bitcoin-wallet/id1288339409"; // Replace with the wallet download page
-           }
+           //if(deviceType ==  "Android"){
+           //const fallbackLink = "https://play.google.com/store/apps/details?id=com.wallet.crypto.trustapp"; // Replace with the wallet download page
+           //}else{
+           //const fallbackLink = "https://apps.apple.com/app/trust-crypto-bitcoin-wallet/id1288339409"; // Replace with the wallet download page
+           //}
            // Attempt to open the wallet app
-           window.location.href = paymentLink;
+           
    
-           // Fallback to the wallet download page after a delay
-           setTimeout(function () {
-             window.location.href = fallbackLink;
-           }, 5000); // 2-second delay before redirecting to the fallback
+           
          }
     
             ///////////////////////////////////////////

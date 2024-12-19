@@ -46,7 +46,7 @@ func AcquirerList(c *fiber.Ctx) error {
 	var total int64
 	database.DB.Db.Table(tableNameAcq).Order(listOrderByAcq).Limit(limit).Offset(offset).Find(&acquirerList).Count(&total)
 
-	fmt.Println(acquirerList)
+	//fmt.Println(acquirerList)
 	return c.Render(pageNameAcq, fiber.Map{
 		"Title":        pageTitleAcq,
 		"Subtitle":     pageTitleAcq,

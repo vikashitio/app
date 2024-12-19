@@ -35,7 +35,8 @@ func AdminInvoiceListView(c *fiber.Ctx) error {
 	if Alerts != "" {
 		sess.Delete("AlertX")
 		if err := sess.Save(); err != nil {
-			panic(err)
+			//panic(err)
+			fmt.Println(err)
 		}
 	}
 	var commonURL = os.Getenv("CommonURL")
@@ -95,7 +96,7 @@ func AdminTransactionsView(c *fiber.Ctx) error {
 		searchStringFull = searchStringFull[4:]
 	}
 
-	fmt.Println("searchString => ", searchStringFull)
+	//fmt.Println("searchString => ", searchStringFull)
 
 	transactionList := []models.Transaction_Pay{}
 	database.DB.Db.Table("transaction").Order("id desc").Where(searchStringFull).Limit(limit).Offset(offset).Find(&transactionList)
@@ -113,7 +114,8 @@ func AdminTransactionsView(c *fiber.Ctx) error {
 	if Alerts != "" {
 		sess.Delete("AlertX")
 		if err := sess.Save(); err != nil {
-			panic(err)
+			//panic(err)
+			fmt.Println(err)
 		}
 	}
 
@@ -148,7 +150,8 @@ func AdminTransDetailsView(c *fiber.Ctx) error {
 	if Alerts != "" {
 		sess.Delete("AlertX")
 		if err := sess.Save(); err != nil {
-			panic(err)
+			//panic(err)
+			fmt.Println(err)
 		}
 	}
 
@@ -198,8 +201,8 @@ func AdminTransApprovalPost(c *fiber.Ctx) error {
 
 	status := function.GetStatusByStatusID(substatus)
 
-	fmt.Println("status =>", status)
-	fmt.Println("Substatus =>", substatus)
+	//fmt.Println("status =>", status)
+	//fmt.Println("Substatus =>", substatus)
 	trackID := c.FormValue("trackID")
 
 	approver_comment := c.FormValue("approver_comment")
@@ -285,7 +288,7 @@ func AdminWithdrawsView(c *fiber.Ctx) error {
 		searchStringFull = searchStringFull[4:]
 	}
 
-	fmt.Println("searchString => ", searchStringFull)
+	//fmt.Println("searchString => ", searchStringFull)
 
 	transactionList := []models.Transaction_Pay{}
 	database.DB.Db.Table("transaction").Order("id desc").Where(searchStringFull).Limit(limit).Offset(offset).Find(&transactionList)
@@ -303,7 +306,8 @@ func AdminWithdrawsView(c *fiber.Ctx) error {
 	if Alerts != "" {
 		sess.Delete("AlertX")
 		if err := sess.Save(); err != nil {
-			panic(err)
+			//panic(err)
+			fmt.Println(err)
 		}
 	}
 
@@ -368,7 +372,7 @@ func AdminRevenueView(c *fiber.Ctx) error {
 		searchStringFull = searchStringFull[4:]
 	}
 
-	fmt.Println("searchString => ", searchStringFull)
+	//fmt.Println("searchString => ", searchStringFull)
 
 	transactionList := []models.Transaction_Pay{}
 	database.DB.Db.Table("transaction").Order("id desc").Where(searchStringFull).Limit(limit).Offset(offset).Find(&transactionList)
@@ -386,7 +390,8 @@ func AdminRevenueView(c *fiber.Ctx) error {
 	if Alerts != "" {
 		sess.Delete("AlertX")
 		if err := sess.Save(); err != nil {
-			panic(err)
+			//panic(err)
+			fmt.Println(err)
 		}
 	}
 

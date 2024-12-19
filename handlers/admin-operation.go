@@ -81,7 +81,7 @@ func AdminLoginPost(c *fiber.Ctx) error {
 				login_time := time.Now().Format("2006-01-02 15:04:05")
 				qry := models.LoginHistory{Client_id: loginList.Admin_id, Login_ip: loginIp, Login_type: 2, Login_time: login_time}
 				result := database.DB.Db.Table("login_history").Select("client_id", "login_ip", "login_type", "login_time").Create(&qry)
-				fmt.Println("Token_id    ", qry.Token_id)
+				//fmt.Println("Token_id    ", qry.Token_id)
 				if result.Error != nil {
 					fmt.Println(result.Error)
 				}
@@ -163,7 +163,8 @@ func AdminIndexView(c *fiber.Ctx) error {
 func AdminLogOut(c *fiber.Ctx) error {
 	sess, err := store.Get(c)
 	if err != nil {
-		panic(err)
+		//panic(err)
+		fmt.Println(err)
 	}
 
 	if sess.Get("AdminLoginToken_id") != nil {
@@ -183,7 +184,8 @@ func AdminLogOut(c *fiber.Ctx) error {
 
 	// Destroy session
 	if err := sess.Destroy(); err != nil {
-		panic(err)
+		//panic(err)
+		fmt.Println(err)
 	}
 	// Clear session or cookies
 	cookie := new(fiber.Cookie)
@@ -296,7 +298,8 @@ func AdminMembersView(c *fiber.Ctx) error {
 	if Alerts != "" {
 		sess.Delete("AlertX")
 		if err := sess.Save(); err != nil {
-			panic(err)
+			//panic(err)
+			fmt.Println(err)
 		}
 	}
 
@@ -355,7 +358,8 @@ func AdminMembersDetailsView(c *fiber.Ctx) error {
 	if Alerts != "" {
 		sess.Delete("AlertX")
 		if err := sess.Save(); err != nil {
-			panic(err)
+			//panic(err)
+			fmt.Println(err)
 		}
 	}
 
@@ -408,7 +412,8 @@ func AdminMemberStatus(c *fiber.Ctx) error {
 
 	sess.Set("AlertX", Alerts)
 	if err := sess.Save(); err != nil {
-		panic(err)
+		//panic(err)
+		fmt.Println(err)
 	}
 
 	return c.Redirect("/admin/members")
@@ -435,7 +440,8 @@ func SupportTicketListing(c *fiber.Ctx) error {
 	if Alerts != "" {
 		sess.Delete("AlertX")
 		if err := sess.Save(); err != nil {
-			panic(err)
+			//panic(err)
+			fmt.Println(err)
 		}
 	}
 
@@ -479,7 +485,8 @@ func AdminMemberLogs(c *fiber.Ctx) error {
 	if Alerts != "" {
 		sess.Delete("AlertX")
 		if err := sess.Save(); err != nil {
-			panic(err)
+			//panic(err)
+			fmt.Println(err)
 		}
 	}
 
@@ -553,7 +560,8 @@ func AdminResetPasswordView(c *fiber.Ctx) error {
 	if Alerts != "" {
 		s.Delete("Alertx")
 		if err := s.Save(); err != nil {
-			panic(err)
+			//panic(err)
+			fmt.Println(err)
 		}
 	}
 
@@ -643,7 +651,8 @@ func AdminCoinIDView(c *fiber.Ctx) error {
 	if Alerts != "" {
 		sess.Delete("AlertX")
 		if err := sess.Save(); err != nil {
-			panic(err)
+			//panic(err)
+			fmt.Println(err)
 		}
 	}
 
@@ -679,7 +688,8 @@ func AdminSupportTicketDetails(c *fiber.Ctx) error {
 	if Alerts != "" {
 		sess.Delete("AlertX")
 		if err := sess.Save(); err != nil {
-			panic(err)
+			//panic(err)
+			fmt.Println(err)
 		}
 	}
 

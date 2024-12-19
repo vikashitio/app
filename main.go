@@ -72,6 +72,9 @@ func main() {
 		Compress:      true,
 		CacheDuration: 10 * 60 * 1000, // Cache static files
 		MaxAge:        3600,
+		ByteRange:     true,
+		Browse:        true,
+		Download:      false,
 	})
 	// Middleware to set correct Content-Type for CSS files
 	app.Use("/assets/css", func(c *fiber.Ctx) error {
@@ -98,7 +101,7 @@ func main() {
 		c.Locals("HostName", os.Getenv("HostName"))       // Set FaviconIcon Path
 
 		GetURL := c.BaseURL() // Get Base Url
-		if GetURL == "http://localhost:"+os.Getenv("PORT") {
+		if GetURL == "http://192.168.1.19:"+os.Getenv("PORT") {
 			c.Locals("CssURLS", os.Getenv("GitUrl")) // Set Logo Path
 		} else {
 			c.Locals("CssURLS", os.Getenv("FileURL")) // Set Logo Path

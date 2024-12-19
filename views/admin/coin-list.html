@@ -38,6 +38,7 @@
                   <th scope="col">Network</th>
                   <th scope="col">Address</th>
                   <th scope="col">Status</th>
+                  <th scope="col">TrustID <a href="https://github.com/trustwallet/wallet-core/blob/master/registry.json" target="_parent" title="view TrustID"><i class="fa-solid fa-circle-info fa-fw text-info"></i></a></th>
                   <th scope="col" class="text-end mx-2">Action</th>
                 </tr>
               </thead>
@@ -62,6 +63,7 @@
                     </div>
                     </td> 
                     <td>{{if eq .Status 1}} <i class="fa-regular fa-circle-check text-success"></i> {{else}} <i class="fa-regular fa-circle-xmark text-danger"></i> {{end}}</td>
+                    <td>{{.Coin_pay_url}}</td>
                     <td class="text-end mx-2"><a class="text-dark mx-2" href="/admin/coin-list/edit/{{.Coin_id}}" title="EDIT COIN"><i class="fa-solid fa-pen-to-square"></i></a> <a class="text-danger mx-2" href="/admin/coin-list/delete/{{.Coin_id}}" title="DELETE COIN"><i class="fa-solid fa-trash"></i></a></td>
                   </tr>
                 {{end}}
@@ -132,7 +134,7 @@
         
         <div class="col-md-6 my-2">
           <div class="form-floating">
-            <input type="text" id="coin_pay_url" name="coin_pay_url" class="form-control" title="coin pay url" required="" value="{{if .CoinPayUrl}}{{.CoinPayUrl}}{{end}}">
+            <input type="text" id="coin_pay_url" name="coin_pay_url" class="form-control" title="coin pay url"  value="{{if .CoinPayUrl}}{{.CoinPayUrl}}{{end}}">
             <label for="coin_pay_url">Coin Pay URL</label>
           </div>
         </div>
