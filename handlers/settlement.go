@@ -11,7 +11,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// Function for Post Payment form and display qr code in merchant section
+// Function for Post Settlement form in merchant section
 func SettlementSettingsPost(c *fiber.Ctx) error {
 	s, _ := store.Get(c)
 	// Get Data from ajax
@@ -86,7 +86,7 @@ func SettlementSettingsPost(c *fiber.Ctx) error {
 	return c.JSON(response)
 }
 
-// function for Display Currency Form
+// function for Display Settlement Form
 func SettlementSettingsView(c *fiber.Ctx) error {
 	// check session
 	s, _ := store.Get(c)

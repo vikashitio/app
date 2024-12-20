@@ -53,7 +53,7 @@ func GetCryptoCurrencyList(c *fiber.Ctx) error {
 	})
 }
 
-// function for Display Currency Form
+// function for Display Currency Form view
 func AddCryptoCurrencyView(c *fiber.Ctx) error {
 
 	AdminSession(c)

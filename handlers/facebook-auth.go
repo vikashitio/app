@@ -13,6 +13,8 @@ import (
 	"github.com/valyala/fasthttp/fasthttpadaptor"
 )
 
+// Functions for FaceBook Login
+// Struct for FaceBook Login
 type FBRawData struct {
 	Email     string `json:"email"`
 	FirstName string `json:"first_name"`
@@ -34,7 +36,7 @@ func init() {
 
 }
 
-// GoogleLogin initiates the login process
+// Facebook Login initiates the login process
 func FacebookLogin(c *fiber.Ctx) error {
 
 	c.Request().URI().SetQueryString("provider=facebook") // Add provider query parameter
@@ -46,7 +48,7 @@ func FacebookLogin(c *fiber.Ctx) error {
 	return nil
 }
 
-// GoogleCallback handles the callback from Google
+// Facebook Callback handles the callback from Google
 func FacebookCallback(c *fiber.Ctx) error {
 	s, _ := store.Get(c) // start session
 

@@ -16,7 +16,7 @@ var pageName = "admin/currency"
 var pageTitle = "Currency"
 var listOrderBy = "currency_id ASC"
 
-// For Add / Edit / Delete  Currency from Admin Section
+// For Add / Edit / Delete / List  Currency from Admin Section
 
 // function for Display Currency List
 func GetCurrencyList(c *fiber.Ctx) error {

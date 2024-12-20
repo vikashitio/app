@@ -60,7 +60,7 @@ func GetAdminList(c *fiber.Ctx) error {
 	})
 }
 
-// function for Display Add Form
+// function for Display Add Admin Form
 func AddAdminView(c *fiber.Ctx) error {
 
 	AdminSession(c)
@@ -76,7 +76,7 @@ func AddAdminView(c *fiber.Ctx) error {
 	})
 }
 
-// function for Submit  Form
+// function for Submit Admin  Form
 func AdminPost(c *fiber.Ctx) error {
 
 	AdminSession(c)
@@ -126,7 +126,7 @@ func AdminPost(c *fiber.Ctx) error {
 	return c.Redirect("/" + pageNameA)
 }
 
-// function for Display Edit Form
+// function for Display Edit Admin Form
 func EditAdmin(c *fiber.Ctx) error {
 
 	AdminSession(c)
@@ -148,7 +148,7 @@ func EditAdmin(c *fiber.Ctx) error {
 	})
 }
 
-// function for Deactive Admin
+// function for De Active Admin
 func DeleteAdmin(c *fiber.Ctx) error {
 	AdminSession(c)
 	id := c.Params("TID")

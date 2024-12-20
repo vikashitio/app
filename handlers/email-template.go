@@ -11,14 +11,12 @@ import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
-var tableNameT = "email_template"
-var pageNameT = "admin/email-template"
-var pageTitleT = "Email Template"
-
-// var listSizeT = "10"
-var listOrderByT = "status ASC,template_code ASC"
-
 // For Add Edit Delete Email Template from admin section for send email with related template
+
+var tableNameT = "email_template"                 // define global Table Name
+var pageNameT = "admin/email-template"            // define global Page Name
+var pageTitleT = "Email Template"                 // define global Page Title
+var listOrderByT = "status ASC,template_code ASC" // define global Order in Query
 
 // function for Display Email Template List
 func GetTemplateList(c *fiber.Ctx) error {

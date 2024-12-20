@@ -11,7 +11,7 @@ import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
-// For Add / Edit / Delete Developer Guide from Admin Section
+// For Add / Edit / Delete Developer Guide from Admin Sections
 
 // function for Display Developer Guide List
 func DeveloperGuide(c *fiber.Ctx) error {

@@ -29,13 +29,13 @@ func init() {
 
 }
 
-// GoogleLogin initiates the login process
+// Google Login initiates the login process
 func GoogleLogin(c *fiber.Ctx) error {
 	url := oauthConfig.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 	return c.Redirect(url)
 }
 
-// GoogleCallback handles the callback from Google
+// Google Callback handles the callback from Google
 func GoogleCallback(c *fiber.Ctx) error {
 	s, _ := store.Get(c) // start session
 	code := c.Query("code")

@@ -13,8 +13,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// For Admin
-// Function for Display Invoice Listing in admin section
+// For Admin Section functions for Manage Pay Request / Request / Transaction / Withdraw etc
+
+// Function for Display Pay Request Listing in admin section
 func AdminInvoiceListView(c *fiber.Ctx) error {
 
 	AdminSession(c)
@@ -247,7 +248,7 @@ func AdminTransApprovalPost(c *fiber.Ctx) error {
 	return c.Redirect("/admin/transactions")
 }
 
-// Function for Display Transaction Listing in admin section
+// Function for Display Withdraw Listing in admin section
 func AdminWithdrawsView(c *fiber.Ctx) error {
 
 	AdminSession(c)
@@ -331,7 +332,7 @@ func AdminWithdrawsView(c *fiber.Ctx) error {
 	})
 }
 
-// Function for Display Transaction Listing in admin section
+// Function for Display Revenue Listing in admin section
 func AdminRevenueView(c *fiber.Ctx) error {
 
 	AdminSession(c)

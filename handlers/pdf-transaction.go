@@ -13,7 +13,7 @@ import (
 	"github.com/jung-kurt/gofpdf/v2"
 )
 
-// Page for Generate Transaction list data into PDF
+// Page for Generate Transaction list data into PDF format
 
 func TransPDF(c *fiber.Ctx) error {
 

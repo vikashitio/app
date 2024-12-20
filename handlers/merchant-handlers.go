@@ -15,13 +15,13 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// Functions for Merchant Login / Registration/ Logout/ Login History/ Support Ticket/ change password and check session
+
 var store = session.New()
 
 func init() {
 	//database.ConnectDb() // for connect Db define in function.go
 }
-
-// Functions for Merchant Login / Registration/ Logout/ Login History/ Support Ticket/ change password and check session
 
 // For Display Login form
 func LoginView(c *fiber.Ctx) error {
@@ -520,7 +520,6 @@ func WithdrawFormPost(c *fiber.Ctx) error {
 }
 
 // For Display Merchant Login History
-
 func LoginHistoryView(c *fiber.Ctx) error {
 
 	s, _ := store.Get(c)
@@ -588,7 +587,6 @@ func CustomerView(c *fiber.Ctx) error {
 }
 
 // For Display Merchant API Key
-
 func ApiKeyView(c *fiber.Ctx) error {
 
 	s, _ := store.Get(c)
@@ -628,10 +626,11 @@ func ApiKeyView(c *fiber.Ctx) error {
 		"Alert":        Alerts,
 	})
 }
+
+// For fetch Merchant API Key
 func GetApiKey(c *fiber.Ctx) error {
 
 	s, _ := store.Get(c)
-
 	merchantData := s.Get("MerchantData")
 	if merchantData == nil {
 		fmt.Println("Session Expired102")
@@ -1497,6 +1496,7 @@ func GetNetwork(c *fiber.Ctx) error {
 
 }
 
+// function for process Social Media Login
 func MerchantSocialLogin(c *fiber.Ctx) error {
 
 	s, _ := store.Get(c)

@@ -12,7 +12,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// Function for Post Payment form and display qr code in merchant section
+// Function for For convert crypto to USDT in Merchant section http://localhost:3000/crypto-exchange
 func CryptoExchangeView(c *fiber.Ctx) error {
 	// check session
 	s, _ := store.Get(c)
@@ -41,7 +41,7 @@ func CryptoExchangeView(c *fiber.Ctx) error {
 	})
 }
 
-// function for Display Currency Form
+// function for Post Crypto Exchange Data
 func CryptoExchangePost(c *fiber.Ctx) error {
 	// check session
 	s, _ := store.Get(c)
@@ -62,7 +62,7 @@ func CryptoExchangePost(c *fiber.Ctx) error {
 	return c.Redirect("/crypto-exchange")
 }
 
-// For Matched 2FA Code
+// function for get Crypto Exchange Rate
 func CryptoExchangeRate(c *fiber.Ctx) error {
 
 	s, _ := store.Get(c)

@@ -13,7 +13,7 @@ import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
-// For Add / Edit / Delete  Coin Address from Admin Section
+// For Add / Edit / Delete / List  Coin Address from Admin Section
 
 // function for Display Address List
 func GetAddressList(c *fiber.Ctx) error {

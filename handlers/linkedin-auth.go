@@ -42,7 +42,7 @@ func init() {
 
 }
 
-// GoogleLogin initiates the login process
+// Linked Login initiates the login process
 func LinkedInLogin(c *fiber.Ctx) error {
 
 	// Generate LinkedIn login URL with state parameter
@@ -50,7 +50,7 @@ func LinkedInLogin(c *fiber.Ctx) error {
 	return c.Redirect(authURL)
 }
 
-// GoogleCallback handles the callback from Google
+// Linked Callback handles the callback from Google
 func LinkedInCallback(c *fiber.Ctx) error {
 	s, _ := store.Get(c) // start session
 	// Check the state parameter to prevent CSRF attacks
