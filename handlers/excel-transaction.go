@@ -12,7 +12,7 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
-// function for generate excel
+// function for generate  Excel with Transaction List
 func TransExcel(c *fiber.Ctx) error {
 	f := excelize.NewFile()
 	defer func() {

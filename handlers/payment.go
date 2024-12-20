@@ -170,7 +170,7 @@ func RequestedPaymentViews(c *fiber.Ctx) error {
 	})
 }
 
-// Function for Display invoice form in merchant section
+// Function for Display Pay Request form in merchant section
 func PaymentViews(c *fiber.Ctx) error {
 	// check session
 	s, _ := store.Get(c)
@@ -192,7 +192,7 @@ func PaymentViews(c *fiber.Ctx) error {
 	})
 }
 
-// Function for Post invoice form in merchant section
+// Function for Post Pay Request form in merchant section
 func PaymentRequestPost(c *fiber.Ctx) error {
 
 	// Get Data from ajax
@@ -300,7 +300,7 @@ func PayLinksListViews(c *fiber.Ctx) error {
 	})
 }
 
-// Function for Display invoice form in merchant section
+// Function for Display Pay Request form in merchant section
 func PayLinksViews(c *fiber.Ctx) error {
 	// check session
 	s, _ := store.Get(c)
@@ -322,7 +322,7 @@ func PayLinksViews(c *fiber.Ctx) error {
 	})
 }
 
-// Function for Post invoice form in merchant section
+// Function for Post Pay Request form in merchant section
 func PayLinkPost(c *fiber.Ctx) error {
 
 	// Get Data from ajax
@@ -522,7 +522,7 @@ func PayDataPost(c *fiber.Ctx) error {
 		Coin_pay_url: coin_pay_url,
 	}
 
-	fmt.Println("Response => ", response)
+	//fmt.Println("Response => ", response)
 
 	aid, err := strconv.ParseUint(coinList.Address_id, 10, 32)
 	if err != nil {

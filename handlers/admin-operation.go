@@ -50,7 +50,6 @@ func AdminLoginView(c *fiber.Ctx) error {
 }
 
 // function for post admin login form
-
 func AdminLoginPost(c *fiber.Ctx) error {
 	// Parses the request body
 	getAdminUserName := c.FormValue("admin-username")
@@ -127,7 +126,7 @@ func AdminLoginPost(c *fiber.Ctx) error {
 	})
 }
 
-// Display Data on Admin Dashboard
+// Display page with Data on Admin Dashboard
 func AdminIndexView(c *fiber.Ctx) error {
 
 	AdminSession(c)
@@ -213,7 +212,7 @@ func AdminSession(c *fiber.Ctx) error {
 	return nil
 }
 
-// function for admin login history
+// function for admin login history Listing
 func AdminLoginHistory(c *fiber.Ctx) error {
 
 	AdminSession(c)
@@ -458,7 +457,7 @@ func SupportTicketListing(c *fiber.Ctx) error {
 	})
 }
 
-// Function for Support Ticket Listing - Admin
+// Function for Display Merchant Log File
 func AdminMemberLogs(c *fiber.Ctx) error {
 
 	AdminSession(c)
@@ -704,7 +703,7 @@ func AdminSupportTicketDetails(c *fiber.Ctx) error {
 	})
 }
 
-// For Post Admin Support ticket form
+// For Post Admin Support ticket reply form
 func AdminSubmitSupportTicketReply(c *fiber.Ctx) error {
 	AdminSession(c)
 	// // Session Check

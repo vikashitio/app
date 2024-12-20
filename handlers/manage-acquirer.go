@@ -11,14 +11,12 @@ import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
+// For Add / Edit / Delete  Acquirer from Admin Section
+
 var tableNameAcq = "acquirer"
 var pageNameAcq = "admin/acquirer"
 var pageTitleAcq = "Acquirer"
-
-// var listSizeAcq = "10"
 var listOrderByAcq = "status ASC,acquirer_title ASC"
-
-// For Add / Edit / Delete  Acquirer from Admin Section
 
 // function for Display Acquirer List
 func AcquirerList(c *fiber.Ctx) error {
@@ -76,7 +74,7 @@ func AddAcquirerForm(c *fiber.Ctx) error {
 	})
 }
 
-// function for Post Add / Edit Acquirer Form
+// function for Post Acquirer Form
 func AcquirerPost(c *fiber.Ctx) error {
 
 	AdminSession(c)

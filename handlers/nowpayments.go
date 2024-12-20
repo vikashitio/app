@@ -14,12 +14,15 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// Function for Now Payment API
+
 var apiKeyNP = "Y3WR3PA-TG04W8G-HDTMVZG-Z3PCWYD"
 var apiPath = "https://api-sandbox.nowpayments.io"
 var callbackURL = "https://itio.in/nowpayments/callback.php"
 var successURL = "https://itio.in/nowpayments/responce.php"
 var failedURL = "https://itio.in/nowpayments/responce.php"
 
+// Function for display Coin List
 func AddCryptoView(c *fiber.Ctx) error {
 	//VID := c.Params("VID")
 
@@ -42,7 +45,7 @@ func AddCryptoView(c *fiber.Ctx) error {
 		fmt.Println("3434343=>>", err)
 	}
 	if LoginMerchantID == nil {
-	fmt.Println("Session Expired106")
+		fmt.Println("Session Expired106")
 		return c.Redirect("/login")
 	}
 
@@ -54,6 +57,7 @@ func AddCryptoView(c *fiber.Ctx) error {
 	})
 }
 
+// Function for Generate Coin
 func AddCryptoPost(c *fiber.Ctx) error {
 
 	s, _ := store.Get(c)
@@ -63,7 +67,7 @@ func AddCryptoPost(c *fiber.Ctx) error {
 	//voltID := s.Get("LoginVoltID").(string)
 	//LoginMerchantEmail := s.Get("LoginMerchantEmail").(string)
 	if LoginMerchantID == nil {
-	fmt.Println("Session Expired105")
+		fmt.Println("Session Expired105")
 		return c.Redirect("/login")
 	}
 
@@ -144,6 +148,7 @@ func AddCryptoPost(c *fiber.Ctx) error {
 	return c.Redirect("/transactions-np")
 }
 
+// Function for view coin Request Form
 func RequestCryptoView(c *fiber.Ctx) error {
 	//VID := c.Params("VID")
 
@@ -161,7 +166,7 @@ func RequestCryptoView(c *fiber.Ctx) error {
 		fmt.Println("3434343=>>", err)
 	}
 	if LoginMerchantID == nil {
-	fmt.Println("Session Expired107")
+		fmt.Println("Session Expired107")
 		return c.Redirect("/login")
 	}
 
@@ -173,6 +178,7 @@ func RequestCryptoView(c *fiber.Ctx) error {
 	})
 }
 
+// Function for Submit coin Request Form
 func RequestCryptoPost(c *fiber.Ctx) error {
 
 	s, _ := store.Get(c)
@@ -276,6 +282,7 @@ func RequestCryptoPost(c *fiber.Ctx) error {
 	return c.Redirect("/transactions-np")
 }
 
+// Function for view Transaction List
 func TransactionsNPView(c *fiber.Ctx) error {
 
 	// check session
@@ -343,6 +350,8 @@ func TransactionsNPView(c *fiber.Ctx) error {
 }
 
 var httpClient = &http.Client{} // Reuse HTTP client
+
+// Function for execute Api Request
 func MakeAPIRequestNP(method, path string, body interface{}) ([]byte, error) {
 	var url = apiPath + path
 
@@ -380,4 +389,3 @@ func MakeAPIRequestNP(method, path string, body interface{}) ([]byte, error) {
 
 	return respBody, nil
 }
-      

@@ -17,6 +17,7 @@ import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
+// Define struct
 type StatusResponse struct {
 	Hashcode       string `json:"hashcode"`
 	Payment_status string `json:"payment_status"`
@@ -30,7 +31,7 @@ type StatusRequest struct {
 	Client_id      int64  `json:"client_id"`
 }
 
-// Function for generate random password
+// Function for Set Amount Format
 func cryptoAmountFormat(receivedAmount string) float64 {
 	// convert string to float value
 	receivedAmt, err := strconv.ParseFloat(receivedAmount, 64)

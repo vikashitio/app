@@ -15,6 +15,7 @@ import (
 
 // toBase64 converts the QR code bytes to base64 to embed in the HTML img tag
 
+// Function for Google enable 2FA
 func EnableTwoFA(c *fiber.Ctx) error {
 
 	// check session
@@ -69,6 +70,7 @@ func EnableTwoFA(c *fiber.Ctx) error {
 	})
 }
 
+// Function for Google enable 2FA
 func ActivateTwoFA(c *fiber.Ctx) error {
 
 	// check session
@@ -149,6 +151,7 @@ func ActivateTwoFA(c *fiber.Ctx) error {
 
 }
 
+// Function for Google disable 2FA
 func DeactivateTwoFA(c *fiber.Ctx) error {
 
 	// check session
@@ -189,7 +192,7 @@ func DeactivateTwoFA(c *fiber.Ctx) error {
 	return c.Redirect("/profile")
 }
 
-// For Display Login form
+// Function for Google verify 2FA
 func VerifyTwoFA(c *fiber.Ctx) error {
 
 	s, _ := store.Get(c)
@@ -216,7 +219,7 @@ func VerifyTwoFA(c *fiber.Ctx) error {
 	})
 }
 
-// For Matched 2FA Code
+// Function for Submit 2FA data
 func VerifyTwoFAPost(c *fiber.Ctx) error {
 
 	s, _ := store.Get(c)

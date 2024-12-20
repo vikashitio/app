@@ -13,6 +13,7 @@ import (
 	"github.com/wcharczuk/go-chart/v2"
 )
 
+// Page for create country graph
 // Fetch IP addresses from PostgreSQL using Raw SQL
 func getIPsFromDB() ([]string, error) {
 	var ips []string
@@ -52,7 +53,7 @@ func getCountryFromIP(dbReader *geoip2.Reader, ip string) string {
 	return record.Country.Names["en"] // Return the country name in English
 }
 
-// Handler to get balance by address
+// function for generate graph by country
 func AdminCountryGraph(c *fiber.Ctx) error {
 
 	// Fetch IP addresses from the database using Raw SQL

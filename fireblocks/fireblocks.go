@@ -17,6 +17,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// Function used for Fireblock API
 var store = session.New()
 
 var apiPath = "https://sandbox-api.fireblocks.io"

@@ -12,6 +12,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// Function for use fireblock API
 // for sandbox
 var privateKeyPath = "./fireblocks_secret.key"
 var apiKey = "abdb1385-da35-44e9-b66c-e21feae3745f" // itioapi
@@ -20,6 +21,7 @@ var apiKey = "abdb1385-da35-44e9-b66c-e21feae3745f" // itioapi
 //var privateKeyPath = "./fireblocks_secret_live.key"
 //var apiKey = "7cd91e4b-012c-4ea8-97d5-22f6761c0d2a"
 
+// Get user list from fireblock user by API
 func UsersView(c *fiber.Ctx) error {
 
 	AdminSession(c)
@@ -61,6 +63,7 @@ func UsersView(c *fiber.Ctx) error {
 	})
 }
 
+// Get Vault Wallet list from fireblock API
 func CreateVaultWallet(c *fiber.Ctx) error {
 
 	VID := c.FormValue("VID")
@@ -126,6 +129,7 @@ func CreateVaultWallet(c *fiber.Ctx) error {
 	return c.Redirect("/admin/vault")
 }
 
+// Get Wallet list from fireblock API
 func WalletView(c *fiber.Ctx) error {
 
 	VID := c.Params("VID")
@@ -169,6 +173,7 @@ func WalletView(c *fiber.Ctx) error {
 	})
 }
 
+// Get Vault list from fireblock API
 func VoltView(c *fiber.Ctx) error {
 
 	AdminSession(c)
@@ -220,6 +225,7 @@ func VoltView(c *fiber.Ctx) error {
 	})
 }
 
+// Get Wallet list from fireblock API
 func WalletListView(c *fiber.Ctx) error {
 
 	s, _ := store.Get(c)
@@ -256,6 +262,7 @@ func WalletListView(c *fiber.Ctx) error {
 	})
 }
 
+// create Volt Wallet  from fireblock API
 func CreateVaultWalletAddress(c *fiber.Ctx) error {
 
 	VID := c.Params("VID")
@@ -291,6 +298,7 @@ func CreateVaultWalletAddress(c *fiber.Ctx) error {
 	return c.Redirect(path)
 }
 
+// create New Volt Wallet  from fireblock API
 func CreateNewVault(c *fiber.Ctx) error {
 
 	s, _ := store.Get(c)
@@ -351,6 +359,7 @@ func CreateNewVault(c *fiber.Ctx) error {
 	return c.Redirect("/wallet-list")
 }
 
+// Update Wallet Balance  from fireblock API
 func UpdateWalletBalance(c *fiber.Ctx) error {
 
 	s, _ := store.Get(c)
@@ -421,6 +430,7 @@ func UpdateWalletBalance(c *fiber.Ctx) error {
 	return c.Redirect("/wallet-list")
 }
 
+// view Vault Accounts from fireblock API
 func VaultAccountsView(c *fiber.Ctx) error {
 
 	AdminSession(c)
@@ -455,6 +465,7 @@ func VaultAccountsView(c *fiber.Ctx) error {
 	})
 }
 
+// view Vault Wallet from fireblock API
 func CreateVaultWalletView(c *fiber.Ctx) error {
 	VID := c.Params("VID")
 
@@ -473,6 +484,7 @@ func CreateVaultWalletView(c *fiber.Ctx) error {
 	})
 }
 
+// Display Transfer from fireblock API
 func TransferView(c *fiber.Ctx) error {
 	//VID := c.Params("VID")
 
@@ -501,6 +513,7 @@ func TransferView(c *fiber.Ctx) error {
 	})
 }
 
+// Submit Transfer from fireblock API
 func TransferPost(c *fiber.Ctx) error {
 
 	s, _ := store.Get(c)

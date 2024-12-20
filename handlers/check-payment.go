@@ -361,7 +361,7 @@ func SuccessView(c *fiber.Ctx) error {
 func PayQRView(c *fiber.Ctx) error {
 
 	PaymentID := c.Query("iid")
-	//fmt.Println(PaymentID)
+
 	//=============Fetch Invoice Details by trackid===============
 	invoiceData := models.Invoice_Master{}
 	database.DB.Db.Table("invoice").Where("trackid = ?", PaymentID).Find(&invoiceData)

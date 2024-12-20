@@ -14,6 +14,7 @@ import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
+// Define for struct for payment / pay link
 type APIResponsePaylinkSuccess struct {
 	Status      string
 	ReferanceID string
@@ -67,6 +68,7 @@ func ApiPaymentLink(c *fiber.Ctx) error {
 
 	//fmt.Println("Amount - > ".requestedamount)
 
+	//  get values from array and set in variable
 	productName := strings.TrimSpace(link.ProductName)
 	description := strings.TrimSpace(link.Description)
 	customerName := strings.TrimSpace(link.CustomerName)
@@ -100,7 +102,7 @@ func ApiPaymentLink(c *fiber.Ctx) error {
 			})
 		}
 
-		Ip := c.Context().RemoteIP().String()
+		Ip := c.Context().RemoteIP().String() // Get Current IP
 		qry := models.Invoice_Master{Client_id: MID, Requestedamount: requestedamount, Requestedcurrency: price_currency, Product_name: productName, Description: description, Ip: Ip, Trackid: trackID, Name: customerName, Email: customerEmail, Order_id: orderID, Is_fee_paid_by_user: is_fee_paid_by_user, Return_url: return_url}
 		result := database.DB.Db.Table("invoice").Select("client_id", "requestedamount", "requestedcurrency", "product_name", "description", "ip", "trackid", "name", "email", "order_id", "is_fee_paid_by_user", "return_url").Create(&qry)
 		invoice_id := strconv.FormatUint(uint64(qry.Invoice_id), 10)
@@ -110,7 +112,7 @@ func ApiPaymentLink(c *fiber.Ctx) error {
 
 		}
 		var commonURL = os.Getenv("CommonURL")
-		PayURL := commonURL + "/pay?iid=" + trackID
+		PayURL := commonURL + "/pay?iid=" + trackID // create pay url
 		status := "Ok"
 
 		response := APIResponsePaylinkSuccess{
@@ -139,10 +141,7 @@ func ApiBalanceByCrypto(c *fiber.Ctx) error {
 	// Retrieve a specific header
 	apikey = strings.TrimSpace(c.Get("Apikey"))
 	currency = strings.TrimSpace(strings.ToLower(c.Query("Currency")))
-	//apikey := "76419b7b23017e61"
 	//currency := strings.ToLower("LTC")
-	//fmt.Println("currency")
-	//apikey := "76419b7b23017e61"
 
 	MID, errorx := function.GetMIDByApikey(apikey)
 	//fmt.Println(MID)
@@ -227,7 +226,7 @@ func ApiCustomer(c *fiber.Ctx) error {
 	return c.JSON(response)
 }
 
-// Function for Get Customer List By API
+// Function for Get Pay Links By API
 func ApiCheckouts(c *fiber.Ctx) error {
 	apiError := ""
 	// Retrieve a specific header

@@ -12,6 +12,8 @@ import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
+// This page for testing not in use
+
 // Struct to hold the API response
 type BalanceResponse struct {
 	Balance string `json:"balance"`

@@ -20,7 +20,7 @@ func InvoicePDF(c *fiber.Ctx) error {
 
 	row := models.Invoice_Master{}
 	database.DB.Db.Table("invoice").Where("trackid = ? AND invoice_type = ? AND status = ?", trackid, 2, 1).Find(&row)
-	fmt.Println("Data => ", row)
+	//fmt.Println("Data => ", row)
 	RequesteAmount := strings.ToUpper(row.Requestedcurrency) + " " + fmt.Sprintf("%f", row.Requestedamount)
 	ReceiverName := function.GetNameByMID(row.Client_id)
 	ReceiverEmail := function.GetEmailByMID(row.Client_id)
