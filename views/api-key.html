@@ -55,21 +55,29 @@
               <input type="hidden" name="tableID" value="{{if .ClientStore.ID}}{{.ClientStore.ID}}{{end}}">
 
               <div class="mb-20">  
-                  <label for="webhookurl" class="fw-semibold mb-8 text-primary-light">Return URL</label>
+                  <label for="webhookurl" class="fw-semibold mb-8 text-primary-light">Return URL <a data-bs-container="body" data-bs-toggle="popover" data-bs-placement="right" data-bs-content="The web address to which you are redirected after completing a Payment action, It ensures you return to the appropriate page on the website or app.">
+                   
+                    <iconify-icon icon="emojione:information" class="icon text-lg"></iconify-icon>
+                  </a></label>
                   <div class="input-group input-group-lg border input-form-light radius-8">
                       <input type="text" class="form-control bg-base border-0 radius-8" id="return_url" name="return_url" placeholder="Return URL" value="{{if .ClientStore.Return_url}}{{.ClientStore.Return_url}}{{end}}">
                   </div>
               </div>
 
               <div class="mb-20">  
-                <label for="webhookurl" class="fw-semibold mb-8 text-primary-light">Webhook URL</label>
+                <label for="webhookurl" class="fw-semibold mb-8 text-primary-light">Webhook URL  <a data-bs-container="body" data-bs-toggle="popover" data-bs-placement="right" data-bs-content="This URL that allows one system to send real-time data or notifications to another system automatically when a specific event or Payment occurs.">
+                   
+                  <iconify-icon icon="emojione:information" class="icon text-lg"></iconify-icon>
+                </a></label>
                 <div class="input-group input-group-lg border input-form-light radius-8">
                     <input type="text" class="form-control bg-base border-0 radius-8" id="webhookurl" name="webhookurl" placeholder="Webhook URL" value="{{if .ClientStore.Webhookurl}}{{.ClientStore.Webhookurl}}{{end}}">
                 </div>
             </div>
 
             <div class="mb-20">  
-              <label for="webhookurl" class="fw-semibold mb-8 text-primary-light">Success Margin in % Between (0.01 - 10.00)</label>
+              <label for="webhookurl" class="fw-semibold mb-8 text-primary-light">Success Margin in % Between (0.01 - 10.00)  <a data-bs-container="body" data-bs-toggle="popover" data-bs-placement="right" data-bs-content="Success: Transaction within ± {{if .ClientStore.Success_margin}}{{.ClientStore.Success_margin}}{{end}} % Margin make success transaction">
+                <iconify-icon icon="emojione:information" class="icon text-lg"></iconify-icon>
+              </a></label>
               <div class="input-group input-group-lg border input-form-light radius-8">
                   <input type="number" min="0.01" max="10" step="0.01"class="form-control bg-base border-0 radius-8" id="success_margin" name="success_margin" placeholder="" value="{{if .ClientStore.Success_margin}}{{.ClientStore.Success_margin}}{{end}}">
               </div>
@@ -100,4 +108,8 @@ $('.api-validation').click(function(){
       return false;
     }
 });
+
+const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
+const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
+  
   </script>

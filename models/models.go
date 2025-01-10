@@ -104,13 +104,17 @@ type WalletListBalance struct {
 // Struct For Login Details
 type LoginList struct {
 	//gorm.Model
-	Client_id   uint `gorm:"primaryKey"`
-	Full_name   string
-	Password    string
-	Status      int
-	Totp_secret string
-	Totp_status int
-	User_agent  string
+	Client_id           uint `gorm:"primaryKey"`
+	Full_name           string
+	Password            string
+	Status              int
+	Totp_secret         string
+	Totp_status         int
+	User_agent          string
+	Password_created_at string
+	FailedAttempts      int
+	AccountLocked       bool
+	LockTime            *time.Time
 }
 
 // Struct For Merchant Details
@@ -169,8 +173,25 @@ type Client_Master struct {
 
 // for change merchant password
 type ClientPassword struct {
-	Client_id uint   `gorm:"primaryKey"`
-	Password  string `json:"password,omitempty"`
+	Client_id           uint   `gorm:"primaryKey"`
+	Password            string `json:"password,omitempty"`
+	Password_created_at string `json:"password_created_at,omitempty"`
+}
+
+// for change merchant Account active - deactive after wrong password
+type ClientWrongPasswordActivation struct {
+	Client_id      uint       `gorm:"primaryKey"`
+	FailedAttempts int        `json:"failed_attempts,omitempty"`
+	AccountLocked  bool       `json:"account_locked,omitempty"`
+	LockTime       *time.Time `json:"lock_time,omitempty"`
+}
+
+// for change merchant Account active - deactive after wrong password
+type ClientWrongPasswordLock struct {
+	Client_id      uint      `gorm:"primaryKey"`
+	FailedAttempts int       `json:"failed_attempts,omitempty"`
+	AccountLocked  bool      `json:"account_locked,omitempty"`
+	LockTime       time.Time `json:"lock_time,omitempty"`
 }
 
 type ApiBody struct {

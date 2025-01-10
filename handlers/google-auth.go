@@ -19,15 +19,13 @@ import (
 func EnableTwoFA(c *fiber.Ctx) error {
 
 	// check session
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
 	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		fmt.Println("Session Expired")
-		return c.Redirect("/login", 301)
-	}
+
 	// Get value
 	LoginMerchantEmail := s.Get("LoginMerchantEmail").(string)
-	fmt.Sprintln("LoginMerchantEmail == > ", LoginMerchantEmail)
+	//fmt.Sprintln("LoginMerchantEmail == > ", LoginMerchantEmail)
 	Alerts := s.Get("Alert")
 	s.Delete("Alert")
 	if err := s.Save(); err != nil {
@@ -74,12 +72,9 @@ func EnableTwoFA(c *fiber.Ctx) error {
 func ActivateTwoFA(c *fiber.Ctx) error {
 
 	// check session
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
 	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		fmt.Println("Session Expired122")
-		return c.Redirect("/login", 301)
-	}
 	LoginMerchantID := s.Get("LoginMerchantID")
 	getName := s.Get("LoginMerchantName").(string)
 	getEmail := s.Get("LoginMerchantEmail").(string)
@@ -155,13 +150,9 @@ func ActivateTwoFA(c *fiber.Ctx) error {
 func DeactivateTwoFA(c *fiber.Ctx) error {
 
 	// check session
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
 	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		fmt.Println("Session Expired122")
-		return c.Redirect("/login", 301)
-	}
-
 	LoginID := s.Get("LoginMerchantID").(uint)
 	totpSecret := ""
 	result := database.DB.Db.Table("client_master").Save(&models.Update2FA{Client_id: LoginID, Totp_secret: totpSecret, Totp_status: 0})

@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 	"template/database"
@@ -89,12 +88,9 @@ func SettlementSettingsPost(c *fiber.Ctx) error {
 // function for Display Settlement Form
 func SettlementSettingsView(c *fiber.Ctx) error {
 	// check session
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
 	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		fmt.Println("Session Expired116")
-		return c.Redirect("/login", 301)
-	}
 	LoginMerchantID := s.Get("LoginMerchantID")
 
 	//fmt.Print("LoginMerchantID =>", LoginMerchantID)

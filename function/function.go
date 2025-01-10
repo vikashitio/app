@@ -157,7 +157,7 @@ func PasswordGenerator(passwordLength int) string {
 	lowerCase := "abcdefghijklmnopqrstuvwxyz" // lowercase
 	upperCase := "ABCDEFGHIJKLMNOPQRSTUVWXYZ" // uppercase
 	numbers := "0123456789"                   // numbers
-	specialChar := "-"                        // special characters
+	specialChar := "0"                        // special characters
 	//specialChar := "!@#$%^&*()_-+={}[/?]"     // special characters
 
 	// Variable for storing password
@@ -460,4 +460,40 @@ func UpdateMerchantHistory(updatetype, uptadedesc, ip string, Client_id uint) bo
 	database.DB.Db.Table("update_history").Select("client_id", "Update_ip", "Update_type", "Update_desc", "Updated_on").Create(&qry)
 
 	return true
+}
+
+type PasswordHistoryData struct {
+	Client_id       uint
+	Hashed_password string
+}
+
+// Function for Update Merchant History
+func PasswordHistory(Password string, Client_id uint) bool {
+
+	// Create Query and Insert into DB
+	qry := PasswordHistoryData{Client_id: Client_id, Hashed_password: Password}
+	database.DB.Db.Table("password_history").Select("client_id", "hashed_password").Create(&qry)
+
+	return true
+}
+
+// Function for Update Merchant History
+func PasswordGeneratedDuration(PasswordDate string) int {
+	//days := 1
+	// Parse the dates
+	layout := "2006-01-02"
+	// Parse the date string
+	parsedDate, _ := time.Parse(time.RFC3339, PasswordDate)
+	// Format the date to "YYYY-MM-DD"
+	lastPasswordDate := parsedDate.Format(layout)        // convert date format like 2006-01-02
+	todayDate := time.Now().Format(layout)               // convert date format like 2006-01-02
+	startDate, _ := time.Parse(layout, lastPasswordDate) // convert date type string to time
+	endDate, _ := time.Parse(layout, todayDate)          // convert date type string to time
+
+	// Calculate the difference
+	duration := endDate.Sub(startDate)
+	days := int(duration.Hours() / 24)
+	//fmt.Println("days : -  ", days)
+
+	return days
 }

@@ -17,10 +17,40 @@ import (
 
 // Functions for Merchant Login / Registration/ Logout/ Login History/ Support Ticket/ change password and check session
 
-var store = session.New()
+// Configure session middleware for auto session out when page inactivity for 20 minutes
+var store = session.New(session.Config{
+	Expiration: 20 * time.Minute, // Set session expiration time
+	//CookieHTTPOnly: true,            // Secure cookie handling
+})
 
 func init() {
 	//database.ConnectDb() // for connect Db define in function.go
+
+}
+
+const (
+	maxFailedAttempts = 3
+	lockDuration      = 1 * time.Minute // Lock duration if needed
+)
+
+// Check admin Session exist or not
+func MerchantSession(c *fiber.Ctx) error {
+	// Session Check
+
+	s, _ := store.Get(c)
+	merchantData := s.Get("MerchantData")
+	fmt.Println("MerchantData", merchantData)
+	if merchantData == nil {
+
+		s.Set("Alert", "Error Session expired") // Set a session key
+		if err := s.Save(); err != nil {
+			fmt.Println("check data - ", err)
+		}
+		//fmt.Println("PPPPPPpppppppp")
+		// Redirect to another URL
+		return c.Redirect("/logout")
+	}
+	return nil
 }
 
 // For Display Login form
@@ -28,7 +58,7 @@ func LoginView(c *fiber.Ctx) error {
 	//c.Set("Cache-Control", "no-store")
 	s, _ := store.Get(c)
 	Alerts := s.Get("Alert")
-	fmt.Print("Alerts ", Alerts)
+	//fmt.Print("Alerts ", Alerts)
 	if Alerts != "" {
 		s.Delete("Alert")
 		if err := s.Save(); err != nil {
@@ -54,6 +84,7 @@ func LoginView(c *fiber.Ctx) error {
 
 // For Submit Login form
 func LoginPost(c *fiber.Ctx) error {
+	s, _ := store.Get(c)
 	// Parses the request body
 	getUserName := c.FormValue("username")
 	getPassword := c.FormValue("password")
@@ -63,18 +94,52 @@ func LoginPost(c *fiber.Ctx) error {
 	Alerts := ""
 	loginList := models.LoginList{}
 	result := database.DB.Db.Table("client_master").Where("status = ? AND username = ?", 1, getUserName).Find(&loginList)
-
-	//fmt.Println("Login Details", loginList)
-
+	//fmt.Println("result -> ", loginList)
 	if result.Error != nil {
 		//fmt.Println("ERROR in QUERY")
 		Alerts = "ERROR in QUERY"
 	}
 
+	//fmt.Println("Days := ", days)
 	if result.RowsAffected == 1 {
 
+		var failedAttempts = loginList.FailedAttempts
+		var accountLocked = loginList.AccountLocked
+		var lockTime = loginList.LockTime
+
+		//fmt.Println("failedAttempts =>", failedAttempts)
+		//fmt.Println("accountLocked =>", accountLocked)
+
+		// Check if account is locked
+		if accountLocked {
+			fmt.Println("accountLocked =>", accountLocked)
+			if lockTime != nil && time.Since(*lockTime) >= lockDuration { //
+
+				fmt.Println("Account unlocked Locked")
+				// Unlock the account if the lock duration has passed
+
+				database.DB.Db.Table("client_master").Save(&models.ClientWrongPasswordActivation{Client_id: loginList.Client_id, AccountLocked: false, FailedAttempts: 0, LockTime: nil})
+
+			} else {
+
+				s.Set("Alert", "Account is locked for 15 Minuts") // Set a session key
+				if err := s.Save(); err != nil {
+					fmt.Println("check data - ", err)
+				}
+				return c.Redirect("/login")
+
+			}
+		}
+
+		// for check password  Expired or not
+		days := function.PasswordGeneratedDuration(loginList.Password_created_at)
+
+		// Get Password Period Limit from Env File
+		passwordPeriod, _ := strconv.Atoi(os.Getenv("PASSWORDEXPIREDPERIOD")) // Convert string to integer
 		if loginList.Status != 1 {
-			//fmt.Println("Account Not Activate / Deleted")
+			Alerts = "Account Not Activate / Deleted"
+		} else if days > passwordPeriod {
+			Alerts = "Password Is Expired. Please change password"
 		} else if loginList.Password != "" {
 			err := bcrypt.CompareHashAndPassword([]byte(loginList.Password), []byte(getPassword))
 			if err == nil {
@@ -131,7 +196,34 @@ func LoginPost(c *fiber.Ctx) error {
 				return c.Redirect("/")
 
 			} else {
+
 				Alerts = "Wrong Password"
+
+				failedAttempts++
+				if failedAttempts >= maxFailedAttempts {
+
+					database.DB.Db.Table("client_master").Save(&models.ClientWrongPasswordLock{Client_id: loginList.Client_id, AccountLocked: true, FailedAttempts: failedAttempts, LockTime: time.Now()})
+					if result.Error != nil {
+						fmt.Println("Database error")
+
+					}
+
+					s.Set("Alert", "Account locked due to multiple failed attempts") // Set a session key
+					if err := s.Save(); err != nil {
+						fmt.Println("check data - ", err)
+					}
+					return c.Redirect("/login")
+
+				} else {
+					//_, err := db.Exec(`UPDATE users SET failed_attempts = $1 WHERE id = $2`, failedAttempts, id)
+					result = database.DB.Db.Table("client_master").Omit("AccountLocked", "LockTime").Save(&models.ClientWrongPasswordActivation{Client_id: loginList.Client_id, FailedAttempts: failedAttempts})
+
+					if result.Error != nil {
+						fmt.Println("Database error")
+
+					}
+				}
+
 			}
 
 		}
@@ -149,6 +241,7 @@ func LoginPost(c *fiber.Ctx) error {
 
 // Function for Merchant Logout
 func LogOut(c *fiber.Ctx) error {
+
 	s, err := store.Get(c)
 	if err != nil {
 		//panic(err)
@@ -184,6 +277,17 @@ func LogOut(c *fiber.Ctx) error {
 	cookie.Name = "session_id"
 	cookie.Expires = time.Now().Add(-1 * time.Hour)
 	c.Cookie(cookie)
+	msg, _ := strconv.Atoi(c.Query("v", "1"))
+	Alerts := "Session expired. Please log in again."
+	if msg == 2 {
+		Alerts = ""
+	}
+
+	// check session
+	s.Set("Alert", Alerts) // Set a session key
+	if err := s.Save(); err != nil {
+		return err
+	}
 	return c.Redirect("/login")
 }
 
@@ -252,7 +356,7 @@ func RegistrationPost(c *fiber.Ctx) error {
 			if err != nil {
 				fmt.Println("issue sending verification email")
 			}
-			fmt.Print("Email Error 3")
+			//fmt.Print("Email Error 3")
 			s, _ := store.Get(c)
 
 			loginIp := c.Context().RemoteIP().String()
@@ -277,7 +381,9 @@ func RegistrationPost(c *fiber.Ctx) error {
 			if err := s.Save(); err != nil {
 				return err
 			}
-
+			//fmt.Println("Password => ", string(hash))
+			//fmt.Println("Client ID => ", ClientID)
+			function.PasswordHistory(string(hash), ClientID)
 			return c.Redirect("/profile")
 
 		}
@@ -295,12 +401,14 @@ func RegistrationPost(c *fiber.Ctx) error {
 // Function for display transaction list and wallet with balance on merchant dashboard
 func IndexView(c *fiber.Ctx) error {
 
+	//MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
 	merchantData := s.Get("MerchantData")
 	if merchantData == nil {
-		fmt.Println("Session Expired101")
-		return c.Redirect("/login", 301)
+		//fmt.Println("Session Expired102")
+		return c.Redirect("/logout?v=2")
 	}
+
 	//fmt.Print("merchantData => ", merchantData)
 	LoginMerchantID := s.Get("LoginMerchantID")
 
@@ -343,12 +451,9 @@ func IndexView(c *fiber.Ctx) error {
 // Function for display Withdraw View
 func WithdrawView(c *fiber.Ctx) error {
 
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
 	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		fmt.Println("Session Expired101")
-		return c.Redirect("/login", 301)
-	}
 	LoginMerchantID := s.Get("LoginMerchantID")
 
 	assetList := []models.CoinWithBalance{}
@@ -384,12 +489,9 @@ func WithdrawView(c *fiber.Ctx) error {
 // Function for Submit Withdraw Form
 func WithdrawFormPost(c *fiber.Ctx) error {
 
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
-	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		fmt.Println("Session Expired101")
-		return c.Redirect("/login", 301)
-	}
+	//merchantData := s.Get("MerchantData")
 	LoginMerchantID := s.Get("LoginMerchantID")
 
 	asset_ID, err := strconv.ParseInt(c.FormValue("assetID"), 10, 32)
@@ -522,12 +624,11 @@ func WithdrawFormPost(c *fiber.Ctx) error {
 // For Display Merchant Login History
 func LoginHistoryView(c *fiber.Ctx) error {
 
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
-
 	merchantData := s.Get("MerchantData")
 	if merchantData == nil {
-		fmt.Println("Session Expired102")
-		return c.Redirect("/login", 301)
+		return c.Redirect("/logout")
 	}
 	LoginMerchantID := s.Get("LoginMerchantID")
 
@@ -554,13 +655,10 @@ func LoginHistoryView(c *fiber.Ctx) error {
 
 // For Display Customer Listing
 func CustomerView(c *fiber.Ctx) error {
-
 	s, _ := store.Get(c)
-
 	merchantData := s.Get("MerchantData")
 	if merchantData == nil {
-		fmt.Println("Session Expired102")
-		return c.Redirect("/login", 301)
+		return c.Redirect("/logout")
 	}
 	LoginMerchantID := s.Get("LoginMerchantID")
 
@@ -570,8 +668,11 @@ func CustomerView(c *fiber.Ctx) error {
 	offset := (page - 1) * limit
 
 	customerData := []models.CustomerList{}
-	database.DB.Db.Table("customer").Select("customer_name", "customer_email", "COUNT(*) AS total_customer").Limit(limit).Offset(offset).Where(&models.LoginHistory{Client_id: LoginMerchantID.(uint)}).Group("customer_email, customer_name").Find(&customerData)
-
+	result := database.DB.Db.Table("customer").Select("customer_name", "customer_email", "COUNT(*) AS total_customer").Limit(limit).Offset(offset).Where(&models.LoginHistory{Client_id: LoginMerchantID.(uint)}).Group("customer_email, customer_name").Find(&customerData)
+	if result.Error != nil {
+		fmt.Println(result.Error)
+		//return c.Redirect("/logoutxx")
+	}
 	var total int64
 	database.DB.Db.Table("customer").Select("customer_name", "customer_email", "COUNT(*) AS total_customer").Where(&models.CustomerList{Client_id: LoginMerchantID.(uint)}).Group("customer_email, customer_name").Count(&total)
 
@@ -590,11 +691,9 @@ func CustomerView(c *fiber.Ctx) error {
 func ApiKeyView(c *fiber.Ctx) error {
 
 	s, _ := store.Get(c)
-
 	merchantData := s.Get("MerchantData")
 	if merchantData == nil {
-		fmt.Println("Session Expired102")
-		return c.Redirect("/login", 301)
+		return c.Redirect("/logout")
 	}
 	LoginMerchantID := s.Get("LoginMerchantID")
 
@@ -629,13 +728,9 @@ func ApiKeyView(c *fiber.Ctx) error {
 
 // For fetch Merchant API Key
 func GetApiKey(c *fiber.Ctx) error {
-
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
-	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		fmt.Println("Session Expired102")
-		return c.Redirect("/login", 301)
-	}
+	//merchantData := s.Get("MerchantData")
 	LoginMerchantID := s.Get("LoginMerchantID")
 	currentTime := time.Now()
 	// Format the current time as a string
@@ -775,8 +870,8 @@ func ResetPasswordSubmit(c *fiber.Ctx) error {
 
 	hashcode := c.FormValue("hashcode")
 	if hashcode == "" {
-		fmt.Println("Session Expired120")
-		return c.Redirect("/login", 301)
+		//fmt.Println("Session Expired120")
+		return c.Redirect("/logout")
 	}
 
 	// Parses the request body
@@ -799,17 +894,23 @@ func ResetPasswordSubmit(c *fiber.Ctx) error {
 		//////////
 		// if GET ID than work update else insert
 		// for Full path use- filePath & only file name use file.Filename
-		result := database.DB.Db.Table("client_master").Save(&models.ClientPassword{Client_id: getTableID, Password: string(hash)})
+		curr_date := time.Now().Format("2006-01-02")
+		result := database.DB.Db.Table("client_master").Save(&models.ClientPassword{Client_id: getTableID, Password: string(hash), Password_created_at: curr_date})
 		qrs := "Change Password by Merchant with hashcode - " + hashcode
 		//fmt.Println(loginList.Status)
 		Alerts = "Password Change successfully"
 		if result.Error != nil {
 			//fmt.Println("ERROR in QUERY")
 			Alerts = "Password Not Updated"
+			return c.Redirect("/login")
 		} else {
 
 			updateIp := c.Context().RemoteIP().String()
 			function.UpdateMerchantHistory("Password", qrs, updateIp, getTableID)
+			//fmt.Println("Password => ", string(hash))
+			//fmt.Println("Client ID => ", getTableID)
+			function.PasswordHistory(string(hash), getTableID)
+
 		}
 	} else {
 		Alerts = "Password and confirm password not matched"
@@ -817,7 +918,7 @@ func ResetPasswordSubmit(c *fiber.Ctx) error {
 	// check session
 	s, _ := store.Get(c)
 
-	fmt.Print("Message=>", Alerts)
+	//fmt.Print("Message=>", Alerts)
 	s.Set("Alert", Alerts) // Set a session key
 	if err := s.Save(); err != nil {
 		return err
@@ -828,13 +929,10 @@ func ResetPasswordSubmit(c *fiber.Ctx) error {
 
 // For  Merchant Support ticket Listing
 func SupportTicket(c *fiber.Ctx) error {
-
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
 	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		fmt.Println("Session Expired115")
-		return c.Redirect("/login", 301)
-	}
+
 	LoginMerchantID := s.Get("LoginMerchantID")
 
 	Alerts := s.Get("Alert")
@@ -870,14 +968,11 @@ func SupportTicket(c *fiber.Ctx) error {
 
 // For Display Merchant Support ticket form
 func AddSupportTicket(c *fiber.Ctx) error {
-
+	MerchantSession(c) // redirect when session not found
 	// check session
 	s, _ := store.Get(c)
 	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		fmt.Println("Session Expired116")
-		return c.Redirect("/login", 301)
-	}
+
 	Alerts := s.Get("Alert")
 	if Alerts != "" {
 		s.Delete("Alert")
@@ -901,13 +996,9 @@ func SupportTicketDetails(c *fiber.Ctx) error {
 
 	ticketID := c.Query("tid")
 	//fmt.Println("ticketID => ", ticketID)
-
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
 	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		fmt.Println("Session Expired115")
-		return c.Redirect("/login", 301)
-	}
 	LoginMerchantID := s.Get("LoginMerchantID")
 
 	Alerts := s.Get("Alert")
@@ -942,13 +1033,9 @@ func SubmitSupportTicket(c *fiber.Ctx) error {
 
 	ticket_subject := c.FormValue("ticket_subject")
 	ticket_desc := c.FormValue("ticket_desc")
-
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
-	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		fmt.Println("Session Expired118")
-		return c.Redirect("/login", 301)
-	}
+	//merchantData := s.Get("MerchantData")
 
 	client_id := s.Get("LoginMerchantID").(uint)
 
@@ -997,13 +1084,9 @@ func SubmitSupportTicketReply(c *fiber.Ctx) error {
 	reply_desc := c.FormValue("reply_desc")
 
 	//fmt.Println(ticket_id, reply_desc)
-
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
-	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		fmt.Println("Session Expired118")
-		return c.Redirect("/login", 301)
-	}
+	//merchantData := s.Get("MerchantData")
 
 	reply_by := s.Get("LoginMerchantName").(string)
 	usertype := "Merchant"
@@ -1045,12 +1128,9 @@ func SubmitSupportTicketReply(c *fiber.Ctx) error {
 func ChangePasswordView(c *fiber.Ctx) error {
 
 	// check session
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
 	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		fmt.Println("Session Expired117")
-		return c.Redirect("/login")
-	}
 	// Get value
 	LoginMerchantID := s.Get("LoginMerchantID")
 
@@ -1076,13 +1156,9 @@ func ChangePasswordView(c *fiber.Ctx) error {
 func ChangePasswordPost(c *fiber.Ctx) error {
 
 	// check session
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
-	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		fmt.Println("Session Expired120")
-		return c.Redirect("/login", 301)
-	}
-
+	//merchantData := s.Get("MerchantData")
 	// Parses the request body
 	new_password := c.FormValue("new_password")
 	confirm_password := c.FormValue("confirm_password")
@@ -1102,7 +1178,8 @@ func ChangePasswordPost(c *fiber.Ctx) error {
 		//////////
 		// if GET ID than work update else insert
 		// for Full path use- filePath & only file name use file.Filename
-		result := database.DB.Db.Table("client_master").Save(&models.ClientPassword{Client_id: getTableID, Password: string(hash)})
+		curr_date := time.Now().Format("2006-01-02")
+		result := database.DB.Db.Table("client_master").Save(&models.ClientPassword{Client_id: getTableID, Password: string(hash), Password_created_at: curr_date})
 		qrs := "Change Password by Merchant from profile"
 		//fmt.Println(loginList.Status)
 		Alerts = "Password update successfully"
@@ -1113,6 +1190,9 @@ func ChangePasswordPost(c *fiber.Ctx) error {
 
 			updateIp := c.Context().RemoteIP().String()
 			function.UpdateMerchantHistory("Password", qrs, updateIp, getTableID)
+			//fmt.Println("Password => ", string(hash))
+			//fmt.Println("Client ID => ", getTableID)
+			function.PasswordHistory(string(hash), getTableID)
 		}
 	} else {
 		Alerts = "Password and confirm password not matched"
@@ -1130,12 +1210,9 @@ func ChangePasswordPost(c *fiber.Ctx) error {
 func StorePost(c *fiber.Ctx) error {
 
 	// check session
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
-	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		fmt.Println("Session Expired120")
-		return c.Redirect("/login", 301)
-	}
+	//merchantData := s.Get("MerchantData")
 
 	// Parses the request body
 
@@ -1187,12 +1264,10 @@ func StorePost(c *fiber.Ctx) error {
 func ProfileView(c *fiber.Ctx) error {
 
 	// check session
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
 	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		fmt.Println("Session Expired122")
-		return c.Redirect("/login", 301)
-	}
+
 	// Get value
 	LoginMerchantID := s.Get("LoginMerchantID")
 	Alerts := s.Get("Alert")
@@ -1294,12 +1369,10 @@ func ProfilePost(c *fiber.Ctx) error {
 func GetCryptoWalletList(c *fiber.Ctx) error {
 
 	// check session
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
 	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		fmt.Println("Session Expired116")
-		return c.Redirect("/login", 301)
-	}
+
 	LoginMerchantID := s.Get("LoginMerchantID")
 	Alerts := s.Get("Alert")
 	if Alerts != "" {
@@ -1336,14 +1409,11 @@ func GetCryptoWalletList(c *fiber.Ctx) error {
 
 // function for Display Currency Form
 func AddCryptoWalletView(c *fiber.Ctx) error {
-	fmt.Println("ADD WALLET")
+	//fmt.Println("ADD WALLET")
 	// check session
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
 	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		fmt.Println("Session Expired116")
-		return c.Redirect("/login", 301)
-	}
 
 	currencyList := []models.CoinList{}
 	database.DB.Db.Table("coin_list").Select("coin", "coin_title").Group("coin, coin_title").Where("status = ?", 1).Find(&currencyList)
@@ -1359,13 +1429,9 @@ func AddCryptoWalletView(c *fiber.Ctx) error {
 
 // function for Post Add / Edit Currency Form
 func CryptoWalletPost(c *fiber.Ctx) error {
-
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
-	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		fmt.Println("Session Expired118")
-		return c.Redirect("/login", 301)
-	}
+	//merchantData := s.Get("MerchantData")
 
 	// Parses the request body
 	crypto_code := c.FormValue("crypto_code")
@@ -1419,12 +1485,9 @@ func EditCryptoWallet(c *fiber.Ctx) error {
 	tableID := c.Params("TID")
 
 	// check session
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
 	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		fmt.Println("Session Expired116")
-		return c.Redirect("/login", 301)
-	}
 
 	data := models.CryptoWalletList{}
 	database.DB.Db.Table("client_wallet").Where("wallet_id = ?", tableID).Find(&data)
@@ -1646,6 +1709,9 @@ func MerchantSocialLogin(c *fiber.Ctx) error {
 				if result.Error != nil {
 					fmt.Println(result.Error)
 				}
+				fmt.Println("Password => ", loginList.Password)
+				fmt.Println("Client ID => ", loginList.Client_id)
+				function.PasswordHistory(loginList.Password, loginList.Client_id)
 
 				return c.Redirect("/")
 

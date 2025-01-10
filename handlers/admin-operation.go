@@ -471,14 +471,14 @@ func AdminMemberLogs(c *fiber.Ctx) error {
 	offset := (page - 1) * limit
 
 	logsList := []models.UpdateHistory{}
+	var total int64 // for count table data
 	if mid == 0 {
 		database.DB.Db.Table("update_history").Order("update_id DESC").Limit(limit).Offset(offset).Find(&logsList)
+		database.DB.Db.Table("update_history").Count(&total)
 	} else {
 		database.DB.Db.Table("update_history").Where("client_id = ?", mid).Order("update_id DESC").Limit(limit).Offset(offset).Find(&logsList)
+		database.DB.Db.Table("update_history").Where("client_id = ?", mid).Count(&total)
 	}
-
-	var total int64
-	database.DB.Db.Table("update_history").Count(&total)
 
 	Alerts := sess.Get("AlertX")
 	if Alerts != "" {

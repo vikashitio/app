@@ -227,13 +227,9 @@ func VoltView(c *fiber.Ctx) error {
 
 // Get Wallet list from fireblock API
 func WalletListView(c *fiber.Ctx) error {
-
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
 	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		fmt.Println("Session Expired")
-		return c.Redirect("/login", 301)
-	}
 
 	Alerts := s.Get("Alerts")
 

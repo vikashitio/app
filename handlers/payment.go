@@ -18,12 +18,11 @@ import (
 func PayView(c *fiber.Ctx) error {
 
 	// check session
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
 
 	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		return c.Redirect("/login", 301)
-	}
+
 	// Display coin list in List box
 	coinList := []models.CoinList{}
 	database.DB.Db.Table("coin_list").Order("coin ASC").Where("status = ?", 1).Find(&coinList)
@@ -47,11 +46,9 @@ func PayView(c *fiber.Ctx) error {
 func TransactionsView(c *fiber.Ctx) error {
 
 	// check session
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
 	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		return c.Redirect("/login")
-	}
 	LoginMerchantID := s.Get("LoginMerchantID")
 
 	// Get query parameters
@@ -132,11 +129,9 @@ func TransactionsView(c *fiber.Ctx) error {
 func RequestedPaymentViews(c *fiber.Ctx) error {
 
 	// check session
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
 	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		return c.Redirect("/login", 301)
-	}
 	LoginMerchantID := s.Get("LoginMerchantID")
 
 	// Get query parameters for page and limit
@@ -173,11 +168,9 @@ func RequestedPaymentViews(c *fiber.Ctx) error {
 // Function for Display Pay Request form in merchant section
 func PaymentViews(c *fiber.Ctx) error {
 	// check session
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
 	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		return c.Redirect("/login", 301)
-	}
 
 	// For display Currency List on List Box
 	currencyList := []models.CurrencyList{}
@@ -262,11 +255,9 @@ func PaymentRequestPost(c *fiber.Ctx) error {
 func PayLinksListViews(c *fiber.Ctx) error {
 
 	// check session
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
 	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		return c.Redirect("/login", 301)
-	}
 	LoginMerchantID := s.Get("LoginMerchantID")
 
 	// Get query parameters for page and limit
@@ -303,11 +294,9 @@ func PayLinksListViews(c *fiber.Ctx) error {
 // Function for Display Pay Request form in merchant section
 func PayLinksViews(c *fiber.Ctx) error {
 	// check session
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
 	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		return c.Redirect("/login", 301)
-	}
 
 	// For display Currency List on List Box
 	currencyList := []models.CurrencyList{}
@@ -328,11 +317,10 @@ func PayLinkPost(c *fiber.Ctx) error {
 	// Get Data from ajax
 	////////////////////////////////////
 	// check session
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
 	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		return c.Redirect("/login", 301)
-	}
+
 	Alerts := ""
 	CID := s.Get("LoginMerchantID").(uint)
 	Ip := c.Context().RemoteIP().String()
@@ -427,7 +415,7 @@ func PayDataPost(c *fiber.Ctx) error {
 	///////////////////////////
 
 	if price_amount == "" || price_currency == "" || req.Cid == "" {
-		return c.Redirect("/login", 301)
+		return c.Redirect("/logout")
 
 	}
 

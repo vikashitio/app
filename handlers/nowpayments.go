@@ -27,13 +27,9 @@ func AddCryptoView(c *fiber.Ctx) error {
 	//VID := c.Params("VID")
 
 	// check session
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
 	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		fmt.Println("Session Expired")
-		fmt.Println("Session Expired104")
-		return c.Redirect("/login", 301)
-	}
 	// Get value
 	LoginMerchantID := s.Get("LoginMerchantID")
 	//voltID := s.Get("LoginVoltID")
@@ -180,13 +176,10 @@ func RequestCryptoView(c *fiber.Ctx) error {
 
 // Function for Submit coin Request Form
 func RequestCryptoPost(c *fiber.Ctx) error {
-
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
-	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		fmt.Println("Session Expired108")
-		return c.Redirect("/login")
-	}
+	//merchantData := s.Get("MerchantData")
+
 	Alerts := "Transfer Process"
 
 	randomID, err := function.GenerateRandomID(16) // 16 bytes will give us a 32 character hex string
@@ -286,12 +279,9 @@ func RequestCryptoPost(c *fiber.Ctx) error {
 func TransactionsNPView(c *fiber.Ctx) error {
 
 	// check session
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
 	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		fmt.Println("Session Expired109")
-		return c.Redirect("/login")
-	}
 	LoginMerchantID := s.Get("LoginMerchantID")
 
 	// Get query parameters for page and limit

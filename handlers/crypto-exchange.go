@@ -15,12 +15,10 @@ import (
 // Function for For convert crypto to USDT in Merchant section http://localhost:3000/crypto-exchange
 func CryptoExchangeView(c *fiber.Ctx) error {
 	// check session
+	MerchantSession(c) // redirect when session not found
 	s, _ := store.Get(c)
 	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		fmt.Println("Session Expired116")
-		return c.Redirect("/login", 301)
-	}
+
 	LoginMerchantID := s.Get("LoginMerchantID")
 
 	assetList := []models.CoinWithBalance{}
@@ -44,12 +42,9 @@ func CryptoExchangeView(c *fiber.Ctx) error {
 // function for Post Crypto Exchange Data
 func CryptoExchangePost(c *fiber.Ctx) error {
 	// check session
-	s, _ := store.Get(c)
-	merchantData := s.Get("MerchantData")
-	if merchantData == nil {
-		fmt.Println("Session Expired116")
-		return c.Redirect("/login", 301)
-	}
+	MerchantSession(c) // redirect when session not found
+	//s, _ := store.Get(c)
+	//merchantData := s.Get("MerchantData")
 
 	//LoginMerchantID := s.Get("LoginMerchantID")
 
